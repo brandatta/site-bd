@@ -4,34 +4,25 @@ from PIL import Image
 # ================== CONFIG ==================
 st.set_page_config(page_title="Brandatta - Servicios", layout="wide")
 
-# ================== ESTILOS ==================
+# ================== ESTILOS (Minimal + fondo) ==================
 st.markdown("""
 <style>
   html, body, [data-testid="stAppViewContainer"] { background: #d4fbd7 !important; }
   header {visibility: hidden;}  #MainMenu {visibility: hidden;}  footer {visibility: hidden;}
 
-  /* Contenedor central propio */
-  .center-screen {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;   /* ocupa toda la altura */
-    text-align: center;
-  }
-
-  /* Logo titilante */
+  /* Logo titilante: apuntamos a la img renderizada por st.image */
   @keyframes blink {
     0% { opacity: 1; transform: scale(1); }
     50% { opacity: .35; transform: scale(1.02); }
     100% { opacity: 1; transform: scale(1); }
   }
-  .center-screen img {
+  .stImage img {
     animation: blink 1.6s ease-in-out infinite;
-    max-width: 220px !important;
-    width: 220px !important;
+    max-width: 220px !important;       /* más chico */
+    width: 220px !important;            /* fuerza ancho */
     height: auto !important;
-    margin-bottom: 1.5rem;
+    display: block;
+    margin: 0 auto;                     /* centrado */
   }
 
   /* Botón Ingresar */
@@ -65,24 +56,24 @@ if "ingresado" not in st.session_state:
 
 # ================== PORTADA ==================
 if not st.session_state.ingresado:
-    st.markdown("<div class='center-screen'>", unsafe_allow_html=True)
+    st.write("")
+    _, c2, _ = st.columns([1,2,1])
+    with c2:
+        try:
+            logo = Image.open("logo.png")
+            # No usamos container width para respetar el tamaño CSS (220px)
+            st.image(logo, use_container_width=False)
+        except Exception:
+            st.markdown("<p style='text-align:center;font-weight:600;'>Colocá un archivo <code>logo.png</code> en la carpeta de la app.</p>", unsafe_allow_html=True)
 
-    try:
-        logo = Image.open("logo.png")
-        st.image(logo, use_container_width=False)
-    except Exception:
-        st.markdown("<p style='font-weight:600;'>Colocá un archivo <code>logo.png</code> en la carpeta de la app.</p>", unsafe_allow_html=True)
-
-    st.markdown("<div class='ingresar'>", unsafe_allow_html=True)
-    if st.button("Ingresar"):
-        st.session_state.ingresado = True
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    st.markdown("</div>", unsafe_allow_html=True)  # cierre del contenedor
+        st.markdown("<div class='ingresar' style='text-align:center;margin-top:1rem;'>", unsafe_allow_html=True)
+        if st.button("Ingresar"):
+            st.session_state.ingresado = True
+        st.markdown("</div>", unsafe_allow_html=True)
 
 # ================== HOME (Tarjetas de servicios) ==================
 else:
-    st.markdown("<h2 style='margin:0 0 .6rem 0;text-align:center;'>Servicios</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='margin:0 0 .6rem 0;'>Servicios</h2>", unsafe_allow_html=True)
 
     servicios = [
         "Consultoría & Discovery",
