@@ -10,7 +10,17 @@ st.markdown("""
   html, body, [data-testid="stAppViewContainer"] { background: #d4fbd7 !important; }
   header {visibility: hidden;}  #MainMenu {visibility: hidden;}  footer {visibility: hidden;}
 
-  /* Logo titilante: apuntamos a la img renderizada por st.image */
+  /* Contenedor centrado */
+  .center-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 85vh;  /* ocupa casi toda la pantalla */
+    text-align: center;
+  }
+
+  /* Logo titilante */
   @keyframes blink {
     0% { opacity: 1; transform: scale(1); }
     50% { opacity: .35; transform: scale(1.02); }
@@ -18,11 +28,10 @@ st.markdown("""
   }
   .stImage img {
     animation: blink 1.6s ease-in-out infinite;
-    max-width: 220px !important;       /* más chico */
-    width: 220px !important;            /* fuerza ancho */
+    max-width: 220px !important;
+    width: 220px !important;
     height: auto !important;
-    display: block;
-    margin: 0 auto;                     /* centrado */
+    margin-bottom: 1.2rem;
   }
 
   /* Botón Ingresar */
@@ -33,20 +42,6 @@ st.markdown("""
     border: 1px solid rgba(0,0,0,0.15);
     background: white;
   }
-
-  /* Tarjetas */
-  .card {
-    border: 1px solid rgba(0,0,0,0.10);
-    border-radius: 18px;
-    padding: 18px 16px;
-    background: white;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-    transition: transform .12s ease, box-shadow .12s ease;
-    min-height: 120px;
-    display: flex; align-items: center; justify-content: center; text-align: center;
-  }
-  .card:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(0,0,0,0.08); }
-  .card h3 { margin: 0; font-size: 1.05rem; letter-spacing: .2px; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -56,20 +51,19 @@ if "ingresado" not in st.session_state:
 
 # ================== PORTADA ==================
 if not st.session_state.ingresado:
-    st.write("")
-    _, c2, _ = st.columns([1,2,1])
-    with c2:
-        try:
-            logo = Image.open("logo.png")
-            # No usamos container width para respetar el tamaño CSS (220px)
-            st.image(logo, use_container_width=False)
-        except Exception:
-            st.markdown("<p style='text-align:center;font-weight:600;'>Colocá un archivo <code>logo.png</code> en la carpeta de la app.</p>", unsafe_allow_html=True)
+    # Contenedor centrado
+    st.markdown("<div class='center-container'>", unsafe_allow_html=True)
+    try:
+        logo = Image.open("logo.png")
+        st.image(logo, use_container_width=False)
+    except Exception:
+        st.markdown("<p style='font-weight:600;'>Colocá un archivo <code>logo.png</code> en la carpeta de la app.</p>", unsafe_allow_html=True)
 
-        st.markdown("<div class='ingresar' style='text-align:center;margin-top:1rem;'>", unsafe_allow_html=True)
-        if st.button("Ingresar"):
-            st.session_state.ingresado = True
-        st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("<div class='ingresar'>", unsafe_allow_html=True)
+    if st.button("Ingresar"):
+        st.session_state.ingresado = True
+    st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # ================== HOME (Tarjetas de servicios) ==================
 else:
