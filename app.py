@@ -71,7 +71,8 @@ if not st.session_state.ingresado:
     with c2:
         try:
             logo = Image.open("logo.png")
-            st.image(logo, use_column_width=True, output_format="PNG", caption=None)
+            # 🔁 Cambio: use_container_width en lugar de use_column_width
+            st.image(logo, use_container_width=True, output_format="PNG", caption=None)
         except Exception:
             st.write("")
             st.markdown("<p style='text-align:center;font-weight:600;'>Colocá un archivo <code>logo.png</code> en la carpeta de la app.</p>", unsafe_allow_html=True)
