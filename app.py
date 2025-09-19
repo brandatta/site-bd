@@ -10,22 +10,24 @@ st.markdown("""
   html, body, [data-testid="stAppViewContainer"] {
     background: #d4fbd7 !important;
   }
-  /* Ocultar menú/footers para look minimal */
   header {visibility: hidden;}
   #MainMenu {visibility: hidden;}
   footer {visibility: hidden;}
 
-  /* Logo titilante */
+  /* Logo titilante aplicado a la imagen */
   @keyframes blink {
     0% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.35; transform: scale(1.02); }
     100% { opacity: 1; transform: scale(1); }
   }
-  .blink-logo {
+  .blink-logo img {
     animation: blink 1.6s ease-in-out infinite;
+    max-width: 220px !important; /* tamaño reducido */
+    margin: 0 auto;
+    display: block;
   }
 
-  /* Botón Ingresar centrado y minimal */
+  /* Botón Ingresar */
   .ingresar button {
     border-radius: 999px;
     padding: 0.7rem 1.2rem;
@@ -66,25 +68,22 @@ if "ingresado" not in st.session_state:
 
 # ================== PORTADA ==================
 if not st.session_state.ingresado:
-    st.write("")  # pequeño spacer
+    st.write("")
     c1, c2, c3 = st.columns([1,2,1])
     with c2:
         try:
             logo = Image.open("logo.png")
-            # 🔁 Cambio: use_container_width en lugar de use_column_width
-            st.image(logo, use_container_width=True, output_format="PNG", caption=None)
+            st.image(logo, use_container_width=False, output_format="PNG", caption=None)
+            # Aplicamos clase CSS para animación
+            st.markdown("<div class='blink-logo'></div>", unsafe_allow_html=True)
         except Exception:
             st.write("")
             st.markdown("<p style='text-align:center;font-weight:600;'>Colocá un archivo <code>logo.png</code> en la carpeta de la app.</p>", unsafe_allow_html=True)
-        st.markdown("<div class='blink-logo' style='text-align:center;margin-top:-1rem;'> </div>", unsafe_allow_html=True)
 
-        st.markdown("<div style='text-align:center;margin-top:0.25rem;margin-bottom:0.75rem;font-size:1.1rem;font-weight:600;'>Ingresar</div>", unsafe_allow_html=True)
-        col_btn = st.container()
-        with col_btn:
-            st.markdown("<div class='ingresar' style='text-align:center;'>", unsafe_allow_html=True)
-            if st.button("Ingresar"):
-                st.session_state.ingresado = True
-            st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("<div class='ingresar' style='text-align:center;margin-top:1rem;'>", unsafe_allow_html=True)
+        if st.button("Ingresar"):
+            st.session_state.ingresado = True
+        st.markdown("</div>", unsafe_allow_html=True)
 
 # ================== HOME (Tarjetas de servicios) ==================
 else:
