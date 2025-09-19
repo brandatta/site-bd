@@ -33,19 +33,18 @@ st.markdown("""
 if "ingresado" not in st.session_state:
     st.session_state.ingresado = False
 
-# Soporte para query params (click en botón HTML)
+# Soporte para query params (click del botón HTML)
 qp = st.query_params
 if not st.session_state.ingresado and qp.get("ing", ["0"])[0] == "1":
     st.session_state.ingresado = True
-    # Limpiar el query param para no quedar “pegado” al refrescar
     try:
         del qp["ing"]
     except Exception:
         pass
 
-# ================== PORTADA (HTML full-screen centrado) ==================
+# ================== PORTADA (HTML centrado en 800px de alto) ==================
 if not st.session_state.ingresado:
-    # Cargar logo y pasarlo a base64 para usarlo en <img>
+    # Pasar logo a base64 para <img>
     try:
         logo = Image.open("logo.png")
         buf = BytesIO()
@@ -53,17 +52,17 @@ if not st.session_state.ingresado:
         b64 = base64.b64encode(buf.getvalue()).decode()
         img_src = f"data:image/png;base64,{b64}"
     except Exception:
-        # Fallback: texto si no hay logo
         img_src = ""
 
     st_html(f"""
     <div style="
-        height: 100vh;
+        height: 100%;
         width: 100%;
+        min-height: 100%;
         display: flex;
         align-items: center;
         justify-content: center;">
-      <div style="text-align:center;">
+      <div style="text-align:center; max-width: 90vw;">
         {'<img src="'+img_src+'" alt="logo" style="max-width:220px;width:220px;height:auto;animation: blink 1.6s ease-in-out infinite; display:block; margin:0 auto 16px auto;" />' if img_src else '<div style="font-weight:600;margin-bottom:16px;">Subí <code>logo.png</code></div>'}
         <button id="ingresar"
           style="
@@ -74,6 +73,10 @@ if not st.session_state.ingresado:
       </div>
     </div>
     <style>
+      html, body {{
+        margin: 0; padding: 0; height: 100%;
+        overflow: hidden;
+      }}
       @keyframes blink {{
         0% {{ opacity: 1; transform: scale(1); }}
         50% {{ opacity: .35; transform: scale(1.02); }}
@@ -90,7 +93,7 @@ if not st.session_state.ingresado:
         }});
       }}
     </script>
-    """, height=0)  # height=0 => ocupa la altura del contenido (100vh)
+    """, height=800)  # ⬅️ altura visible del iframe (podés subir a 900/1000 si querés)
     st.stop()
 
 # ================== HOME (Tarjetas de servicios) ==================
