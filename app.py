@@ -4,20 +4,21 @@ from PIL import Image
 # ================== CONFIG ==================
 st.set_page_config(page_title="Brandatta - Servicios", layout="wide")
 
-# ================== ESTILOS (Minimal + fondo) ==================
+# ================== ESTILOS (fondo + centrado absoluto) ==================
 st.markdown("""
 <style>
   html, body, [data-testid="stAppViewContainer"] { background: #d4fbd7 !important; }
   header {visibility: hidden;}  #MainMenu {visibility: hidden;}  footer {visibility: hidden;}
 
-  /* Contenedor centrado */
-  .center-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 85vh;  /* ocupa casi toda la pantalla */
-    text-align: center;
+  /* Centrado absoluto del contenido de la página */
+  .block-container {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 100vh !important; /* ocupa toda la altura visible */
   }
 
   /* Logo titilante */
@@ -31,7 +32,8 @@ st.markdown("""
     max-width: 220px !important;
     width: 220px !important;
     height: auto !important;
-    margin-bottom: 1.2rem;
+    display: block;
+    margin: 0 auto 1.2rem auto;  /* centrado + separación con el botón */
   }
 
   /* Botón Ingresar */
@@ -42,6 +44,20 @@ st.markdown("""
     border: 1px solid rgba(0,0,0,0.15);
     background: white;
   }
+
+  /* Tarjetas */
+  .card {
+    border: 1px solid rgba(0,0,0,0.10);
+    border-radius: 18px;
+    padding: 18px 16px;
+    background: white;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    transition: transform .12s ease, box-shadow .12s ease;
+    min-height: 120px;
+    display: flex; align-items: center; justify-content: center; text-align: center;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(0,0,0,0.08); }
+  .card h3 { margin: 0; font-size: 1.05rem; letter-spacing: .2px; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -51,10 +67,9 @@ if "ingresado" not in st.session_state:
 
 # ================== PORTADA ==================
 if not st.session_state.ingresado:
-    # Contenedor centrado
-    st.markdown("<div class='center-container'>", unsafe_allow_html=True)
     try:
         logo = Image.open("logo.png")
+        # Respetamos el tamaño CSS (220px), por eso no usamos container width
         st.image(logo, use_container_width=False)
     except Exception:
         st.markdown("<p style='font-weight:600;'>Colocá un archivo <code>logo.png</code> en la carpeta de la app.</p>", unsafe_allow_html=True)
@@ -62,7 +77,6 @@ if not st.session_state.ingresado:
     st.markdown("<div class='ingresar'>", unsafe_allow_html=True)
     if st.button("Ingresar"):
         st.session_state.ingresado = True
-    st.markdown("</div>", unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ================== HOME (Tarjetas de servicios) ==================
