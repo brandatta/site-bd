@@ -29,7 +29,7 @@ if not st.session_state.ingresado:
     </style>
     """, unsafe_allow_html=True)
 
-    # ---- Logo centrado con HTML (base64) para evitar desalineos de st.image ----
+    # ---- Logo centrado con HTML (base64) ----
     logo_html = ""
     try:
         logo = Image.open("logo.png")
@@ -56,44 +56,37 @@ if not st.session_state.ingresado:
 
 # ================== SERVICIOS ==================
 else:
-    # ---- Estilos servicios: minimal total, fondo blanco, tarjetas blancas y bordes rectos ----
+    # ---- Estilos servicios: tarjetas cuadradas, minimal, bordes rectos ----
     st.markdown("""
     <style>
       [data-testid="stAppViewContainer"] { background: #ffffff !important; }
       header {visibility: hidden;}  #MainMenu {visibility: hidden;}  footer {visibility: hidden;}
 
-      /* Contenedor ancho máximo para centrar la grilla sin ocupar toda la pantalla */
       .wrap { max-width: 1120px; margin: 0 auto; }
 
-      /* Tarjeta minimal: blanca, SIN sombra, bordes rectos y finos (#d4fbd7) */
       .card {
         background: #ffffff;
         border: 1px solid #d4fbd7;
-        border-radius: 0;           /* bordes rectos */
-        padding: 22px 18px;
-        min-height: 110px;
-
-        display: flex; align-items: center; justify-content: center; text-align: center;
-
-        transition: border-color .12s ease, background-color .12s ease;
+        border-radius: 0;              /* bordes rectos */
+        aspect-ratio: 1 / 1;           /* cuadrado perfecto */
+        width: 100%;                   /* ocupa ancho de columna */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        transition: border-color .12s ease;
       }
 
-      /* Hover muy sutil (sin sombra) */
       .card:hover {
-        border-color: #bff3c5;      /* leve énfasis */
-        background-color: #ffffff;  /* se mantiene blanco */
+        border-color: #bff3c5;
       }
 
       .card h3 {
         margin: 0;
-        font-size: 1.0rem;
+        font-size: 1rem;
         font-weight: 600;
-        letter-spacing: .15px;
-        color: #111827; /* gris oscuro sobrio */
+        color: #111827;
       }
-
-      /* Separación mínima entre filas en pantallas chicas */
-      .row-gap { margin-bottom: 10px; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -109,7 +102,6 @@ else:
         "Soporte & Capacitación"
     ]
 
-    # 3 x 2 grid (dentro del contenedor centrado)
     for fila in range(2):
         cols = st.columns(3, gap="large")
         for i, col in enumerate(cols):
@@ -118,7 +110,6 @@ else:
                 continue
             with col:
                 st.markdown(f"<div class='card'><h3>{servicios[idx]}</h3></div>", unsafe_allow_html=True)
-        st.markdown("<div class='row-gap'></div>", unsafe_allow_html=True)
 
-    st.markdown("</div>", unsafe_allow_html=True)  # cierre .wrap
+    st.markdown("</div>", unsafe_allow_html=True)
     st.caption("Tip: cambiá los títulos en la lista `servicios` para personalizar las tarjetas.")
