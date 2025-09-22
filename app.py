@@ -16,7 +16,7 @@ if "nav" not in st.session_state or st.session_state.get("nav") not in opciones_
 
 # ================== PORTADA ==================
 if not st.session_state.ingresado:
-    # Estilos portada (margen superior reducido)
+    # Estilos portada (margen superior MUY reducido)
     st.markdown("""
     <style>
       html, body, [data-testid="stAppViewContainer"] { background: #d4fbd7 !important; }
@@ -28,7 +28,7 @@ if not st.session_state.ingresado:
         100% { opacity: 1; transform: scale(1); }
       }
 
-      .hero-wrap { padding: 6vh 0 4vh; } /* antes: 12vh 0 6vh */
+      .hero-wrap { padding: 2vh 0 1vh; } /* antes 6vh 0 4vh */
     </style>
     """, unsafe_allow_html=True)
 
@@ -48,7 +48,7 @@ if not st.session_state.ingresado:
 
     st.markdown(f"<div class='hero-wrap'>{logo_html}</div>", unsafe_allow_html=True)
 
-    # Botón debajo del logo, centrado
+    # Botón justo debajo del logo, centrado
     c1, c2, c3 = st.columns([1,1,1])
     with c2:
         if st.button("Ingresar"):
@@ -61,14 +61,13 @@ else:
       [data-testid="stAppViewContainer"] { background: #ffffff !important; }
       header {visibility: hidden;}  #MainMenu {visibility: hidden;}  footer {visibility: hidden;}
 
-      .wrap { max-width: 1120px; margin: 0 auto; padding: 0 8px 32px; } /* antes: 8px 8px 40px */
+      .wrap { max-width: 1120px; margin: 0 auto; padding: 0 8px 24px; } /* menos padding arriba y abajo */
 
       /* Dropdown minimal (bordes rectos) */
       .nav-select .stSelectbox > div > div {
         border-radius: 0 !important;
         border: 1px solid #e5e5e7 !important;
       }
-      .nav-select label { font-weight: 600; margin-bottom: 6px; }
 
       /* Tarjetas rectangulares minimal */
       .tile { width: 240px; margin: 0 auto; }
@@ -93,18 +92,17 @@ else:
         color: #111827;
       }
 
-      .row-spacer { height: 36px; } /* un poco menos alta también */
-      .title { text-align:center; font-weight:700; font-size:1.20rem; margin: 4px 0 12px 0; } /* margen superior reducido */
-
-      .section h3 { margin: 0 0 8px 0; font-size: 1.05rem; }
-      .section p  { margin: 0 0 6px 0; color: #333; }
-      .hairline   { border-top: 1px solid #e5e5e7; margin: 10px 0 14px 0; }
+      .row-spacer { height: 16px; } /* separación vertical aún menor */
+      .title { text-align:center; font-weight:700; font-size:1.18rem; margin: 0 0 8px 0; } /* margen superior 0 */
+      .hairline   { border-top: 1px solid #e5e5e7; margin: 8px 0 12px 0; }
+      .section h3 { margin: 0 0 6px 0; font-size: 1.02rem; }
+      .section p  { margin: 0 0 4px 0; color: #333; }
     </style>
     """, unsafe_allow_html=True)
 
     st.markdown("<div class='wrap'>", unsafe_allow_html=True)
 
-    # Menú desplegable centrado (sin spacer extra)
+    # Menú desplegable centrado, sin label visible (quita espacio extra)
     s1, s2, s3 = st.columns([1,2,1])
     with s2:
         st.markdown("<div class='nav-select'>", unsafe_allow_html=True)
@@ -113,7 +111,13 @@ else:
             idx = opciones_nav.index(nav_actual)
         except ValueError:
             idx = 0
-        seleccion = st.selectbox("Navegación", opciones_nav, index=idx, key="nav_select")
+        seleccion = st.selectbox(
+            label="Navegación",
+            options=opciones_nav,
+            index=idx,
+            key="nav_select",
+            label_visibility="collapsed"  # quita margen del label
+        )
         st.session_state.nav = seleccion
         st.markdown("</div>", unsafe_allow_html=True)
 
