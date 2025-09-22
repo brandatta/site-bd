@@ -96,7 +96,8 @@ else:
       header {visibility: hidden;}  #MainMenu {visibility: hidden;}  footer {visibility: hidden;}
       .block-container, [data-testid="block-container"] { padding-top: 0 !important; padding-bottom: 0 !important; }
 
-      .wrap { max-width: 1120px; margin: 0 auto; padding: 0 8px 16px; }
+      /* Ampliamos el contenedor para 3 columnas de 440px */
+      .wrap { max-width: 1440px; margin: 0 auto; padding: 0 8px 16px; }
 
       /* Dropdown minimal (bordes rectos) + Manjari adentro */
       .nav-select .stSelectbox > div > div {
@@ -107,42 +108,44 @@ else:
         font-family: 'Manjari', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important;
       }
 
-      /* Tarjetas rectangulares minimal */
-      .tile { width: 220px; margin: 0 auto; }
-      @media (max-width: 900px){ .tile{ width:200px; } }
-      @media (max-width: 680px){ .tile{ width:180px; } }
+      /* ===== Tarjetas rectangulares (DOBLE tamaño) ===== */
+      .tile { width: 440px; margin: 0 auto; }                 /* antes 220px */
+      @media (max-width: 1200px){ .tile{ width: 400px; } }    /* antes 200px */
+      @media (max-width: 900px){  .tile{ width: 360px; } }    /* antes 180px */
 
       .card {
         background: #ffffff;
         border: 1px solid #d4fbd7;
         border-radius: 0;
-        height: 110px;
+        height: 220px;                                        /* antes 110px */
         display: flex; align-items: center; justify-content: center; text-align: center;
         transition: border-color .12s ease, transform .12s ease;
       }
       .card:hover { border-color: #bff3c5; transform: translateY(-1px); }
 
-      /* >>> Fuerzo Manjari dentro de la tarjeta y todos sus hijos <<< */
+      /* Forzar Manjari dentro de la tarjeta y todos sus hijos */
       .card, .card * {
         font-family: 'Manjari', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important;
       }
 
       .card h3 {
         margin: 0;
-        font-size: 0.95rem;
+        font-size: 1.05rem;   /* un poquito más grande para el nuevo tamaño */
         font-weight: 700;
         letter-spacing: .15px;
         color: #111827;
+        line-height: 1.25;
+        padding: 0 12px;      /* respirito lateral por si son textos largos */
       }
 
-      .row-spacer { height: 10px; }
+      .row-spacer { height: 12px; }
       .title {
-        text-align:center; font-weight:700; font-size:1.15rem; margin: 0 0 6px 0;
+        text-align:center; font-weight:700; font-size:1.2rem; margin: 0 0 8px 0;
         font-family: 'Manjari', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important;
       }
-      .hairline   { border-top: 1px solid #e5e5e7; margin: 6px 0 10px 0; }
-      .section h3 { margin: 0 0 4px 0; font-size: 1.0rem; font-weight:700; }
-      .section p  { margin: 0 0 3px 0; color: #333; font-size: 0.95rem; font-weight:400; }
+      .hairline   { border-top: 1px solid #e5e5e7; margin: 8px 0 12px 0; }
+      .section h3 { margin: 0 0 6px 0; font-size: 1.05rem; font-weight:700; }
+      .section p  { margin: 0 0 4px 0; color: #333; font-size: 0.98rem; font-weight:400; }
     </style>
     """, unsafe_allow_html=True)
 
