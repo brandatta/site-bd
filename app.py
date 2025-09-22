@@ -2,7 +2,6 @@ import streamlit as st
 from PIL import Image
 import base64
 from io import BytesIO
-from streamlit.components.v1 import html as st_html
 
 # ================== CONFIG ==================
 st.set_page_config(page_title="Brandatta - Servicios", layout="wide")
@@ -15,195 +14,167 @@ opciones_nav = ["Servicios", "Contacto", "Acerca de nosotros", "Clientes"]
 if "nav" not in st.session_state or st.session_state.get("nav") not in opciones_nav:
     st.session_state.nav = "Servicios"
 
-# ================== ROUTING POR QUERY PARAM (desde el botón HTML) ==================
-qp = st.query_params
-if not st.session_state.ingresado and qp.get("ing", ["0"])[0] == "1":
-    st.session_state.ingresado = True
-    # Limpio el query param para no quedar pegado
+# ===== Helper: logo a <img> base64 centrado =====
+def logo_html_src(path="logo.png", width_px=200):
     try:
-        del qp["ing"]
-    except Exception:
-        pass
-
-# ================== PORTADA (HTML FULLSCREEN, CENTRADO REAL) ==================
-if not st.session_state.ingresado:
-    # Convierto el logo a base64 para usarlo en <img>
-    try:
-        logo = Image.open("logo.png")
-        buf = BytesIO(); logo.save(buf, format="PNG")
+        img = Image.open(path)
+        buf = BytesIO(); img.save(buf, format="PNG")
         b64 = base64.b64encode(buf.getvalue()).decode()
-        img_tag = f'<img src="data:image/png;base64,{b64}" alt="logo" />'
+        return f'<img src="data:image/png;base64,{b64}" alt="logo" style="width:{width_px}px;max-width:{width_px}px;height:auto;display:block;margin:0 auto;" />'
     except Exception:
-        img_tag = '<div style="font-weight:600;">Subí <code>logo.png</code> a la carpeta de la app.</div>'
+        return "<p style='text-align:center;font-weight:600;margin:0;'>Subí <code>logo.png</code> a la carpeta de la app.</p>"
 
-    st_html(f"""
-    <div style="
-      height: 100vh;
-      width: 100%;
-      background: #d4fbd7;
-      display: flex;
-      align-items: center;
-      justify-content: center;">
-      <div style="text-align:center;">
-        <style>
-          @keyframes blink {{
-            0% {{ opacity: 1; transform: scale(1); }}
-            50% {{ opacity: .35; transform: scale(1.02); }}
-            100% {{ opacity: 1; transform: scale(1); }}
-          }}
-          .logo-brandatta {{
-            width: 200px; max-width: 200px; height: auto;
-            animation: blink 1.6s ease-in-out infinite;
-            display: block; margin: 0 auto 14px auto;
-          }}
-          .cta {{
-            border-radius: 0;
-            padding: 10px 18px;
-            font-weight: 600;
-            border: 1px solid rgba(0,0,0,0.15);
-            background: #fff;
-            cursor: pointer;
-          }}
-          .cta:hover {{ background:#f6f6f6; }}
-          body, html {{ margin:0; padding:0; }}
-        </style>
-        {img_tag.replace('<img ', '<img class="logo-brandatta" ')}
-        <button id="ingresar" class="cta">Ingresar</button>
-      </div>
-    </div>
-    <script>
-      const btn = document.getElementById('ingresar');
-      if (btn) {{
-        btn.addEventListener('click', () => {{
-          const url = new URL(window.top.location);
-          url.searchParams.set('ing', '1');
-          window.top.location = url.toString();
-        }});
-      }}
-    </script>
-    """, height=800)  # altura del iframe; centra dentro con 100vh
-    st.stop()
+# ================== PORTADA (centrada, sin márgenes blancos) ==================
+if not st.session_state.ingresado:
+    st.markdown("""
+    <style>
+      /* Fondo total en portada: sin márgenes blancos */
+      html, body, [data-testid="stAppViewContainer"] { background: #d4fbd7 !important; }
 
-# ================== CONTENIDO (DROPDOWN + TARJETAS RECTANGULARES COMPACTAS) ==================
-st.markdown("""
-<style>
-  /* Contenido compacto */
-  [data-testid="stAppViewContainer"] { background: #ffffff !important; }
-  header {visibility: hidden;}  #MainMenu {visibility: hidden;}  footer {visibility: hidden;}
+      /* Ocultar chrome de Streamlit para look minimal */
+      header {visibility: hidden;}  #MainMenu {visibility: hidden;}  footer {visibility: hidden;}
 
-  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 8px 16px; }
+      /* Eliminar padding por defecto y centrar en viewport */
+      .block-container, [data-testid="block-container"] {
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        min-height: 100vh !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;      /* centra horizontal */
+        justify-content: center !important;   /* centra vertical */
+        gap: 14px; /* distancia entre logo y botón */
+      }
 
-  /* Dropdown minimal (bordes rectos) */
-  .nav-select .stSelectbox > div > div {
-    border-radius: 0 !important;
-    border: 1px solid #e5e5e7 !important;
-  }
+      /* Titilado suave del logo */
+      @keyframes blink { 0%{opacity:1;transform:scale(1);} 50%{opacity:.35;transform:scale(1.02);} 100%{opacity:1;transform:scale(1);} }
+      .hero-logo { animation: blink 1.6s ease-in-out infinite; }
+    </style>
+    """, unsafe_allow_html=True)
 
-  /* Tarjetas rectangulares minimal */
-  .tile { width: 220px; margin: 0 auto; }
-  @media (max-width: 900px){ .tile{ width:200px; } }
-  @media (max-width: 680px){ .tile{ width:180px; } }
+    # Logo (centrado por el contenedor flex)
+    st.markdown(logo_html_src(width_px=200).replace("<img ", "<img class='hero-logo' "), unsafe_allow_html=True)
 
-  .card {
-    background: #ffffff;
-    border: 1px solid #d4fbd7;
-    border-radius: 0;
-    height: 110px;
-    display: flex; align-items: center; justify-content: center; text-align: center;
-    transition: border-color .12s ease, transform .12s ease;
-  }
-  .card:hover { border-color: #bff3c5; transform: translateY(-1px); }
+    # Botón real de Streamlit (funciona siempre)
+    if st.button("Ingresar"):
+        st.session_state.ingresado = True
 
-  .card h3 {
-    margin: 0;
-    font-size: 0.95rem;
-    font-weight: 600;
-    letter-spacing: .15px;
-    color: #111827;
-  }
+# ================== CONTENIDO (dropdown + tarjetas rectangulares compactas) ==================
+else:
+    st.markdown("""
+    <style>
+      /* Restauro fondo blanco y mantengo márgenes compactos */
+      [data-testid="stAppViewContainer"] { background: #ffffff !important; }
+      header {visibility: hidden;}  #MainMenu {visibility: hidden;}  footer {visibility: hidden;}
+      .block-container, [data-testid="block-container"] { padding-top: 0 !important; padding-bottom: 0 !important; }
 
-  .row-spacer { height: 10px; }
-  .title { text-align:center; font-weight:700; font-size:1.15rem; margin: 0 0 6px 0; }
-  .hairline   { border-top: 1px solid #e5e5e7; margin: 6px 0 10px 0; }
-  .section h3 { margin: 0 0 4px 0; font-size: 1.0rem; }
-  .section p  { margin: 0 0 3px 0; color: #333; font-size: 0.95rem; }
-</style>
-""", unsafe_allow_html=True)
+      .wrap { max-width: 1120px; margin: 0 auto; padding: 0 8px 16px; }
 
-st.markdown("<div class='wrap'>", unsafe_allow_html=True)
+      /* Dropdown minimal (bordes rectos) */
+      .nav-select .stSelectbox > div > div {
+        border-radius: 0 !important;
+        border: 1px solid #e5e5e7 !important;
+      }
 
-# Dropdown centrado
-s1, s2, s3 = st.columns([1,2,1])
-with s2:
-    st.markdown("<div class='nav-select'>", unsafe_allow_html=True)
-    nav_actual = st.session_state.get("nav", "Servicios")
-    try:
-        idx = opciones_nav.index(nav_actual)
-    except ValueError:
-        idx = 0
-    seleccion = st.selectbox(
-        "Navegación",
-        opciones_nav,
-        index=idx,
-        key="nav_select",
-        label_visibility="collapsed"
-    )
-    st.session_state.nav = seleccion
+      /* Tarjetas rectangulares minimal */
+      .tile { width: 220px; margin: 0 auto; }
+      @media (max-width: 900px){ .tile{ width:200px; } }
+      @media (max-width: 680px){ .tile{ width:180px; } }
+
+      .card {
+        background: #ffffff;
+        border: 1px solid #d4fbd7;
+        border-radius: 0;
+        height: 110px;
+        display: flex; align-items: center; justify-content: center; text-align: center;
+        transition: border-color .12s ease, transform .12s ease;
+      }
+      .card:hover { border-color: #bff3c5; transform: translateY(-1px); }
+
+      .card h3 {
+        margin: 0;
+        font-size: 0.95rem;
+        font-weight: 600;
+        letter-spacing: .15px;
+        color: #111827;
+      }
+
+      .row-spacer { height: 10px; }
+      .title { text-align:center; font-weight:700; font-size:1.15rem; margin: 0 0 6px 0; }
+      .hairline   { border-top: 1px solid #e5e5e7; margin: 6px 0 10px 0; }
+      .section h3 { margin: 0 0 4px 0; font-size: 1.0rem; }
+      .section p  { margin: 0 0 3px 0; color: #333; font-size: 0.95rem; }
+    </style>
+    """, unsafe_allow_html=True)
+
+    st.markdown("<div class='wrap'>", unsafe_allow_html=True)
+
+    # Dropdown centrado sin label
+    s1, s2, s3 = st.columns([1,2,1])
+    with s2:
+        st.markdown("<div class='nav-select'>", unsafe_allow_html=True)
+        nav_actual = st.session_state.get("nav", "Servicios")
+        try:
+            idx = opciones_nav.index(nav_actual)
+        except ValueError:
+            idx = 0
+        seleccion = st.selectbox("Navegación", opciones_nav, index=idx, key="nav_select", label_visibility="collapsed")
+        st.session_state.nav = seleccion
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    # Contenido según selección
+    if st.session_state.nav == "Servicios":
+        st.markdown("<div class='title'>Servicios</div>", unsafe_allow_html=True)
+        servicios = [
+            "Consultoría & Discovery",
+            "Desarrollo de Aplicaciones",
+            "Integraciones (SAP / Ecommerce)",
+            "Tableros & Analytics",
+            "Automatizaciones & RPA",
+            "Soporte & Capacitación"
+        ]
+
+        cols = st.columns(3, gap="small")
+        for i, col in enumerate(cols):
+            with col:
+                st.markdown(f"<div class='tile'><div class='card'><h3>{servicios[i]}</h3></div></div>", unsafe_allow_html=True)
+
+        st.markdown("<div class='row-spacer'></div>", unsafe_allow_html=True)
+
+        cols2 = st.columns(3, gap="small")
+        for j, col in enumerate(cols2):
+            idx2 = 3 + j
+            with col:
+                st.markdown(f"<div class='tile'><div class='card'><h3>{servicios[idx2]}</h3></div></div>", unsafe_allow_html=True)
+
+    elif st.session_state.nav == "Contacto":
+        st.markdown("<div class='hairline'></div>", unsafe_allow_html=True)
+        st.markdown("""
+        <div class="section">
+          <h3>Contacto</h3>
+          <p>Email: contacto@brandatta.com</p>
+          <p>Teléfono: +54 11 0000-0000</p>
+          <p>Dirección: Buenos Aires, Argentina</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+    elif st.session_state.nav == "Acerca de nosotros":
+        st.markdown("<div class='hairline'></div>", unsafe_allow_html=True)
+        st.markdown("""
+        <div class="section">
+          <h3>Acerca de nosotros</h3>
+          <p>Construimos soluciones digitales a medida: integraciones con SAP y Ecommerce, tableros, automatizaciones y apps.</p>
+          <p>Enfocados en performance, UX minimalista y resultados de negocio.</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+    elif st.session_state.nav == "Clientes":
+        st.markdown("<div class='hairline'></div>", unsafe_allow_html=True)
+        st.markdown("""
+        <div class="section">
+          <h3>Clientes</h3>
+          <p>Trabajamos con compañías de retail, industria y servicios: Georgalos, Vicbor, ITPS, Biosidus, Glam, Espumas, Café Martínez, entre otros.</p>
+        </div>
+        """, unsafe_allow_html=True)
+
     st.markdown("</div>", unsafe_allow_html=True)
-
-# Contenido según selección
-if st.session_state.nav == "Servicios":
-    st.markdown("<div class='title'>Servicios</div>", unsafe_allow_html=True)
-    servicios = [
-        "Consultoría & Discovery",
-        "Desarrollo de Aplicaciones",
-        "Integraciones (SAP / Ecommerce)",
-        "Tableros & Analytics",
-        "Automatizaciones & RPA",
-        "Soporte & Capacitación"
-    ]
-
-    cols = st.columns(3, gap="small")
-    for i, col in enumerate(cols):
-        with col:
-            st.markdown(f"<div class='tile'><div class='card'><h3>{servicios[i]}</h3></div></div>", unsafe_allow_html=True)
-
-    st.markdown("<div class='row-spacer'></div>", unsafe_allow_html=True)
-
-    cols2 = st.columns(3, gap="small")
-    for j, col in enumerate(cols2):
-        idx2 = 3 + j
-        with col:
-            st.markdown(f"<div class='tile'><div class='card'><h3>{servicios[idx2]}</h3></div></div>", unsafe_allow_html=True)
-
-elif st.session_state.nav == "Contacto":
-    st.markdown("<div class='hairline'></div>", unsafe_allow_html=True)
-    st.markdown("""
-    <div class="section">
-      <h3>Contacto</h3>
-      <p>Email: contacto@brandatta.com</p>
-      <p>Teléfono: +54 11 0000-0000</p>
-      <p>Dirección: Buenos Aires, Argentina</p>
-    </div>
-    """, unsafe_allow_html=True)
-
-elif st.session_state.nav == "Acerca de nosotros":
-    st.markdown("<div class='hairline'></div>", unsafe_allow_html=True)
-    st.markdown("""
-    <div class="section">
-      <h3>Acerca de nosotros</h3>
-      <p>Construimos soluciones digitales a medida: integraciones con SAP y Ecommerce, tableros, automatizaciones y apps.</p>
-      <p>Enfocados en performance, UX minimalista y resultados de negocio.</p>
-    </div>
-    """, unsafe_allow_html=True)
-
-elif st.session_state.nav == "Clientes":
-    st.markdown("<div class='hairline'></div>", unsafe_allow_html=True)
-    st.markdown("""
-    <div class="section">
-      <h3>Clientes</h3>
-      <p>Trabajamos con compañías de retail, industria y servicios: Georgalos, Vicbor, ITPS, Biosidus, Glam, Espumas, Café Martínez, entre otros.</p>
-    </div>
-    """, unsafe_allow_html=True)
-
-st.markdown("</div>", unsafe_allow_html=True)
