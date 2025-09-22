@@ -14,81 +14,85 @@ opciones_nav = ["Servicios", "Contacto", "Acerca de nosotros", "Clientes"]
 if "nav" not in st.session_state or st.session_state.get("nav") not in opciones_nav:
     st.session_state.nav = "Servicios"
 
-# ================== PORTADA ==================
+# ================== PORTADA (CENTRADA) ==================
 if not st.session_state.ingresado:
+    # CSS SOLO para la portada: centro absoluto usando flex en el contenedor principal
     st.markdown("""
     <style>
-      /* mata el padding superior/inferior por defecto de Streamlit */
-      .block-container { padding-top: 0 !important; padding-bottom: 0 !important; }
-
       html, body, [data-testid="stAppViewContainer"] { background: #d4fbd7 !important; }
       header {visibility: hidden;}  #MainMenu {visibility: hidden;}  footer {visibility: hidden;}
 
-      @keyframes blink { 0%{opacity:1;transform:scale(1);} 50%{opacity:.35;transform:scale(1.02);} 100%{opacity:1;transform:scale(1);} }
+      /* Centro absoluto del contenido (logo + botón) */
+      .block-container {
+        min-height: 100vh !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        gap: 14px; /* espacio entre logo y botón */
+      }
 
-      /* contenedor del hero: prácticamente sin márgenes */
-      .hero-wrap { padding: 0.5vh 0 0 !important; }
-      /* reduce cualquier margin-top que pueda tener el primer bloque */
-      .hero-wrap:first-child { margin-top: 0 !important; }
+      @keyframes blink {
+        0% { opacity: 1; transform: scale(1); }
+        50% { opacity: .35; transform: scale(1.02); }
+        100% { opacity: 1; transform: scale(1); }
+      }
     </style>
     """, unsafe_allow_html=True)
 
-    # Logo centrado y pequeño
+    # Logo centrado (HTML base64) — 200px para estética compacta
     try:
         logo = Image.open("logo.png")
         buf = BytesIO(); logo.save(buf, format="PNG")
         b64 = base64.b64encode(buf.getvalue()).decode()
-        logo_html = f"""
-        <div style="display:flex;justify-content:center;">
-          <img src="data:image/png;base64,{b64}" alt="logo"
-               style="width:180px;max-width:180px;height:auto;animation:blink 1.6s ease-in-out infinite;" />
-        </div>
-        """
+        st.markdown(
+            f"""
+            <img src="data:image/png;base64,{b64}" alt="logo"
+                 style="width:200px;max-width:200px;height:auto;
+                        animation:blink 1.6s ease-in-out infinite; display:block;" />
+            """,
+            unsafe_allow_html=True,
+        )
     except Exception:
-        logo_html = "<p style='text-align:center;font-weight:600;margin:0;'>Subí <code>logo.png</code> a la carpeta de la app.</p>"
+        st.markdown(
+            "<p style='text-align:center;font-weight:600;margin:0;'>Subí <code>logo.png</code> a la carpeta de la app.</p>",
+            unsafe_allow_html=True,
+        )
 
-    st.markdown(f"<div class='hero-wrap'>{logo_html}</div>", unsafe_allow_html=True)
+    # Botón justo debajo (centrado por el flex del contenedor)
+    if st.button("Ingresar"):
+        st.session_state.ingresado = True
 
-    # Botón justo debajo del logo, sin espacios extra
-    c1, c2, c3 = st.columns([1,1,1])
-    with c2:
-        st.write("")  # casi nulo, conserva layout
-        if st.button("Ingresar"):
-            st.session_state.ingresado = True
-
-# ================== CONTENIDO ==================
+# ================== CONTENIDO (dropdown + tarjetas) ==================
 else:
     st.markdown("""
     <style>
-      /* elimina padding global del contenedor también aquí */
+      /* Restauro layout compacto para la vista de servicios */
       .block-container { padding-top: 0 !important; padding-bottom: 0 !important; }
 
       [data-testid="stAppViewContainer"] { background: #ffffff !important; }
       header {visibility: hidden;}  #MainMenu {visibility: hidden;}  footer {visibility: hidden;}
 
-      .wrap { max-width: 1120px; margin: 0 auto; padding: 0 8px 12px !important; } /* aún más chico */
+      .wrap { max-width: 1120px; margin: 0 auto; padding: 0 8px 16px; }
 
-      /* Dropdown minimal sin espacio extra */
+      /* Dropdown minimal (bordes rectos) */
       .nav-select .stSelectbox > div > div {
         border-radius: 0 !important;
         border: 1px solid #e5e5e7 !important;
       }
-      /* reduce el margen inferior del select */
-      .nav-select [data-baseweb="select"] { margin-bottom: 4px !important; }
 
-      /* columnas con menos padding lateral */
-      [data-testid="column"] { padding-left: 4px !important; padding-right: 4px !important; }
-
-      /* tarjetas rectangulares minimal */
-      .tile { width: 200px; margin: 0 auto; } /* más angostas */
-      @media (max-width: 900px){ .tile{ width:180px; } }
-      @media (max-width: 680px){ .tile{ width:170px; } }
+      /* Tarjetas rectangulares minimal */
+      .tile { width: 220px; margin: 0 auto; }
+      @media (max-width: 900px){ .tile{ width:200px; } }
+      @media (max-width: 680px){ .tile{ width:180px; } }
 
       .card {
         background: #ffffff;
         border: 1px solid #d4fbd7;
         border-radius: 0;
-        height: 110px; /* más bajas */
+        height: 110px;
         display: flex; align-items: center; justify-content: center; text-align: center;
         transition: border-color .12s ease, transform .12s ease;
       }
@@ -102,9 +106,9 @@ else:
         color: #111827;
       }
 
-      .row-spacer { height: 8px; } /* separación mínima entre filas */
-      .title { text-align:center; font-weight:700; font-size:1.1rem; margin: 0 0 6px 0 !important; }
-      .hairline   { border-top: 1px solid #e5e5e7; margin: 6px 0 8px 0 !important; }
+      .row-spacer { height: 10px; }
+      .title { text-align:center; font-weight:700; font-size:1.15rem; margin: 0 0 6px 0; }
+      .hairline   { border-top: 1px solid #e5e5e7; margin: 6px 0 10px 0; }
       .section h3 { margin: 0 0 4px 0; font-size: 1.0rem; }
       .section p  { margin: 0 0 3px 0; color: #333; font-size: 0.95rem; }
     </style>
@@ -112,10 +116,10 @@ else:
 
     st.markdown("<div class='wrap'>", unsafe_allow_html=True)
 
-    # Dropdown centrado sin label ni margen extra
+    # Dropdown centrado sin label
     s1, s2, s3 = st.columns([1,2,1])
     with s2:
-        st.markdown("<div class='nav-select' style='margin: 4px auto 2px;'>", unsafe_allow_html=True)
+        st.markdown("<div class='nav-select'>", unsafe_allow_html=True)
         nav_actual = st.session_state.get("nav", "Servicios")
         try:
             idx = opciones_nav.index(nav_actual)
@@ -131,6 +135,7 @@ else:
         st.session_state.nav = seleccion
         st.markdown("</div>", unsafe_allow_html=True)
 
+    # Contenido según selección
     if st.session_state.nav == "Servicios":
         st.markdown("<div class='title'>Servicios</div>", unsafe_allow_html=True)
         servicios = [
