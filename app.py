@@ -28,8 +28,14 @@ def logo_html_src(path="logo.png", width_px=200):
 if not st.session_state.ingresado:
     st.markdown("""
     <style>
-      /* Fondo total verde en portada */
-      html, body, [data-testid="stAppViewContainer"] { background: #d4fbd7 !important; }
+      /* Cargamos Manjari (Google Fonts) */
+      @import url('https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&display=swap');
+
+      /* Fondo total y tipografía global */
+      html, body, [data-testid="stAppViewContainer"] {
+        background: #d4fbd7 !important;
+        font-family: 'Manjari', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important;
+      }
       header {visibility: hidden;}  #MainMenu {visibility: hidden;}  footer {visibility: hidden;}
 
       /* 1) El contenedor principal ocupa 100vh y usa flex */
@@ -55,11 +61,12 @@ if not st.session_state.ingresado:
       /* Botón centrado y un poco más abajo */
       [data-testid="stVerticalBlock"]:first-of-type .stButton > button {
         display: block !important;
-        margin: 28px auto 0 auto !important;   /* <- antes 0; ahora 28px hacia abajo */
+        margin: 28px auto 0 auto !important;   /* separación extra bajo el logo */
         border-radius: 0 !important;
         border: 1px solid rgba(0,0,0,0.15) !important;
         background: #fff !important;
-        font-weight: 600 !important;
+        font-weight: 700 !important;
+        font-family: 'Manjari', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important;
         padding: 10px 18px !important;
         cursor: pointer;
       }
@@ -79,16 +86,26 @@ if not st.session_state.ingresado:
 else:
     st.markdown("""
     <style>
-      [data-testid="stAppViewContainer"] { background: #ffffff !important; }
+      /* Cargamos Manjari también en esta vista */
+      @import url('https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&display=swap');
+
+      [data-testid="stAppViewContainer"] {
+        background: #ffffff !important;
+        font-family: 'Manjari', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important;
+      }
       header {visibility: hidden;}  #MainMenu {visibility: hidden;}  footer {visibility: hidden;}
       .block-container, [data-testid="block-container"] { padding-top: 0 !important; padding-bottom: 0 !important; }
 
       .wrap { max-width: 1120px; margin: 0 auto; padding: 0 8px 16px; }
 
-      /* Dropdown minimal (bordes rectos) */
+      /* Dropdown minimal (bordes rectos) + tipografía Manjari adentro */
       .nav-select .stSelectbox > div > div {
         border-radius: 0 !important;
         border: 1px solid #e5e5e7 !important;
+        font-family: 'Manjari', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important;
+      }
+      .nav-select [data-baseweb="select"] * {
+        font-family: 'Manjari', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important;
       }
 
       /* Tarjetas rectangulares minimal */
@@ -103,22 +120,26 @@ else:
         height: 110px;
         display: flex; align-items: center; justify-content: center; text-align: center;
         transition: border-color .12s ease, transform .12s ease;
+        font-family: 'Manjari', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important;
       }
       .card:hover { border-color: #bff3c5; transform: translateY(-1px); }
 
       .card h3 {
         margin: 0;
         font-size: 0.95rem;
-        font-weight: 600;
+        font-weight: 700;
         letter-spacing: .15px;
         color: #111827;
       }
 
       .row-spacer { height: 10px; }
-      .title { text-align:center; font-weight:700; font-size:1.15rem; margin: 0 0 6px 0; }
+      .title {
+        text-align:center; font-weight:700; font-size:1.15rem; margin: 0 0 6px 0;
+        font-family: 'Manjari', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important;
+      }
       .hairline   { border-top: 1px solid #e5e5e7; margin: 6px 0 10px 0; }
-      .section h3 { margin: 0 0 4px 0; font-size: 1.0rem; }
-      .section p  { margin: 0 0 3px 0; color: #333; font-size: 0.95rem; }
+      .section h3 { margin: 0 0 4px 0; font-size: 1.0rem; font-weight:700; }
+      .section p  { margin: 0 0 3px 0; color: #333; font-size: 0.95rem; font-weight:400; }
     </style>
     """, unsafe_allow_html=True)
 
