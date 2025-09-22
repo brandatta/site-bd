@@ -24,51 +24,35 @@ if not st.session_state.ingresado:
         100% { opacity: 1; transform: scale(1); }
       }
 
-      /* Contenedor central */
-      .hero-wrap {
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-      }
-
-      .hero-wrap img {
-        width: 220px;
-        max-width: 220px;
-        height: auto;
-        animation: blink 1.6s ease-in-out infinite;
-        margin-bottom: 1.5rem;
-      }
-
-      /* Botón Ingresar */
-      .ingresar button {
-        border-radius: 999px;
-        padding: 0.7rem 1.2rem;
-        font-weight: 600;
-        border: 1px solid rgba(0,0,0,0.15);
-        background: white;
-      }
+      /* Centrado vertical aproximado (sin romper layout) */
+      .hero-wrap { padding: 12vh 0 8vh; }
     </style>
     """, unsafe_allow_html=True)
 
-    # ---- Logo + botón centrados en un único bloque ----
+    # ---- Logo centrado con HTML (base64) para evitar desalineos de st.image ----
     logo_html = ""
     try:
         logo = Image.open("logo.png")
         buf = BytesIO(); logo.save(buf, format="PNG")
         b64 = base64.b64encode(buf.getvalue()).decode()
-        logo_html = f"<img src='data:image/png;base64,{b64}' alt='logo'/>"
+        logo_html = f"""
+        <div style="display:flex;justify-content:center;">
+          <img src="data:image/png;base64,{b64}"
+               alt="logo"
+               style="width:220px;max-width:220px;height:auto;
+                      animation: blink 1.6s ease-in-out infinite;" />
+        </div>
+        """
     except Exception:
-        logo_html = "<p style='font-weight:600;'>Subí <code>logo.png</code> a la carpeta de la app.</p>"
+        logo_html = "<p style='text-align:center;font-weight:600;'>Subí <code>logo.png</code> a la carpeta de la app.</p>"
 
-    st.markdown(f"<div class='hero-wrap'>{logo_html}", unsafe_allow_html=True)
-    # Botón justo debajo del logo
-    st.markdown("<div class='ingresar'>", unsafe_allow_html=True)
-    if st.button("Ingresar"):
-        st.session_state.ingresado = True
-    st.markdown("</div></div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='hero-wrap'>{logo_html}</div>", unsafe_allow_html=True)
+
+    # ---- Botón centrado ----
+    b1, b2, b3 = st.columns([1,1,1])
+    with b2:
+        if st.button("Ingresar"):
+            st.session_state.ingresado = True
 
 # ================== SERVICIOS ==================
 else:
