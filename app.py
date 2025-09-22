@@ -28,42 +28,57 @@ def logo_html_src(path="logo.png", width_px=200):
 if not st.session_state.ingresado:
     st.markdown("""
     <style>
-      /* Fondo total en portada: sin márgenes blancos */
+      /* Fondo total en portada + ocultar chrome */
       html, body, [data-testid="stAppViewContainer"] { background: #d4fbd7 !important; }
-
-      /* Ocultar chrome de Streamlit para look minimal */
       header {visibility: hidden;}  #MainMenu {visibility: hidden;}  footer {visibility: hidden;}
 
-      /* Eliminar padding por defecto y centrar en viewport */
+      /* Contenedor principal: alto completo + centrado perfecto */
       .block-container, [data-testid="block-container"] {
-        padding-top: 0 !important;
-        padding-bottom: 0 !important;
         min-height: 100vh !important;
         display: flex !important;
         flex-direction: column !important;
-        align-items: center !important;      /* centra horizontal */
-        justify-content: center !important;   /* centra vertical */
-        gap: 14px; /* distancia entre logo y botón */
+        justify-content: center !important;  /* centro vertical */
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
       }
 
-      /* Titilado suave del logo */
+      /* Fila de columnas: que no meta padding extra arriba */
+      [data-testid="stHorizontalBlock"] { margin-top: 0 !important; }
+
+      /* Columna central: todo centrado */
+      .center-col { text-align: center; }
+
+      /* Botón centrado de verdad */
+      .center-col .stButton > button {
+        display: block !important;
+        margin: 10px auto 0 auto !important;  /* justo debajo del logo */
+        border-radius: 0 !important;          /* recto, minimal */
+        border: 1px solid rgba(0,0,0,0.15) !important;
+        background: #fff !important;
+        font-weight: 600 !important;
+        padding: 10px 18px !important;
+      }
+
+      /* Logo titilando suavemente */
       @keyframes blink { 0%{opacity:1;transform:scale(1);} 50%{opacity:.35;transform:scale(1.02);} 100%{opacity:1;transform:scale(1);} }
       .hero-logo { animation: blink 1.6s ease-in-out infinite; }
     </style>
     """, unsafe_allow_html=True)
 
-    # Logo (centrado por el contenedor flex)
-    st.markdown(logo_html_src(width_px=200).replace("<img ", "<img class='hero-logo' "), unsafe_allow_html=True)
-
-    # Botón real de Streamlit (funciona siempre)
-    if st.button("Ingresar"):
-        st.session_state.ingresado = True
+    # Tres columnas y usamos SOLO la central para logo + botón
+    c1, c2, c3 = st.columns([1,1,1])
+    with c2:
+        st.markdown("<div class='center-col'>", unsafe_allow_html=True)
+        st.markdown(logo_html_src(width_px=200).replace("<img ", "<img class='hero-logo' "), unsafe_allow_html=True)
+        if st.button("Ingresar", key="ingresar_btn"):
+            st.session_state.ingresado = True
+        st.markdown("</div>", unsafe_allow_html=True)
 
 # ================== CONTENIDO (dropdown + tarjetas rectangulares compactas) ==================
 else:
     st.markdown("""
     <style>
-      /* Restauro fondo blanco y mantengo márgenes compactos */
+      /* Fondo blanco y márgenes compactos */
       [data-testid="stAppViewContainer"] { background: #ffffff !important; }
       header {visibility: hidden;}  #MainMenu {visibility: hidden;}  footer {visibility: hidden;}
       .block-container, [data-testid="block-container"] { padding-top: 0 !important; padding-bottom: 0 !important; }
