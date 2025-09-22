@@ -61,7 +61,7 @@ if not st.session_state.ingresado:
       /* Botón centrado y un poco más abajo */
       [data-testid="stVerticalBlock"]:first-of-type .stButton > button {
         display: block !important;
-        margin: 28px auto 0 auto !important;   /* separación extra bajo el logo */
+        margin: 28px auto 0 auto !important;
         border-radius: 0 !important;
         border: 1px solid rgba(0,0,0,0.15) !important;
         background: #fff !important;
@@ -71,13 +71,13 @@ if not st.session_state.ingresado:
         cursor: pointer;
       }
 
-      /* Logo con titilado suave */
+      /* Logo titilando */
       @keyframes blink { 0%{opacity:1;transform:scale(1);} 50%{opacity:.35;transform:scale(1.02);} 100%{opacity:1;transform:scale(1);} }
       .hero-logo { animation: blink 1.6s ease-in-out infinite; }
     </style>
     """, unsafe_allow_html=True)
 
-    # --- HERO: logo + botón (en el PRIMER bloque vertical) ---
+    # HERO: logo + botón
     st.markdown(logo_html_src(width_px=200).replace("<img ", "<img class='hero-logo' "), unsafe_allow_html=True)
     if st.button("Ingresar", key="ingresar_btn"):
         st.session_state.ingresado = True
@@ -98,11 +98,10 @@ else:
 
       .wrap { max-width: 1120px; margin: 0 auto; padding: 0 8px 16px; }
 
-      /* Dropdown minimal (bordes rectos) + tipografía Manjari adentro */
+      /* Dropdown minimal (bordes rectos) + Manjari adentro */
       .nav-select .stSelectbox > div > div {
         border-radius: 0 !important;
         border: 1px solid #e5e5e7 !important;
-        font-family: 'Manjari', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important;
       }
       .nav-select [data-baseweb="select"] * {
         font-family: 'Manjari', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important;
@@ -120,9 +119,13 @@ else:
         height: 110px;
         display: flex; align-items: center; justify-content: center; text-align: center;
         transition: border-color .12s ease, transform .12s ease;
-        font-family: 'Manjari', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important;
       }
       .card:hover { border-color: #bff3c5; transform: translateY(-1px); }
+
+      /* >>> Fuerzo Manjari dentro de la tarjeta y todos sus hijos <<< */
+      .card, .card * {
+        font-family: 'Manjari', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important;
+      }
 
       .card h3 {
         margin: 0;
