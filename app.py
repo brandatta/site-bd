@@ -6,24 +6,33 @@ from io import BytesIO
 # ================== CONFIG ==================
 st.set_page_config(page_title="Brandatta - Servicios", layout="wide")
 
-# ================== STATE ==================
+# ================== STATE (seguro/defensivo) ==================
 if "ingresado" not in st.session_state:
     st.session_state.ingresado = False
-if "nav" not in st.session_state:
-    st.session_state.nav = "Servicios"  # Servicios | Contacto | Acerca de nosotros | Clientes
+
+opciones_nav = ["Servicios", "Contacto", "Acerca de nosotros", "Clientes"]
+if "nav" not in st.session_state or st.session_state.get("nav") not in opciones_nav:
+    st.session_state.nav = "Servicios"
 
 # ================== PORTADA ==================
 if not st.session_state.ingresado:
+    # Estilos portada: fondo d4fbd7 + animación de logo
     st.markdown("""
     <style>
       html, body, [data-testid="stAppViewContainer"] { background: #d4fbd7 !important; }
       header {visibility: hidden;}  #MainMenu {visibility: hidden;}  footer {visibility: hidden;}
-      @keyframes blink { 0%{opacity:1;transform:scale(1);} 50%{opacity:.35;transform:scale(1.02);} 100%{opacity:1;transform:scale(1);} }
-      .hero-wrap { padding: 12vh 0 8vh; }
+
+      @keyframes blink {
+        0% { opacity: 1; transform: scale(1); }
+        50% { opacity: .35; transform: scale(1.02); }
+        100% { opacity: 1; transform: scale(1); }
+      }
+
+      .hero-wrap { padding: 12vh 0 6vh; }
     </style>
     """, unsafe_allow_html=True)
 
-    # Logo centrado (base64) + botón debajo
+    # Logo centrado con HTML (evita desalineos de st.image)
     try:
         logo = Image.open("logo.png")
         buf = BytesIO(); logo.save(buf, format="PNG")
@@ -39,14 +48,15 @@ if not st.session_state.ingresado:
 
     st.markdown(f"<div class='hero-wrap'>{logo_html}</div>", unsafe_allow_html=True)
 
+    # Botón directamente debajo del logo, centrado
     c1, c2, c3 = st.columns([1,1,1])
     with c2:
         if st.button("Ingresar"):
             st.session_state.ingresado = True
 
-# ================== CONTENIDO ==================
+# ================== CONTENIDO (con navegación por menú desplegable) ==================
 else:
-    # ===== Estilos generales + dropdown minimal =====
+    # Estilos generales + tarjetas rectangulares minimal
     st.markdown("""
     <style>
       [data-testid="stAppViewContainer"] { background: #ffffff !important; }
@@ -54,14 +64,14 @@ else:
 
       .wrap { max-width: 1120px; margin: 0 auto; padding: 8px 8px 40px; }
 
-      /* Dropdown centrado y minimal (bordes rectos) */
+      /* Dropdown minimal (bordes rectos) */
       .nav-select .stSelectbox > div > div {
         border-radius: 0 !important;
         border: 1px solid #e5e5e7 !important;
       }
       .nav-select label { font-weight: 600; }
 
-      /* Tarjetas rectangulares minimal */
+      /* Tarjetas rectangulares minimal, bordes rectos con color d4fbd7 */
       .tile { width: 240px; margin: 0 auto; }
       @media (max-width: 900px){ .tile{ width:220px; } }
       @media (max-width: 680px){ .tile{ width:200px; } }
@@ -70,7 +80,7 @@ else:
         background: #ffffff;
         border: 1px solid #d4fbd7;
         border-radius: 0;
-        height: 120px;
+        height: 120px; /* rectángulo */
         display: flex; align-items: center; justify-content: center; text-align: center;
         transition: border-color .12s ease, transform .12s ease;
       }
@@ -95,21 +105,21 @@ else:
 
     st.markdown("<div class='wrap'>", unsafe_allow_html=True)
 
-    # ===== Menú desplegable (centrado) =====
+    # Menú desplegable centrado y robusto (sin ValueError)
     s1, s2, s3 = st.columns([1,2,1])
     with s2:
-        st.markdown("### ", unsafe_allow_html=True)  # pequeño respiro arriba
-        with st.container():
-            st.markdown("<div class='nav-select'>", unsafe_allow_html=True)
-            seleccion = st.selectbox(
-                "Navegación",
-                ["Servicios", "Contacto", "Acerca de nosotros", "Clientes"],
-                index=["Servicios", "Contacto", "Acerca de nosotros", "Clientes"].index(st.session_state.nav)
-            )
-            st.session_state.nav = seleccion
-            st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("### ", unsafe_allow_html=True)
+        st.markdown("<div class='nav-select'>", unsafe_allow_html=True)
+        nav_actual = st.session_state.get("nav", "Servicios")
+        try:
+            idx = opciones_nav.index(nav_actual)
+        except ValueError:
+            idx = 0
+        seleccion = st.selectbox("Navegación", opciones_nav, index=idx, key="nav_select")
+        st.session_state.nav = seleccion
+        st.markdown("</div>", unsafe_allow_html=True)
 
-    # ===== Contenido según selección =====
+    # Contenido según selección
     if st.session_state.nav == "Servicios":
         st.markdown("<div class='title'>Servicios</div>", unsafe_allow_html=True)
         servicios = [
@@ -130,9 +140,9 @@ else:
 
         cols2 = st.columns(3, gap="large")
         for j, col in enumerate(cols2):
-            idx = 3 + j
+            idx2 = 3 + j
             with col:
-                st.markdown(f"<div class='tile'><div class='card'><h3>{servicios[idx]}</h3></div></div>", unsafe_allow_html=True)
+                st.markdown(f"<div class='tile'><div class='card'><h3>{servicios[idx2]}</h3></div></div>", unsafe_allow_html=True)
 
     elif st.session_state.nav == "Contacto":
         st.markdown("<div class='hairline'></div>", unsafe_allow_html=True)
