@@ -52,15 +52,16 @@ if not st.session_state.ingresado:
         width: 100% !important;
       }
 
-      /* Botón centrado (por si algún wrapper mete display inline) */
+      /* Botón centrado y un poco más abajo */
       [data-testid="stVerticalBlock"]:first-of-type .stButton > button {
         display: block !important;
-        margin: 0 auto !important;
+        margin: 28px auto 0 auto !important;   /* <- antes 0; ahora 28px hacia abajo */
         border-radius: 0 !important;
         border: 1px solid rgba(0,0,0,0.15) !important;
         background: #fff !important;
         font-weight: 600 !important;
         padding: 10px 18px !important;
+        cursor: pointer;
       }
 
       /* Logo con titilado suave */
