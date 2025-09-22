@@ -16,7 +16,7 @@ if "nav" not in st.session_state or st.session_state.get("nav") not in opciones_
 
 # ================== PORTADA ==================
 if not st.session_state.ingresado:
-    # Estilos portada: fondo d4fbd7 + animación de logo
+    # Estilos portada (margen superior reducido)
     st.markdown("""
     <style>
       html, body, [data-testid="stAppViewContainer"] { background: #d4fbd7 !important; }
@@ -28,11 +28,11 @@ if not st.session_state.ingresado:
         100% { opacity: 1; transform: scale(1); }
       }
 
-      .hero-wrap { padding: 12vh 0 6vh; }
+      .hero-wrap { padding: 6vh 0 4vh; } /* antes: 12vh 0 6vh */
     </style>
     """, unsafe_allow_html=True)
 
-    # Logo centrado con HTML (evita desalineos de st.image)
+    # Logo centrado (HTML base64)
     try:
         logo = Image.open("logo.png")
         buf = BytesIO(); logo.save(buf, format="PNG")
@@ -48,30 +48,29 @@ if not st.session_state.ingresado:
 
     st.markdown(f"<div class='hero-wrap'>{logo_html}</div>", unsafe_allow_html=True)
 
-    # Botón directamente debajo del logo, centrado
+    # Botón debajo del logo, centrado
     c1, c2, c3 = st.columns([1,1,1])
     with c2:
         if st.button("Ingresar"):
             st.session_state.ingresado = True
 
-# ================== CONTENIDO (con navegación por menú desplegable) ==================
+# ================== CONTENIDO (dropdown + tarjetas) ==================
 else:
-    # Estilos generales + tarjetas rectangulares minimal
     st.markdown("""
     <style>
       [data-testid="stAppViewContainer"] { background: #ffffff !important; }
       header {visibility: hidden;}  #MainMenu {visibility: hidden;}  footer {visibility: hidden;}
 
-      .wrap { max-width: 1120px; margin: 0 auto; padding: 8px 8px 40px; }
+      .wrap { max-width: 1120px; margin: 0 auto; padding: 0 8px 32px; } /* antes: 8px 8px 40px */
 
       /* Dropdown minimal (bordes rectos) */
       .nav-select .stSelectbox > div > div {
         border-radius: 0 !important;
         border: 1px solid #e5e5e7 !important;
       }
-      .nav-select label { font-weight: 600; }
+      .nav-select label { font-weight: 600; margin-bottom: 6px; }
 
-      /* Tarjetas rectangulares minimal, bordes rectos con color d4fbd7 */
+      /* Tarjetas rectangulares minimal */
       .tile { width: 240px; margin: 0 auto; }
       @media (max-width: 900px){ .tile{ width:220px; } }
       @media (max-width: 680px){ .tile{ width:200px; } }
@@ -80,7 +79,7 @@ else:
         background: #ffffff;
         border: 1px solid #d4fbd7;
         border-radius: 0;
-        height: 120px; /* rectángulo */
+        height: 120px;
         display: flex; align-items: center; justify-content: center; text-align: center;
         transition: border-color .12s ease, transform .12s ease;
       }
@@ -94,21 +93,20 @@ else:
         color: #111827;
       }
 
-      .row-spacer { height: 44px; }
-      .title { text-align:center; font-weight:700; font-size:1.25rem; margin: 0 0 14px 0; }
+      .row-spacer { height: 36px; } /* un poco menos alta también */
+      .title { text-align:center; font-weight:700; font-size:1.20rem; margin: 4px 0 12px 0; } /* margen superior reducido */
 
       .section h3 { margin: 0 0 8px 0; font-size: 1.05rem; }
       .section p  { margin: 0 0 6px 0; color: #333; }
-      .hairline   { border-top: 1px solid #e5e5e7; margin: 14px 0 18px 0; }
+      .hairline   { border-top: 1px solid #e5e5e7; margin: 10px 0 14px 0; }
     </style>
     """, unsafe_allow_html=True)
 
     st.markdown("<div class='wrap'>", unsafe_allow_html=True)
 
-    # Menú desplegable centrado y robusto (sin ValueError)
+    # Menú desplegable centrado (sin spacer extra)
     s1, s2, s3 = st.columns([1,2,1])
     with s2:
-        st.markdown("### ", unsafe_allow_html=True)
         st.markdown("<div class='nav-select'>", unsafe_allow_html=True)
         nav_actual = st.session_state.get("nav", "Servicios")
         try:
