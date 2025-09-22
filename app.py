@@ -56,70 +56,49 @@ if not st.session_state.ingresado:
 
 # ================== SERVICIOS ==================
 else:
-    # ---- Estilos servicios: fondo blanco + tarjetas sobrias ----
+    # ---- Estilos servicios: minimal total, fondo blanco, tarjetas blancas y bordes rectos ----
     st.markdown("""
     <style>
       [data-testid="stAppViewContainer"] { background: #ffffff !important; }
       header {visibility: hidden;}  #MainMenu {visibility: hidden;}  footer {visibility: hidden;}
 
-      /* Contenedor de ancho máximo para centrar la grilla */
-      .wrap {
-        max-width: 1180px;
-        margin: 0 auto;
-      }
+      /* Contenedor ancho máximo para centrar la grilla sin ocupar toda la pantalla */
+      .wrap { max-width: 1120px; margin: 0 auto; }
 
-      /* Tarjeta sobria: blanca, borde fino y acento lateral sutil */
+      /* Tarjeta minimal: blanca, SIN sombra, bordes rectos y finos (#d4fbd7) */
       .card {
-        position: relative;
         background: #ffffff;
         border: 1px solid #d4fbd7;
-        border-radius: 16px;
-        padding: 20px 18px 18px 22px;
-        min-height: 130px;
+        border-radius: 0;           /* bordes rectos */
+        padding: 22px 18px;
+        min-height: 110px;
 
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
+        display: flex; align-items: center; justify-content: center; text-align: center;
 
-        transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        transition: border-color .12s ease, background-color .12s ease;
       }
 
-      /* Acento lateral izquierdo (muy sutil) */
-      .card::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 10px;
-        bottom: 10px;
-        width: 4px;
-        border-radius: 6px;
-        background: #d4fbd7;
-        opacity: 0.9;
-      }
-
+      /* Hover muy sutil (sin sombra) */
       .card:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.06);
-        border-color: #c7f6cb; /* leve énfasis en hover */
+        border-color: #bff3c5;      /* leve énfasis */
+        background-color: #ffffff;  /* se mantiene blanco */
       }
 
       .card h3 {
         margin: 0;
-        font-size: 1.02rem;
+        font-size: 1.0rem;
         font-weight: 600;
         letter-spacing: .15px;
-        color: #111827; /* gris oscuro, sobrio */
+        color: #111827; /* gris oscuro sobrio */
       }
 
-      /* Espaciado entre filas */
-      .row-gap { margin-bottom: 14px; }
+      /* Separación mínima entre filas en pantallas chicas */
+      .row-gap { margin-bottom: 10px; }
     </style>
     """, unsafe_allow_html=True)
 
     st.markdown("<div class='wrap'>", unsafe_allow_html=True)
-    st.markdown("<h2 style='margin:0 0 1rem 0; text-align:center; font-weight:700; font-size:1.35rem;'>Servicios</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='margin:0 0 1rem 0; text-align:center; font-weight:700; font-size:1.25rem;'>Servicios</h2>", unsafe_allow_html=True)
 
     servicios = [
         "Consultoría & Discovery",
@@ -139,7 +118,6 @@ else:
                 continue
             with col:
                 st.markdown(f"<div class='card'><h3>{servicios[idx]}</h3></div>", unsafe_allow_html=True)
-        # separador entre filas en pantallas chicas
         st.markdown("<div class='row-gap'></div>", unsafe_allow_html=True)
 
     st.markdown("</div>", unsafe_allow_html=True)  # cierre .wrap
