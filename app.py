@@ -14,7 +14,7 @@ opciones_nav = ["Servicios", "Contacto", "Acerca de nosotros", "Clientes"]
 if "nav" not in st.session_state or st.session_state.get("nav") not in opciones_nav:
     st.session_state.nav = "Servicios"
 
-# ===== Helper: logo a <img> base64 centrado =====
+# ===== Helper: logo a <img> base64 =====
 def logo_html_src(path="logo.png", width_px=200):
     try:
         img = Image.open(path)
@@ -24,61 +24,60 @@ def logo_html_src(path="logo.png", width_px=200):
     except Exception:
         return "<p style='text-align:center;font-weight:600;margin:0;'>Subí <code>logo.png</code> a la carpeta de la app.</p>"
 
-# ================== PORTADA (centrada, sin márgenes blancos) ==================
+# ================== PORTADA ==================
 if not st.session_state.ingresado:
     st.markdown("""
     <style>
-      /* Fondo total en portada + ocultar chrome */
+      /* Fondo total verde en portada */
       html, body, [data-testid="stAppViewContainer"] { background: #d4fbd7 !important; }
       header {visibility: hidden;}  #MainMenu {visibility: hidden;}  footer {visibility: hidden;}
 
-      /* Contenedor principal: alto completo + centrado perfecto */
+      /* 1) El contenedor principal ocupa 100vh y usa flex */
       .block-container, [data-testid="block-container"] {
         min-height: 100vh !important;
         display: flex !important;
         flex-direction: column !important;
-        justify-content: center !important;  /* centro vertical */
         padding-top: 0 !important;
         padding-bottom: 0 !important;
       }
 
-      /* Fila de columnas: que no meta padding extra arriba */
-      [data-testid="stHorizontalBlock"] { margin-top: 0 !important; }
+      /* 2) El PRIMER bloque vertical (nuestro hero) se centra completo */
+      [data-testid="stVerticalBlock"]:first-of-type {
+        flex: 1 0 auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;      /* centrado horizontal */
+        justify-content: center !important;   /* centrado vertical */
+        gap: 14px !important;                 /* espacio entre logo y botón */
+        width: 100% !important;
+      }
 
-      /* Columna central: todo centrado */
-      .center-col { text-align: center; }
-
-      /* Botón centrado de verdad */
-      .center-col .stButton > button {
+      /* Botón centrado (por si algún wrapper mete display inline) */
+      [data-testid="stVerticalBlock"]:first-of-type .stButton > button {
         display: block !important;
-        margin: 10px auto 0 auto !important;  /* justo debajo del logo */
-        border-radius: 0 !important;          /* recto, minimal */
+        margin: 0 auto !important;
+        border-radius: 0 !important;
         border: 1px solid rgba(0,0,0,0.15) !important;
         background: #fff !important;
         font-weight: 600 !important;
         padding: 10px 18px !important;
       }
 
-      /* Logo titilando suavemente */
+      /* Logo con titilado suave */
       @keyframes blink { 0%{opacity:1;transform:scale(1);} 50%{opacity:.35;transform:scale(1.02);} 100%{opacity:1;transform:scale(1);} }
       .hero-logo { animation: blink 1.6s ease-in-out infinite; }
     </style>
     """, unsafe_allow_html=True)
 
-    # Tres columnas y usamos SOLO la central para logo + botón
-    c1, c2, c3 = st.columns([1,1,1])
-    with c2:
-        st.markdown("<div class='center-col'>", unsafe_allow_html=True)
-        st.markdown(logo_html_src(width_px=200).replace("<img ", "<img class='hero-logo' "), unsafe_allow_html=True)
-        if st.button("Ingresar", key="ingresar_btn"):
-            st.session_state.ingresado = True
-        st.markdown("</div>", unsafe_allow_html=True)
+    # --- HERO: logo + botón (en el PRIMER bloque vertical) ---
+    st.markdown(logo_html_src(width_px=200).replace("<img ", "<img class='hero-logo' "), unsafe_allow_html=True)
+    if st.button("Ingresar", key="ingresar_btn"):
+        st.session_state.ingresado = True
 
-# ================== CONTENIDO (dropdown + tarjetas rectangulares compactas) ==================
+# ================== CONTENIDO ==================
 else:
     st.markdown("""
     <style>
-      /* Fondo blanco y márgenes compactos */
       [data-testid="stAppViewContainer"] { background: #ffffff !important; }
       header {visibility: hidden;}  #MainMenu {visibility: hidden;}  footer {visibility: hidden;}
       .block-container, [data-testid="block-container"] { padding-top: 0 !important; padding-bottom: 0 !important; }
