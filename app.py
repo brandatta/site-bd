@@ -109,15 +109,17 @@ else:
       @media (max-width: 1200px){ .tile{ width: 400px; } }
       @media (max-width: 900px){  .tile{ width: 360px; } }
 
+      .card-wrap { position: relative; } /* para posicionar el hovercard */
+
       .card {
         background: #ffffff;
         border: 1px solid #d4fbd7;
         border-radius: 0;
         height: 220px;
         display: flex; align-items: center; justify-content: center; text-align: center;
-        transition: border-color .12s ease, transform .12s ease;
+        transition: border-color .12s ease, transform .12s ease, box-shadow .12s ease;
       }
-      .card:hover { border-color: #bff3c5; transform: translateY(-1px); }
+      .card:hover { border-color: #bff3c5; transform: translateY(-1px); box-shadow: 0 12px 24px rgba(0,0,0,.06); }
 
       /* Forzar Manjari dentro de la tarjeta */
       .card, .card * {
@@ -142,6 +144,51 @@ else:
       .hairline   { border-top: 1px solid #e5e5e7; margin: 10px 0 14px 0; }
       .section h3 { margin: 0 0 6px 0; font-size: 1.05rem; font-weight:700; }
       .section p  { margin: 0 0 4px 0; color: #333; font-size: 0.98rem; font-weight:400; }
+
+      /* ===== Hovercard (popup al pasar el mouse) ===== */
+      .hovercard {
+        position: absolute;
+        left: 50%;
+        bottom: calc(100% + 12px);    /* aparece arriba de la tarjeta */
+        transform: translateX(-50%) translateY(6px);
+        width: min(420px, 90vw);
+        background: rgba(255,255,255,0.72);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid #e5e5e7;
+        border-radius: 12px;
+        padding: 12px 14px;
+        box-shadow: 0 18px 38px rgba(0,0,0,.14);
+        opacity: 0; visibility: hidden;
+        transition: opacity .14s ease, transform .14s ease, visibility .14s;
+        z-index: 50;
+        pointer-events: none; /* no roba foco */
+      }
+      .card-wrap:hover .hovercard {
+        opacity: 1; visibility: visible;
+        transform: translateX(-50%) translateY(0);
+      }
+      .hovercard h4 { margin: 0 0 6px 0; font-size: 1.02rem; font-weight: 700; color: #0f172a; }
+      .hovercard p  { margin: 0 0 4px 0; font-size: .95rem; color: #111827; }
+      .hovercard .cta {
+        display: inline-block; margin-top: 8px; padding: 6px 10px;
+        border: 1px solid #e5e5e7; border-radius: 999px; text-decoration: none;
+        color: #0f172a; font-weight: 700; font-size: .92rem; background: #fff;
+      }
+      .hovercard .cta:hover { background: #f5f5f7; }
+
+      /* flechita */
+      .hovercard::after {
+        content: ""; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+        border-width: 8px; border-style: solid;
+        border-color: #e5e5e7 transparent transparent transparent;
+        filter: drop-shadow(0 2px 2px rgba(0,0,0,.05));
+      }
+      .hovercard::before {
+        content: ""; position: absolute; top: calc(100% - 1px); left: 50%; transform: translateX(-50%);
+        border-width: 7px; border-style: solid;
+        border-color: #ffffff transparent transparent transparent;
+      }
     </style>
     """, unsafe_allow_html=True)
 
@@ -160,22 +207,40 @@ else:
         st.session_state.nav = seleccion
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # Contenido según selección
+    # -------- Contenido según selección --------
     if st.session_state.nav == "Servicios":
         st.markdown("<div class='title'>Servicios</div>", unsafe_allow_html=True)
+
         servicios = [
-            "APIs",
-            "Software para Industrias",
-            "Tracking de Pedidos",
-            "Ecommerce",
-            "Finanzas",
-            "Gestión de Stock"
+            {"titulo": "APIs", "desc1": "Diseño y desarrollo de APIs escalables.", "desc2": "Autenticación, rate limiting y monitoreo."},
+            {"titulo": "Software para Industrias", "desc1": "Sistemas a medida para planta/producción.", "desc2": "Integración con ERP y tableros."},
+            {"titulo": "Tracking de Pedidos", "desc1": "Trazabilidad punta a punta.", "desc2": "Notificaciones y SLA visibles."},
+            {"titulo": "Ecommerce", "desc1": "Tiendas headless / integradas.", "desc2": "Pagos, logística y analytics."},
+            {"titulo": "Finanzas", "desc1": "Forecasting y conciliaciones automáticas.", "desc2": "Reportes y auditoría."},
+            {"titulo": "Gestión de Stock", "desc1": "Inventario en tiempo real.", "desc2": "Alertas, valuación y KPIs."},
         ]
 
+        # 3 x 2 con mayor separación lateral
         cols = st.columns(3, gap="large")
         for i, col in enumerate(cols):
             with col:
-                st.markdown(f"<div class='tile'><div class='card'><h3>{servicios[i]}</h3></div></div>", unsafe_allow_html=True)
+                svc = servicios[i]
+                st.markdown(
+                    f"""
+                    <div class='tile'>
+                      <div class='card-wrap'>
+                        <div class='card'><h3>{svc["titulo"]}</h3></div>
+                        <div class='hovercard'>
+                          <h4>{svc["titulo"]}</h4>
+                          <p>• {svc["desc1"]}</p>
+                          <p>• {svc["desc2"]}</p>
+                          <a class="cta" href="mailto:contacto@brandatta.com?subject={svc["titulo"]}%20-%20Consulta" target="_blank" rel="noopener">Escribinos</a>
+                        </div>
+                      </div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
 
         st.markdown("<div class='row-spacer'></div>", unsafe_allow_html=True)
 
@@ -183,7 +248,23 @@ else:
         for j, col in enumerate(cols2):
             idx2 = 3 + j
             with col:
-                st.markdown(f"<div class='tile'><div class='card'><h3>{servicios[idx2]}</h3></div></div>", unsafe_allow_html=True)
+                svc = servicios[idx2]
+                st.markdown(
+                    f"""
+                    <div class='tile'>
+                      <div class='card-wrap'>
+                        <div class='card'><h3>{svc["titulo"]}</h3></div>
+                        <div class='hovercard'>
+                          <h4>{svc["titulo"]}</h4>
+                          <p>• {svc["desc1"]}</p>
+                          <p>• {svc["desc2"]}</p>
+                          <a class="cta" href="mailto:contacto@brandatta.com?subject={svc["titulo"]}%20-%20Consulta" target="_blank" rel="noopener">Escribinos</a>
+                        </div>
+                      </div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
 
     elif st.session_state.nav == "Contacto":
         st.markdown("<div class='hairline'></div>", unsafe_allow_html=True)
