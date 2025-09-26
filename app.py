@@ -168,12 +168,12 @@ else:
     if st.session_state.nav == "Servicios":
         st.markdown("<div class='title'>Servicios</div>", unsafe_allow_html=True)
         servicios = [
-            "Consultoría & Discovery",
-            "Desarrollo de Aplicaciones",
-            "Integraciones (SAP / Ecommerce)",
-            "Tableros & Analytics",
-            "Automatizaciones & RPA",
-            "Soporte & Capacitación"
+            "APIs",
+            "Software para Industrias",
+            "Tracking de Pedidos",
+            "Ecommerce",
+            "Finanzas",
+            "Gestión de Stock"
         ]
 
         cols = st.columns(3, gap="small")
