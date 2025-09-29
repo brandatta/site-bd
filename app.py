@@ -95,7 +95,7 @@ else:
       /* contenedor ancho para 3 columnas grandes */
       .wrap { max-width: 1440px; margin: 0 auto; padding: 0 8px 16px; }
 
-      /* Asegurar que nada se corte */
+      /* Evitar recortes del hover */
       [data-testid="stVerticalBlock"], [data-testid="column"], .wrap, .tile { overflow: visible !important; }
 
       /* Dropdown minimal */
@@ -198,12 +198,6 @@ else:
 
       .hovercard h4 { margin: 0 0 6px 0; font-size: 1.02rem; font-weight: 700; color: #0f172a; }
       .hovercard p  { margin: 0 0 4px 0; font-size: .95rem; color: #111827; }
-      .hovercard .cta {
-        display: inline-block; margin-top: 8px; padding: 6px 10px;
-        border: 1px solid #e5e5e7; border-radius: 999px; text-decoration: none;
-        color: #0f172a; font-weight: 700; font-size: .92rem; background: #fff;
-      }
-      .hovercard .cta:hover { background: #f5f5f7; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -235,7 +229,7 @@ else:
             {"titulo": "Gestión de Stock", "desc1": "Inventario en tiempo real.", "desc2": "Alertas, valuación y KPIs."},
         ]
 
-        # Fila 1 (arriba) — hover abajo (clase .below)
+        # Fila 1 (arriba) — hover abajo
         cols = st.columns(3, gap="large")
         for i, col in enumerate(cols):
             with col:
@@ -249,7 +243,6 @@ else:
                           <h4>{svc["titulo"]}</h4>
                           <p>• {svc["desc1"]}</p>
                           <p>• {svc["desc2"]}</p>
-                          <a class="cta" href="mailto:contacto@brandatta.com?subject={svc["titulo"]}%20-%20Consulta" target="_blank" rel="noopener">Escribinos</a>
                         </div>
                       </div>
                     </div>
@@ -259,7 +252,7 @@ else:
 
         st.markdown("<div class='row-spacer'></div>", unsafe_allow_html=True)
 
-        # Fila 2 (abajo) — hover arriba (por defecto)
+        # Fila 2 (abajo) — hover arriba
         cols2 = st.columns(3, gap="large")
         for j, col in enumerate(cols2):
             idx2 = 3 + j
@@ -274,7 +267,6 @@ else:
                           <h4>{svc["titulo"]}</h4>
                           <p>• {svc["desc1"]}</p>
                           <p>• {svc["desc2"]}</p>
-                          <a class="cta" href="mailto:contacto@brandatta.com?subject={svc["titulo"]}%20-%20Consulta" target="_blank" rel="noopener">Escribinos</a>
                         </div>
                       </div>
                     </div>
