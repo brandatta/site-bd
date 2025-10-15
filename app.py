@@ -101,28 +101,37 @@ else:
       .wrap { max-width: 1440px; margin: 0 auto; padding: 0 8px 16px; }
       [data-testid="stVerticalBlock"], [data-testid="column"], .wrap, .tile { overflow: visible !important; }
 
-      /* ===== Header de navegación ===== */
-      #topnav { 
-        display: flex; 
-        align-items: center; 
-        justify-content: center; 
-        gap: 8px; 
-        padding: 10px 8px 18px; 
+      /* ===== Header estilo brandatta.com.ar (sin logo) ===== */
+      #topnav-wrap{
+        position: sticky; top: 0; z-index: 999;
+        background: #ffffff; 
         border-bottom: 1px solid #e5e5e7;
-        margin-bottom: 12px;
+        box-shadow: 0 1px 6px rgba(0,0,0,.04);
       }
+      #topnav{
+        max-width: 1440px; margin: 0 auto;
+        display: flex; align-items: center; justify-content: center;
+        gap: 22px; padding: 12px 10px;
+      }
+      /* botones como links */
       #topnav .stButton > button{
-        border-radius: 999px !important;
-        border: 1px solid #e5e5e7 !important;
-        background: #fff !important;
-        padding: 6px 14px !important;
+        background: transparent !important;
+        border: none !important;
+        color: #111827 !important;
+        padding: 8px 2px !important;
+        border-bottom: 3px solid transparent !important;
+        text-transform: uppercase;
         font-weight: 700 !important;
-        letter-spacing: .2px;
+        letter-spacing: .04em;
+        font-size: 0.92rem;
+        border-radius: 0 !important;
       }
-      /* activo */
+      #topnav .stButton > button:hover{
+        border-bottom-color: #111827 !important;
+      }
+      /* activo con barra inferior verde */
       #topnav .active > button{
-        background: #d4fbd7 !important;
-        border-color: #bff3c5 !important;
+        border-bottom-color: #10b981 !important; /* verde */
       }
 
       /* ===== Tarjetas ===== */
@@ -143,20 +152,11 @@ else:
         text-align: center;
         transition: border-color .12s ease, transform .12s ease, box-shadow .12s ease;
       }
-      .card:hover {
-        border-color: #bff3c5;
-        transform: translateY(-1px);
-        box-shadow: 0 12px 24px rgba(0,0,0,.06);
-      }
+      .card:hover { border-color: #bff3c5; transform: translateY(-1px); box-shadow: 0 12px 24px rgba(0,0,0,.06); }
 
       .card h3 {
-        margin: 0;
-        font-size: 1.05rem;
-        font-weight: 700;
-        letter-spacing: .15px;
-        color: #111827;
-        line-height: 1.25;
-        padding: 0 12px;
+        margin: 0; font-size: 1.05rem; font-weight: 700; letter-spacing: .15px;
+        color: #111827; line-height: 1.25; padding: 0 12px;
       }
 
       .row-spacer { height: 36px; }
@@ -167,87 +167,48 @@ else:
 
       /* ===== Hovercard ===== */
       .hovercard {
-        position: absolute;
-        left: 50%;
-        width: min(420px, 90vw);
-        background: rgba(255,255,255,0.8);
-        backdrop-filter: blur(8px);
-        border: 1px solid #e5e5e7;
-        border-radius: 10px;
-        padding: 10px 14px;
-        box-shadow: 0 14px 28px rgba(0,0,0,.12);
-        opacity: 0;
-        visibility: hidden;
+        position: absolute; left: 50%; width: min(420px, 90vw);
+        background: rgba(255,255,255,0.8); backdrop-filter: blur(8px);
+        border: 1px solid #e5e5e7; border-radius: 10px;
+        padding: 10px 14px; box-shadow: 0 14px 28px rgba(0,0,0,.12);
+        opacity: 0; visibility: hidden;
         transition: opacity .14s ease, transform .14s ease, visibility .14s;
-        z-index: 50;
-        pointer-events: none;
+        z-index: 50; pointer-events: none;
       }
+      .card-wrap .hovercard { bottom: calc(100% + 10px); transform: translateX(-50%) translateY(6px); }
+      .card-wrap:hover .hovercard { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+      .card-wrap .hovercard::after{
+        content:""; position:absolute; top:100%; left:50%; transform:translateX(-50%);
+        border-width:7px; border-style:solid; border-color:#e5e5e7 transparent transparent transparent;
+      }
+      .card-wrap .hovercard::before{
+        content:""; position:absolute; top:calc(100% - 1px); left:50%; transform:translateX(-50%);
+        border-width:6px; border-style:solid; border-color:#ffffff transparent transparent transparent;
+      }
+      .card-wrap.below .hovercard { top: calc(100% + 10px); bottom:auto; transform: translateX(-50%) translateY(-6px); }
+      .card-wrap.below:hover .hovercard { opacity:1; visibility:visible; transform: translateX(-50%) translateY(0); }
 
-      .card-wrap .hovercard {
-        bottom: calc(100% + 10px);
-        transform: translateX(-50%) translateY(6px);
-      }
-      .card-wrap:hover .hovercard {
-        opacity: 1;
-        visibility: visible;
-        transform: translateX(-50%) translateY(0);
-      }
-
-      .card-wrap .hovercard::after {
-        content: "";
-        position: absolute;
-        top: 100%;
-        left: 50%;
-        transform: translateX(-50%);
-        border-width: 7px;
-        border-style: solid;
-        border-color: #e5e5e7 transparent transparent transparent;
-      }
-      .card-wrap .hovercard::before {
-        content: "";
-        position: absolute;
-        top: calc(100% - 1px);
-        left: 50%;
-        transform: translateX(-50%);
-        border-width: 6px;
-        border-style: solid;
-        border-color: #ffffff transparent transparent transparent;
-      }
-
-      .card-wrap.below .hovercard {
-        top: calc(100% + 10px);
-        bottom: auto;
-        transform: translateX(-50%) translateY(-6px);
-      }
-      .card-wrap.below:hover .hovercard {
-        opacity: 1;
-        visibility: visible;
-        transform: translateX(-50%) translateY(0);
-      }
-
-      .hovercard h4 { margin: 0 0 6px 0; font-size: 1rem; font-weight: 700; color: #0f172a; }
-      .hovercard p  { margin: 0 0 4px 0; font-size: .9rem; color: #111827; }
+      .hovercard h4 { margin:0 0 6px 0; font-size:1rem; font-weight:700; color:#0f172a; }
+      .hovercard p  { margin:0 0 4px 0; font-size:.9rem; color:#111827; }
     </style>
     """, unsafe_allow_html=True)
 
-    st.markdown("<div class='wrap'>", unsafe_allow_html=True)
-
-    # ===== Header de navegación (reemplaza al dropdown) =====
-    st.markdown("<div id='topnav'>", unsafe_allow_html=True)
-    cols = st.columns([1,1,1,1, 6])  # 4 botones + espacio flexible
-    labels = ["Servicios", "Contacto", "Acerca de Nosotros", "Clientes"]
-    keys   = ["nav_serv", "nav_cont", "nav_acerca", "nav_cli"]
-
-    for i, col in enumerate(cols[:4]):
+    # ===== Header de navegación (estilo Brandatta, sin logo) =====
+    st.markdown("<div id='topnav-wrap'><div id='topnav'>", unsafe_allow_html=True)
+    nav_labels = ["Servicios", "Contacto", "Acerca de Nosotros", "Clientes"]
+    nav_keys   = ["nav_serv", "nav_cont", "nav_acerca", "nav_cli"]
+    cols = st.columns(len(nav_labels))
+    for i, col in enumerate(cols):
         with col:
-            # clase 'active' para el botón actual (solo para estilos CSS)
-            active_class = "active" if st.session_state.nav == labels[i] else ""
-            st.markdown(f"<div class='{active_class}'>", unsafe_allow_html=True)
-            if st.button(labels[i], key=keys[i]):
-                st.session_state.nav = labels[i]
+            active = "active" if st.session_state.nav == nav_labels[i] else ""
+            st.markdown(f"<div class='{active}'>", unsafe_allow_html=True)
+            if st.button(nav_labels[i], key=nav_keys[i]):
+                st.session_state.nav = nav_labels[i]
             st.markdown("</div>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("</div></div>", unsafe_allow_html=True)
     # ===========================================
+
+    st.markdown("<div class='wrap'>", unsafe_allow_html=True)
 
     # -------- Contenido según selección --------
     if st.session_state.nav == "Servicios":
