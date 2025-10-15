@@ -2,6 +2,7 @@ import streamlit as st
 from PIL import Image
 import base64
 from io import BytesIO
+from urllib.parse import quote
 
 # ================== CONFIG ==================
 st.set_page_config(page_title="Brandatta - Servicios", layout="wide")
@@ -11,7 +12,31 @@ if "ingresado" not in st.session_state:
     st.session_state.ingresado = False
 
 opciones_nav = ["Servicios", "Contacto", "Acerca de Nosotros", "Clientes"]
-if "nav" not in st.session_state or st.session_state.get("nav") not in opciones_nav:
+
+def _get_nav_from_qp() -> str | None:
+    # Compatibilidad con versiones nuevas/viejas de Streamlit
+    try:
+        # 1.30+ -> devuelve Mapping
+        qp = st.query_params
+        nav = qp.get("nav")
+        if isinstance(nav, list):  # por si alguna versión lo devuelve en lista
+            nav = nav[0] if nav else None
+        return nav
+    except Exception:
+        try:
+            qp = st.experimental_get_query_params()
+            nav = qp.get("nav")
+            if isinstance(nav, list):
+                nav = nav[0] if nav else None
+            return nav
+        except Exception:
+            return None
+
+# Resolver navegación desde query params si viene
+nav_qp = _get_nav_from_qp()
+if nav_qp in opciones_nav:
+    st.session_state.nav = nav_qp
+elif "nav" not in st.session_state or st.session_state.get("nav") not in opciones_nav:
     st.session_state.nav = "Servicios"
 
 # ===== Helper: logo a <img> base64 =====
@@ -101,7 +126,7 @@ else:
       .wrap { max-width: 1440px; margin: 0 auto; padding: 0 8px 16px; }
       [data-testid="stVerticalBlock"], [data-testid="column"], .wrap, .tile { overflow: visible !important; }
 
-      /* ===== Header estilo brandatta.com.ar (sin logo) ===== */
+      /* ===== Header texto clickeable estilo Brandatta (sin logo) ===== */
       #topnav-wrap{
         position: sticky; top: 0; z-index: 999;
         background: #ffffff; 
@@ -111,27 +136,25 @@ else:
       #topnav{
         max-width: 1440px; margin: 0 auto;
         display: flex; align-items: center; justify-content: center;
-        gap: 22px; padding: 12px 10px;
+        gap: 28px; padding: 12px 14px;
       }
-      /* botones como links */
-      #topnav .stButton > button{
-        background: transparent !important;
-        border: none !important;
-        color: #111827 !important;
-        padding: 8px 2px !important;
-        border-bottom: 3px solid transparent !important;
+      #topnav a.navlink{
+        text-decoration: none;
+        color: #111827;
+        padding: 8px 2px;
+        border-bottom: 3px solid transparent;
         text-transform: uppercase;
-        font-weight: 700 !important;
+        font-weight: 800;
         letter-spacing: .04em;
-        font-size: 0.92rem;
-        border-radius: 0 !important;
+        font-size: 0.9rem;
       }
-      #topnav .stButton > button:hover{
-        border-bottom-color: #111827 !important;
+      #topnav a.navlink:hover{
+        text-decoration: underline;
+        text-underline-offset: 3px;
       }
-      /* activo con barra inferior verde */
-      #topnav .active > button{
-        border-bottom-color: #10b981 !important; /* verde */
+      #topnav a.navlink.active{
+        border-bottom-color: #10b981; /* verde Brandatta */
+        text-decoration: none;
       }
 
       /* ===== Tarjetas ===== */
@@ -193,18 +216,14 @@ else:
     </style>
     """, unsafe_allow_html=True)
 
-    # ===== Header de navegación (estilo Brandatta, sin logo) =====
+    # ===== Header de navegación: texto clickeable (enlaces) =====
     st.markdown("<div id='topnav-wrap'><div id='topnav'>", unsafe_allow_html=True)
-    nav_labels = ["Servicios", "Contacto", "Acerca de Nosotros", "Clientes"]
-    nav_keys   = ["nav_serv", "nav_cont", "nav_acerca", "nav_cli"]
-    cols = st.columns(len(nav_labels))
-    for i, col in enumerate(cols):
-        with col:
-            active = "active" if st.session_state.nav == nav_labels[i] else ""
-            st.markdown(f"<div class='{active}'>", unsafe_allow_html=True)
-            if st.button(nav_labels[i], key=nav_keys[i]):
-                st.session_state.nav = nav_labels[i]
-            st.markdown("</div>", unsafe_allow_html=True)
+    links_html = []
+    for label in opciones_nav:
+        href = f"?nav={quote(label)}"
+        active_cls = " active" if st.session_state.nav == label else ""
+        links_html.append(f"<a class='navlink{active_cls}' href='{href}'>{label.upper()}</a>")
+    st.markdown("".join(links_html), unsafe_allow_html=True)
     st.markdown("</div></div>", unsafe_allow_html=True)
     # ===========================================
 
