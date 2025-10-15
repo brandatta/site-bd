@@ -10,7 +10,7 @@ st.set_page_config(page_title="Brandatta - Servicios", layout="wide")
 if "ingresado" not in st.session_state:
     st.session_state.ingresado = False
 
-opciones_nav = ["Servicios", "Contacto", "Acerca de nosotros", "Clientes"]
+opciones_nav = ["Servicios", "Contacto", "Acerca de Nosotros", "Clientes"]
 if "nav" not in st.session_state or st.session_state.get("nav") not in opciones_nav:
     st.session_state.nav = "Servicios"
 
