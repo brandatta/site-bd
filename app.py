@@ -165,17 +165,17 @@ else:
     </style>
     """, unsafe_allow_html=True)
 
-    # ===== MENÚ principal (preserva ing=1 y sp=1 si corresponde) =====
-    links_html = []
-    for label in OP CIONES if False else OPCIONES:
-        params = {"nav": label, "ing": "1"}
-        if st.session_state.soporte_authed:
-            params["sp"] = "1"
-        href = "./?" + "&".join([f"{k}={quote(v)}" for k, v in params.items()])
-        active_cls = " active" if st.session_state.nav == label else ""
-        links_html.append(f"<a class='{active_cls}' href='{href}' target='_self'>{label.upper()}</a>")
-    nav_html = f"<div id='topnav-wrap'><nav class='topnav'>{''.join(links_html)}</nav></div>"
-    st.markdown(nav_html, unsafe_allow_html=True)
+# ===== MENÚ principal (preserva ing=1 y sp=1 si corresponde) =====
+links_html = []
+for label in OPCIONES:
+    params = {"nav": label, "ing": "1"}
+    if st.session_state.soporte_authed:
+        params["sp"] = "1"  # mantiene login de soporte en cualquier navegación
+    href = "./?" + "&".join([f"{k}={quote(v)}" for k, v in params.items()])
+    active_cls = " active" if st.session_state.nav == label else ""
+    links_html.append(f"<a class='{active_cls}' href='{href}' target='_self'>{label.upper()}</a>")
+nav_html = f"<div id='topnav-wrap'><nav class='topnav'>{''.join(links_html)}</nav></div>"
+st.markdown(nav_html, unsafe_allow_html=True)
 
     # ===== CONTENIDO =====
     st.markdown("<div class='wrap'>", unsafe_allow_html=True)
