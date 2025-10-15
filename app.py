@@ -26,18 +26,6 @@ def _qp_get() -> dict:
     except Exception:
         return {}
 
-def _qp_set(d: dict):
-    clean = {k: v for k, v in d.items() if v is not None}
-    if hasattr(st, "query_params"):
-        try:
-            st.query_params.from_dict(clean); return
-        except Exception:
-            pass
-    try:
-        st.experimental_set_query_params(**clean)
-    except Exception:
-        pass
-
 # Resolver nav desde query params
 qp = _qp_get()
 nav_qp = unquote(qp.get("nav")) if qp.get("nav") else None
@@ -133,36 +121,36 @@ else:
       .wrap { max-width: 1440px; margin: 0 auto; padding: 0 8px 16px; }
       [data-testid="stVerticalBlock"], [data-testid="column"], .wrap, .tile { overflow: visible !important; }
 
-      /* ===== Header texto clickeable (sin logo) — mismo look que tu ejemplo ===== */
+      /* ===== Header texto clickeable (letras negras) ===== */
       #topnav-wrap{
         position: sticky; top: 0; z-index: 999;
         background: #ffffff; 
         border-bottom: 1px solid #e5e5e7;
         box-shadow: 0 1px 6px rgba(0,0,0,.04);
       }
-      /* Aseguramos flex aunque Streamlit envuelva en <p> */
+      /* Aseguramos flex aunque Streamlit inserte <p> envolviendo contenido */
       #topnav, #topnav > * {
         max-width: 1440px; margin: 0 auto;
         display: flex; align-items: center; justify-content: center;
-        gap: 28px; padding: 12px 14px;
+        gap: 32px; padding: 12px 16px;
       }
       #topnav a.navlink{
         display: inline-block;
         text-decoration: none;
-        color: #111827;
+        color: #0f0f0f;             /* 🔴 letras negras */
         padding: 8px 2px;
-        border-bottom: 3px solid transparent;
+        border-bottom: 2px solid transparent;  /* barra inferior (solo activa/hover) */
         text-transform: uppercase;
-        font-weight: 800;
-        letter-spacing: .04em;
-        font-size: 0.9rem;
+        font-weight: 700;           /* menos “pesado” que 800 */
+        letter-spacing: .03em;
+        font-size: 0.95rem;
       }
       #topnav a.navlink:hover{
-        text-decoration: underline;
-        text-underline-offset: 3px;
+        border-bottom-color: #0f0f0f;  /* subrayado negro al hover */
+        text-decoration: none;
       }
       #topnav a.navlink.active{
-        border-bottom-color: #10b981; /* verde Brandatta */
+        border-bottom-color: #0f0f0f;  /* activa con barra negra */
         text-decoration: none;
       }
 
