@@ -78,7 +78,7 @@ if not st.session_state.ingresado:
       html, body, [data-testid="stAppViewContainer"] { background: #d4fbd7 !important; font-family: 'Manjari', system-ui, sans-serif !important; }
       header, #MainMenu, footer { visibility: hidden; }
       .block-container { min-height: 100vh !important; display: flex !important; flex-direction: column !important; justify-content: center !important; align-items: center !important; }
-      #hero .stButton > button { margin-top: 28px; border-radius: 0; border: 1px solid rgba(0,0,0,0.15); background: #fff; font-weight: 700; font-family: 'Manjari', sans-serif; padding: 10px 18px; cursor: pointer; }
+      #hero .stButton > button { margin-top: 28px; border-radius: 0; border: 1px solid rgba(0,0,0,0.15); background: #fff; font-weight: 700; padding: 10px 18px; cursor: pointer; }
       @keyframes blink { 0%{opacity:1;transform:scale(1);} 50%{opacity:.4;transform:scale(1.03);} 100%{opacity:1;transform:scale(1);} }
       #hero .hero-logo { animation: blink 1.6s ease-in-out infinite; }
     </style>
@@ -104,7 +104,7 @@ else:
       [data-testid="stAppViewContainer"]{ padding-top: 0 !important; }
 
       /* ===== Menú principal ===== */
-      #topnav-wrap{ position: sticky; top: 0; z-index: 999; background: #ffffff; border-bottom: 1px solid #e5e5e7; box-shadow: 0 1px 6px rgba(0,0,0,.04); margin-top: 0 !important; }
+      #topnav-wrap{ position: sticky; top: 0; z-index: 1000; background: #ffffff; border-bottom: 1px solid #e5e5e7; box-shadow: 0 1px 6px rgba(0,0,0,.04); margin-top: 0 !important; }
       nav.topnav{ max-width: 1440px; margin: 0 auto; padding: 8px 16px !important; display: flex; align-items: center; justify-content: center; gap: 28px !important; }
       nav.topnav a{ color: #0f0f0f; text-decoration: none; padding: 8px 2px; border-bottom: 2px solid transparent; text-transform: uppercase; font-weight: 700; font-size: .95rem; transition: border .15s; }
       nav.topnav a:hover{ border-bottom-color: #0f0f0f; }
@@ -118,28 +118,48 @@ else:
         max-width: 1320px;
         margin: 20px auto 32px;
         justify-items: center;
-        overflow: visible !important; /* ✅ permite que los hover se vean fuera */
+        overflow: visible !important;   /* permite overflow */
       }
-      .tile { width: 100%; max-width: 420px; position: relative; overflow: visible !important; }
-      .card-wrap { position: relative; z-index: 10; overflow: visible !important; }
+
+      /* Cada tile crea un stacking context y sube al hover */
+      .tile { width: 100%; max-width: 420px; position: relative; overflow: visible !important; z-index: 0; }
+      .tile:hover { z-index: 200; }     /* eleva el tile activo sobre sus vecinos */
+
+      .card-wrap { position: relative; overflow: visible !important; }
       .card { background:#fff; border:1px solid #d4fbd7; height:110px; display:flex; align-items:center; justify-content:center; transition:all .15s ease; }
       .card:hover{ border-color:#bff3c5; transform:translateY(-2px); box-shadow:0 10px 24px rgba(0,0,0,.06); }
       .card h3{ font-size:1.05rem; font-weight:700; color:#111; margin:0; }
 
       /* ===== Hovercards ===== */
-      .hovercard{ position:absolute; left:50%; background:rgba(255,255,255,0.95); backdrop-filter:blur(6px); border:1px solid #e5e5e7; border-radius:10px; padding:10px 14px; opacity:0; visibility:hidden; transition:opacity .15s,transform .15s; z-index: 30; /* ✅ sobre todo */ box-shadow:0 10px 25px rgba(0,0,0,0.12); }
+      .hovercard{
+        position:absolute; left:50%;
+        background:rgba(255,255,255,0.97); backdrop-filter:blur(6px);
+        border:1px solid #e5e5e7; border-radius:10px; padding:10px 14px;
+        opacity:0; visibility:hidden; transition:opacity .15s, transform .15s;
+        z-index: 300;                    /* por encima de otros tiles */
+        box-shadow:0 12px 28px rgba(0,0,0,0.14);
+        pointer-events: none;            /* no roba el hover al salir */
+        width: max(280px, 60%);
+      }
       .card-wrap:hover .hovercard{ opacity:1; visibility:visible; }
 
-      /* Hover hacia arriba */
-      .hover-up{ bottom:calc(100% + 8px); transform:translateX(-50%) translateY(4px); }
+      /* Hacia arriba (segundas 3 tarjetas) */
+      .hover-up{ bottom:calc(100% + 8px); transform:translateX(-50%) translateY(6px); }
       .card-wrap:hover .hover-up{ transform:translateX(-50%) translateY(0); }
 
-      /* Hover hacia abajo */
-      .hover-down{ top:calc(100% + 8px); transform:translateX(-50%) translateY(-4px); }
+      /* Hacia abajo (primeras 3 tarjetas) */
+      .hover-down{ top:calc(100% + 8px); transform:translateX(-50%) translateY(-6px); }
       .card-wrap:hover .hover-down{ transform:translateX(-50%) translateY(0); }
 
       .hovercard h4{ margin:0 0 4px; font-size:1rem; font-weight:700; }
       .hovercard p{ margin:0; font-size:.9rem; color:#111; }
+
+      /* ===== Submenú Soporte ===== */
+      #subnav-wrap{ position: sticky; top: 48px; z-index: 900; background: #ffffff; border-bottom: 1px solid #f0f0f1; }
+      nav.subnav{ max-width: 1000px; margin: 0 auto; padding: 8px 16px; display: flex; align-items: center; justify-content: center; gap: 22px; }
+      nav.subnav a{ display:inline-block; color:#111827; text-decoration:none; padding:6px 2px; border-bottom:2px solid transparent; font-weight:600; font-size:.92rem; }
+      nav.subnav a:hover{ border-bottom-color:#111827; }
+      nav.subnav a.active{ border-bottom-color:#111827; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -188,14 +208,15 @@ else:
         st.markdown(f"<div class='services-grid'>{html_cards}</div>", unsafe_allow_html=True)
 
     elif nav == "Contacto":
-        st.markdown("<h3>Contacto</h3><p>Email: brandatta@brandatta.com.ar</p><p>Teléfono: +54 11 0000-0000</p>", unsafe_allow_html=True)
+        st.markdown("<h3>Contacto</h3><p>Email: brandatta@brandatta.com.ar</p><p>Teléfono: +54 11 0000-0000</p><p>Dirección: Buenos Aires, Argentina</p>", unsafe_allow_html=True)
 
     elif nav == "Acerca de Nosotros":
-        st.markdown("<h3>Acerca de nosotros</h3><p>Construimos soluciones digitales a medida...</p>", unsafe_allow_html=True)
+        st.markdown("<h3>Acerca de nosotros</h3><p>Construimos soluciones digitales a medida: integraciones con SAP y Ecommerce, tableros, automatizaciones y apps. Enfocados en performance, UX minimalista y resultados de negocio.</p>", unsafe_allow_html=True)
 
     elif nav == "Clientes":
-        st.markdown("<h3>Clientes</h3><p>Trabajamos con compañías de retail, industria y servicios...</p>", unsafe_allow_html=True)
+        st.markdown("<h3>Clientes</h3><p>Trabajamos con compañías de retail, industria y servicios: Georgalos, Vicbor, ITPS, Biosidus, Glam, Espumas, Café Martínez, entre otros.</p>", unsafe_allow_html=True)
 
+    # ===== SOPORTE =====
     elif nav == "Soporte":
         if not st.session_state.soporte_authed:
             st.markdown("### Soporte — Iniciar sesión")
@@ -207,9 +228,69 @@ else:
                 if email and pwd:
                     st.session_state.soporte_authed = True
                     st.session_state.soporte_user = email
-                    _qp_set({"nav": "Soporte", "ing": "1", "sp": "1"})
+                    _qp_set({"nav": "Soporte", "ing": "1", "sp": "1", "snav": st.session_state.snav})
                     st.success(f"Bienvenido/a, {email}")
                 else:
                     st.error("Completá email y contraseña.")
         else:
-            st.markdown("### Soporte autenticado (en desarrollo)")
+            # Submenú Soporte (sticky y con persistencia)
+            sub_links = []
+            for slabel in SOPORTE_OPCIONES:
+                params = {"nav": "Soporte", "snav": slabel, "ing": "1", "sp": "1"}
+                href = "./?" + "&".join([f"{k}={quote(v)}" for k, v in params.items()])
+                active = " active" if st.session_state.snav == slabel else ""
+                sub_links.append(f"<a class='{active}' href='{href}' target='_self'>{slabel}</a>")
+            st.markdown(f"<div id='subnav-wrap'><nav class='subnav'>{''.join(sub_links)}</nav></div>", unsafe_allow_html=True)
+
+            st.markdown("<div class='hairline' style='border-top:1px solid #e5e5e7;margin:10px 0 14px 0;'></div>", unsafe_allow_html=True)
+
+            snav = st.session_state.snav
+            if snav == "Cargar Ticket":
+                st.markdown("### Cargar Ticket")
+                with st.form("form_ticket", clear_on_submit=True):
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        email_t = st.text_input("Tu email", value=st.session_state.soporte_user or "")
+                        asunto = st.text_input("Asunto")
+                        severidad = st.selectbox("Severidad", ["Baja", "Media", "Alta", "Crítica"])
+                    with col2:
+                        area = st.selectbox("Área", ["Ecommerce", "Finanzas", "Industria", "Infraestructura", "Otro"])
+                        archivo = st.file_uploader("Adjuntar archivo (opcional)")
+                    descripcion = st.text_area("Descripción del problema", height=160, placeholder="Contanos qué ocurrió, pasos para reproducir, capturas, etc.")
+                    enviar = st.form_submit_button("Enviar ticket")
+                if enviar:
+                    if not (email_t and asunto and descripcion):
+                        st.error("Completá email, asunto y descripción.")
+                    else:
+                        import uuid
+                        ticket_id = f"TCK-{uuid.uuid4().hex[:8].upper()}"
+                        st.success(f"✅ Ticket creado: **{ticket_id}**")
+                        st.info("Nuestro equipo te contactará a la brevedad. Revisá tu email para actualizaciones.")
+
+            elif snav == "Documentación":
+                st.markdown("### Documentación")
+                doc_cols = st.columns(2)
+                with doc_cols[0]:
+                    st.markdown("- Introducción a APIs Brandatta")
+                    st.markdown("- Integración con ERP (SAP)")
+                    st.markdown("- Webhooks: mejores prácticas")
+                    st.markdown("- Seguridad y autenticación")
+                with doc_cols[1]:
+                    st.markdown("- Métricas y monitoreo")
+                    st.markdown("- Trazabilidad y tracking")
+                    st.markdown("- E-commerce: Checkout & pagos")
+                    st.markdown("- Resolución de errores comunes")
+
+            elif snav == "Manuales":
+                st.markdown("### Manuales")
+                man_cols = st.columns(2)
+                with man_cols[0]:
+                    st.markdown("- Manual de Operador de Planta")
+                    st.markdown("- Manual de Ecommerce (Administrador)")
+                    st.markdown("- Manual de Finanzas (Conciliaciones)")
+                with man_cols[1]:
+                    st.markdown("- Manual de KPIs & Dashboards")
+                    st.markdown("- Manual de Gestión de Stock")
+                    st.markdown("- Manual de Alertas y SLA")
+
+    st.markdown("</div>", unsafe_allow_html=True)
