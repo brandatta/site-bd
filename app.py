@@ -76,11 +76,9 @@ def header_logo_html(path="logooo (1).png"):
         img = Image.open(path)
         buf = BytesIO(); img.save(buf, format="PNG")
         b64 = base64.b64encode(buf.getvalue()).decode()
-        # No seteamos width fijo; usamos height por CSS para hacerlo responsive
         return f'<img id="brand-logo" src="data:image/png;base64,{b64}" alt="Brandatta" />'
     except Exception:
-        # Fallback simple si no está el archivo
-        return "<div id='brand-logo' style='width:120px;height:36px;background:#eee;border:1px solid #ddd;border-radius:6px;'></div>"
+        return "<div id='brand-logo' style='width:140px;height:48px;background:#eee;border:1px solid #ddd;border-radius:6px;'></div>"
 
 # ================== PORTADA ==================
 if not st.session_state.ingresado:
@@ -122,24 +120,35 @@ else:
       }
       nav.topnav{
         max-width: 1440px; margin: 0 auto;
-        padding: 8px 16px; display: flex; align-items: center; justify-content: space-between; gap: 16px;
+        padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; gap: 16px;
         position: relative;
       }
-      /* Estructura: izquierda logo, centro nav, derecha spacer para centrar real */
-      .nav-left{ display:flex; align-items:center; gap: 10px; min-width: 120px; }
-      .nav-center{ position:absolute; left:50%; transform:translateX(-50%); display:flex; gap: 28px; align-items:center; }
-      .nav-right{ min-width: 120px; } /* spacer simétrico al logo */
+      .nav-left{ display:flex; align-items:center; gap: 10px; min-width: 180px; }
+      .nav-center{ position:absolute; left:50%; transform:translateX(-50%); display:flex; gap: 30px; align-items:center; }
+      .nav-right{ min-width: 180px; }
 
-      /* Logo responsive */
-      #brand-logo{ height: 36px; width: auto; display:block; }
-      @media (max-width: 1200px){ #brand-logo{ height: 32px; } .nav-center{ gap: 24px; } }
-      @media (max-width: 900px){  #brand-logo{ height: 28px; } .nav-center{ gap: 18px; } }
-      @media (max-width: 640px){  #brand-logo{ height: 24px; } .nav-center{ gap: 14px; } }
+      /* Logo responsive (más grande) */
+      #brand-logo{ height: 48px; width: auto; display:block; }
+      @media (max-width: 1200px){
+        #brand-logo{ height: 42px; }
+        .nav-center{ gap: 28px; }
+        .nav-left, .nav-right { min-width: 160px; }
+      }
+      @media (max-width: 900px){
+        #brand-logo{ height: 36px; }
+        .nav-center{ gap: 20px; }
+        .nav-left, .nav-right { min-width: 140px; }
+      }
+      @media (max-width: 640px){
+        #brand-logo{ height: 30px; }
+        .nav-center{ gap: 16px; }
+        .nav-left, .nav-right { min-width: 120px; }
+      }
 
       /* Links del nav */
       .nav-center a{
         color: #0f0f0f; text-decoration: none; padding: 8px 2px;
-        border-bottom: 2px solid transparent; text-transform: uppercase; font-weight: 700; font-size: .95rem; transition: border .15s;
+        border-bottom: 2px solid transparent; text-transform: uppercase; font-weight: 700; font-size: 1rem; transition: border .15s;
         white-space: nowrap;
       }
       .nav-center a:hover{ border-bottom-color: #0f0f0f; }
@@ -184,7 +193,7 @@ else:
       .hovercard p{ margin:0; font-size:.9rem; color:#111; }
 
       /* ===== Submenú Soporte ===== */
-      #subnav-wrap{ position: sticky; top: 48px; z-index: 900; background: #ffffff; border-bottom: 1px solid #f0f0f1; }
+      #subnav-wrap{ position: sticky; top: 58px; z-index: 900; background: #ffffff; border-bottom: 1px solid #f0f0f1; }
       nav.subnav{ max-width: 1000px; margin: 0 auto; padding: 8px 16px; display: flex; align-items: center; justify-content: center; gap: 22px; }
       nav.subnav a{ display:inline-block; color:#111827; text-decoration:none; padding:6px 2px; border-bottom:2px solid transparent; font-weight:600; font-size:.92rem; }
       nav.subnav a:hover{ border-bottom-color:#111827; }
@@ -194,7 +203,6 @@ else:
 
     # ===== HEADER (logo a la izquierda + menú centrado) =====
     logo_left = header_logo_html("logooo (1).png")
-    # Links
     links_html = []
     for label in OPCIONES:
         params = {"nav": label, "ing": "1"}
@@ -278,13 +286,17 @@ else:
                     st.error("Completá email y contraseña.")
         else:
             # Submenú Soporte (sticky y con persistencia)
+            st.markdown("""
+            <div id='subnav-wrap'>
+              <nav class='subnav'>
+            """, unsafe_allow_html=True)
             sub_links = []
             for slabel in SOPORTE_OPCIONES:
                 params = {"nav": "Soporte", "snav": slabel, "ing": "1", "sp": "1"}
                 href = "./?" + "&".join([f"{k}={quote(v)}" for k, v in params.items()])
                 active = " active" if st.session_state.snav == slabel else ""
                 sub_links.append(f"<a class='{active}' href='{href}' target='_self'>{slabel}</a>")
-            st.markdown(f"<div id='subnav-wrap'><nav class='subnav'>{''.join(sub_links)}</nav></div>", unsafe_allow_html=True)
+            st.markdown("".join(sub_links) + "</nav></div>", unsafe_allow_html=True)
 
             st.markdown("<div class='hairline' style='border-top:1px solid #e5e5e7;margin:10px 0 14px 0;'></div>", unsafe_allow_html=True)
 
@@ -303,7 +315,7 @@ else:
                     descripcion = st.text_area("Descripción del problema", height=160, placeholder="Contanos qué ocurrió, pasos para reproducir, capturas, etc.")
                     enviar = st.form_submit_button("Enviar ticket")
                 if enviar:
-                    if not (email_t and asunto and descripcion):
+                    if not (email_t and asunto y := asunto) or not descripcion:
                         st.error("Completá email, asunto y descripción.")
                     else:
                         import uuid
