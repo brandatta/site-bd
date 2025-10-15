@@ -32,21 +32,29 @@ if not st.session_state.ingresado:
 
       html, body, [data-testid="stAppViewContainer"] {
         background: #d4fbd7 !important;
-        font-family: 'Manjari', system-ui, sans-serif !important;
+        font-family: 'Manjari', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important;
       }
-      header, #MainMenu, footer {visibility: hidden;}
+      header, #MainMenu, footer { visibility: hidden; }
 
       .block-container, [data-testid="block-container"] {
         min-height: 100vh !important;
         display: flex !important;
         flex-direction: column !important;
-        justify-content: center !important;
-        align-items: center !important;
         padding-top: 0 !important;
         padding-bottom: 0 !important;
       }
 
-      .stButton > button {
+      [data-testid="stVerticalBlock"]:first-of-type {
+        flex: 1 0 auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 14px !important;
+        width: 100% !important;
+      }
+
+      #hero .stButton > button {
         display: block !important;
         margin: 28px auto 0 auto !important;
         border-radius: 0 !important;
@@ -58,14 +66,24 @@ if not st.session_state.ingresado:
         cursor: pointer;
       }
 
-      @keyframes blink { 0%{opacity:1;transform:scale(1);} 50%{opacity:.35;transform:scale(1.02);} 100%{opacity:1;transform:scale(1);} }
-      .hero-logo { animation: blink 1.6s ease-in-out infinite; }
+      @keyframes blink { 
+        0%{opacity:1;transform:scale(1);} 
+        50%{opacity:.35;transform:scale(1.02);} 
+        100%{opacity:1;transform:scale(1);} 
+      }
+      #hero .hero-logo { animation: blink 1.6s ease-in-out infinite; }
     </style>
     """, unsafe_allow_html=True)
 
+    st.markdown("<div id='hero'>", unsafe_allow_html=True)
     st.markdown(logo_html_src(width_px=200).replace("<img ", "<img class='hero-logo' "), unsafe_allow_html=True)
-    if st.button("Ingresar", key="ingresar_btn"):
-        st.session_state.ingresado = True
+
+    c1, c2, c3 = st.columns([1,2,1])
+    with c2:
+        if st.button("Ingresar", key="ingresar_btn"):
+            st.session_state.ingresado = True
+
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # ================== CONTENIDO ==================
 else:
@@ -91,7 +109,6 @@ else:
         font-family: 'Manjari', system-ui, sans-serif !important;
       }
 
-      /* Tarjetas con mismo ancho y mitad de altura */
       .tile { width: 440px; margin: 0 auto 28px; position: relative; }
       @media (max-width: 1200px){ .tile{ width: 400px; } }
       @media (max-width: 900px){  .tile{ width: 360px; } }
@@ -102,7 +119,7 @@ else:
         background: #ffffff;
         border: 1px solid #d4fbd7;
         border-radius: 0;
-        height: 110px; /* 🔹 mitad de la altura original */
+        height: 110px; /* 🔹 mitad */
         display: flex;
         align-items: center;
         justify-content: center;
@@ -126,17 +143,11 @@ else:
       }
 
       .row-spacer { height: 36px; }
-      .title {
-        text-align:center;
-        font-weight:700;
-        font-size:1.2rem;
-        margin: 0 0 10px 0;
-      }
-      .hairline   { border-top: 1px solid #e5e5e7; margin: 10px 0 14px 0; }
+      .title { text-align:center; font-weight:700; font-size:1.2rem; margin: 0 0 10px 0; }
+      .hairline { border-top: 1px solid #e5e5e7; margin: 10px 0 14px 0; }
       .section h3 { margin: 0 0 6px 0; font-size: 1.05rem; font-weight:700; }
-      .section p  { margin: 0 0 4px 0; color: #333; font-size: 0.98rem; font-weight:400; }
+      .section p { margin: 0 0 4px 0; color: #333; font-size: 0.98rem; font-weight:400; }
 
-      /* ===== Hovercard ===== */
       .hovercard {
         position: absolute;
         left: 50%;
@@ -196,27 +207,6 @@ else:
         transform: translateX(-50%) translateY(0);
       }
 
-      .card-wrap.below .hovercard::after {
-        content: "";
-        position: absolute;
-        bottom: 100%;
-        left: 50%;
-        transform: translateX(-50%) rotate(180deg);
-        border-width: 7px;
-        border-style: solid;
-        border-color: #e5e5e7 transparent transparent transparent;
-      }
-      .card-wrap.below .hovercard::before {
-        content: "";
-        position: absolute;
-        bottom: calc(100% - 1px);
-        left: 50%;
-        transform: translateX(-50%) rotate(180deg);
-        border-width: 6px;
-        border-style: solid;
-        border-color: #ffffff transparent transparent transparent;
-      }
-
       .hovercard h4 {
         margin: 0 0 6px 0;
         font-size: 1rem;
@@ -233,7 +223,6 @@ else:
 
     st.markdown("<div class='wrap'>", unsafe_allow_html=True)
 
-    # Dropdown centrado sin label
     s1, s2, s3 = st.columns([1,2,1])
     with s2:
         st.markdown("<div class='nav-select'>", unsafe_allow_html=True)
@@ -246,10 +235,8 @@ else:
         st.session_state.nav = seleccion
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # -------- Contenido según selección --------
     if st.session_state.nav == "Servicios":
         st.markdown("<div class='title'>Servicios</div>", unsafe_allow_html=True)
-
         servicios = [
             {"titulo": "APIs", "desc1": "Diseño y desarrollo de APIs escalables.", "desc2": "Autenticación, rate limiting y monitoreo."},
             {"titulo": "Software para Industrias", "desc1": "Sistemas a medida para planta/producción.", "desc2": "Integración con ERP y tableros."},
@@ -259,7 +246,6 @@ else:
             {"titulo": "Gestión de Stock", "desc1": "Inventario en tiempo real.", "desc2": "Alertas, valuación y KPIs."},
         ]
 
-        # Fila 1 (arriba)
         cols = st.columns(3, gap="large")
         for i, col in enumerate(cols):
             with col:
@@ -279,7 +265,6 @@ else:
 
         st.markdown("<div class='row-spacer'></div>", unsafe_allow_html=True)
 
-        # Fila 2 (abajo)
         cols2 = st.columns(3, gap="large")
         for j, col in enumerate(cols2):
             idx2 = 3 + j
