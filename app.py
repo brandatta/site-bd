@@ -288,7 +288,7 @@ else:
         st.markdown("""
         <div class="section">
           <h3>Contacto</h3>
-          <p>Email: brandatta@brandatta.com.at</p>
+          <p>Email: brandatta@brandatta.com.ar</p>
           <p>Teléfono: +54 11 0000-0000</p>
           <p>Dirección: Buenos Aires, Argentina</p>
         </div>
