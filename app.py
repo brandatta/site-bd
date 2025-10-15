@@ -2,7 +2,6 @@ import streamlit as st
 from PIL import Image
 import base64
 from io import BytesIO
-from urllib.parse import quote
 
 # ================== CONFIG ==================
 st.set_page_config(page_title="Brandatta - Servicios", layout="wide")
@@ -10,34 +9,6 @@ st.set_page_config(page_title="Brandatta - Servicios", layout="wide")
 # ================== STATE ==================
 if "ingresado" not in st.session_state:
     st.session_state.ingresado = False
-
-opciones_nav = ["Servicios", "Contacto", "Acerca de Nosotros", "Clientes"]
-
-def _get_nav_from_qp() -> str | None:
-    # Compatibilidad con versiones nuevas/viejas de Streamlit
-    try:
-        # 1.30+ -> devuelve Mapping
-        qp = st.query_params
-        nav = qp.get("nav")
-        if isinstance(nav, list):  # por si alguna versión lo devuelve en lista
-            nav = nav[0] if nav else None
-        return nav
-    except Exception:
-        try:
-            qp = st.experimental_get_query_params()
-            nav = qp.get("nav")
-            if isinstance(nav, list):
-                nav = nav[0] if nav else None
-            return nav
-        except Exception:
-            return None
-
-# Resolver navegación desde query params si viene
-nav_qp = _get_nav_from_qp()
-if nav_qp in opciones_nav:
-    st.session_state.nav = nav_qp
-elif "nav" not in st.session_state or st.session_state.get("nav") not in opciones_nav:
-    st.session_state.nav = "Servicios"
 
 # ===== Helper: logo a <img> base64 =====
 def logo_html_src(path="logo.png", width_px=200):
@@ -126,7 +97,7 @@ else:
       .wrap { max-width: 1440px; margin: 0 auto; padding: 0 8px 16px; }
       [data-testid="stVerticalBlock"], [data-testid="column"], .wrap, .tile { overflow: visible !important; }
 
-      /* ===== Header texto clickeable estilo Brandatta (sin logo) ===== */
+      /* ===== Header texto clickeable (sin logo) ===== */
       #topnav-wrap{
         position: sticky; top: 0; z-index: 999;
         background: #ffffff; 
@@ -138,7 +109,9 @@ else:
         display: flex; align-items: center; justify-content: center;
         gap: 28px; padding: 12px 14px;
       }
+      /* Importante: los <a> deben ser elementos directos de #topnav para que el gap funcione */
       #topnav a.navlink{
+        display: inline-block;
         text-decoration: none;
         color: #111827;
         padding: 8px 2px;
@@ -156,6 +129,9 @@ else:
         border-bottom-color: #10b981; /* verde Brandatta */
         text-decoration: none;
       }
+
+      /* ===== Ajuste de ancla para header sticky ===== */
+      .section-anchor { scroll-margin-top: 90px; }
 
       /* ===== Tarjetas ===== */
       .tile { width: 440px; margin: 0 auto 28px; position: relative; }
@@ -216,96 +192,96 @@ else:
     </style>
     """, unsafe_allow_html=True)
 
-    # ===== Header de navegación: texto clickeable (enlaces) =====
-    st.markdown("<div id='topnav-wrap'><div id='topnav'>", unsafe_allow_html=True)
-    links_html = []
-    for label in opciones_nav:
-        href = f"?nav={quote(label)}"
-        active_cls = " active" if st.session_state.nav == label else ""
-        links_html.append(f"<a class='navlink{active_cls}' href='{href}'>{label.upper()}</a>")
-    st.markdown("".join(links_html), unsafe_allow_html=True)
-    st.markdown("</div></div>", unsafe_allow_html=True)
-    # ===========================================
+    # ===== Header (texto clickeable con anclas) =====
+    st.markdown("<div id='topnav-wrap'><div id='topnav'>"
+                "<a class='navlink active' href='#servicios'>SERVICIOS</a>"
+                "<a class='navlink' href='#contacto'>CONTACTO</a>"
+                "<a class='navlink' href='#acerca'>ACERCA DE NOSOTROS</a>"
+                "<a class='navlink' href='#clientes'>CLIENTES</a>"
+                "</div></div>", unsafe_allow_html=True)
 
     st.markdown("<div class='wrap'>", unsafe_allow_html=True)
 
-    # -------- Contenido según selección --------
-    if st.session_state.nav == "Servicios":
-        st.markdown("<div class='title'>Servicios</div>", unsafe_allow_html=True)
-        servicios = [
-            {"titulo": "APIs", "desc1": "Diseño y desarrollo de APIs escalables.", "desc2": "Autenticación, rate limiting y monitoreo."},
-            {"titulo": "Software para Industrias", "desc1": "Sistemas a medida para planta/producción.", "desc2": "Integración con ERP y tableros."},
-            {"titulo": "Tracking de Pedidos", "desc1": "Trazabilidad punta a punta.", "desc2": "Notificaciones y SLA visibles."},
-            {"titulo": "Ecommerce", "desc1": "Tiendas headless / integradas.", "desc2": "Pagos, logística y analytics."},
-            {"titulo": "Finanzas", "desc1": "Forecasting y conciliaciones automáticas.", "desc2": "Reportes y auditoría."},
-            {"titulo": "Gestión de Stock", "desc1": "Inventario en tiempo real.", "desc2": "Alertas, valuación y KPIs."},
-        ]
+    # ===== Sección: Servicios =====
+    st.markdown("<div id='servicios' class='section-anchor'></div>", unsafe_allow_html=True)
+    st.markdown("<div class='title'>Servicios</div>", unsafe_allow_html=True)
+    servicios = [
+        {"titulo": "APIs", "desc1": "Diseño y desarrollo de APIs escalables.", "desc2": "Autenticación, rate limiting y monitoreo."},
+        {"titulo": "Software para Industrias", "desc1": "Sistemas a medida para planta/producción.", "desc2": "Integración con ERP y tableros."},
+        {"titulo": "Tracking de Pedidos", "desc1": "Trazabilidad punta a punta.", "desc2": "Notificaciones y SLA visibles."},
+        {"titulo": "Ecommerce", "desc1": "Tiendas headless / integradas.", "desc2": "Pagos, logística y analytics."},
+        {"titulo": "Finanzas", "desc1": "Forecasting y conciliaciones automáticas.", "desc2": "Reportes y auditoría."},
+        {"titulo": "Gestión de Stock", "desc1": "Inventario en tiempo real.", "desc2": "Alertas, valuación y KPIs."},
+    ]
 
-        cols = st.columns(3, gap="large")
-        for i, col in enumerate(cols):
-            with col:
-                svc = servicios[i]
-                st.markdown(f"""
-                <div class='tile'>
-                  <div class='card-wrap below'>
-                    <div class='card'><h3>{svc["titulo"]}</h3></div>
-                    <div class='hovercard'>
-                      <h4>{svc["titulo"]}</h4>
-                      <p>• {svc["desc1"]}</p>
-                      <p>• {svc["desc2"]}</p>
-                    </div>
-                  </div>
+    cols = st.columns(3, gap="large")
+    for i, col in enumerate(cols):
+        with col:
+            svc = servicios[i]
+            st.markdown(f"""
+            <div class='tile'>
+              <div class='card-wrap below'>
+                <div class='card'><h3>{svc["titulo"]}</h3></div>
+                <div class='hovercard'>
+                  <h4>{svc["titulo"]}</h4>
+                  <p>• {svc["desc1"]}</p>
+                  <p>• {svc["desc2"]}</p>
                 </div>
-                """, unsafe_allow_html=True)
+              </div>
+            </div>
+            """, unsafe_allow_html=True)
 
-        st.markdown("<div class='row-spacer'></div>", unsafe_allow_html=True)
+    st.markdown("<div class='row-spacer'></div>", unsafe_allow_html=True)
 
-        cols2 = st.columns(3, gap="large")
-        for j, col in enumerate(cols2):
-            idx2 = 3 + j
-            with col:
-                svc = servicios[idx2]
-                st.markdown(f"""
-                <div class='tile'>
-                  <div class='card-wrap'>
-                    <div class='card'><h3>{svc["titulo"]}</h3></div>
-                    <div class='hovercard'>
-                      <h4>{svc["titulo"]}</h4>
-                      <p>• {svc["desc1"]}</p>
-                      <p>• {svc["desc2"]}</p>
-                    </div>
-                  </div>
+    cols2 = st.columns(3, gap="large")
+    for j, col in enumerate(cols2):
+        idx2 = 3 + j
+        with col:
+            svc = servicios[idx2]
+            st.markdown(f"""
+            <div class='tile'>
+              <div class='card-wrap'>
+                <div class='card'><h3>{svc["titulo"]}</h3></div>
+                <div class='hovercard'>
+                  <h4>{svc["titulo"]}</h4>
+                  <p>• {svc["desc1"]}</p>
+                  <p>• {svc["desc2"]}</p>
                 </div>
-                """, unsafe_allow_html=True)
+              </div>
+            </div>
+            """, unsafe_allow_html=True)
 
-    elif st.session_state.nav == "Contacto":
-        st.markdown("<div class='hairline'></div>", unsafe_allow_html=True)
-        st.markdown("""
-        <div class="section">
-          <h3>Contacto</h3>
-          <p>Email: brandatta@brandatta.com.ar</p>
-          <p>Teléfono: +54 11 0000-0000</p>
-          <p>Dirección: Buenos Aires, Argentina</p>
-        </div>
-        """, unsafe_allow_html=True)
+    # ===== Sección: Contacto =====
+    st.markdown("<div id='contacto' class='section-anchor'></div>", unsafe_allow_html=True)
+    st.markdown("<div class='hairline'></div>", unsafe_allow_html=True)
+    st.markdown("""
+    <div class="section">
+      <h3>Contacto</h3>
+      <p>Email: brandatta@brandatta.com.ar</p>
+      <p>Teléfono: +54 11 0000-0000</p>
+      <p>Dirección: Buenos Aires, Argentina</p>
+    </div>
+    """, unsafe_allow_html=True)
 
-    elif st.session_state.nav == "Acerca de Nosotros":
-        st.markdown("<div class='hairline'></div>", unsafe_allow_html=True)
-        st.markdown("""
-        <div class="section">
-          <h3>Acerca de nosotros</h3>
-          <p>Construimos soluciones digitales a medida: integraciones con SAP y Ecommerce, tableros, automatizaciones y apps.</p>
-          <p>Enfocados en performance, UX minimalista y resultados de negocio.</p>
-        </div>
-        """, unsafe_allow_html=True)
+    # ===== Sección: Acerca de Nosotros =====
+    st.markdown("<div id='acerca' class='section-anchor'></div>", unsafe_allow_html=True)
+    st.markdown("<div class='hairline'></div>", unsafe_allow_html=True)
+    st.markdown("""
+    <div class="section">
+      <h3>Acerca de nosotros</h3>
+      <p>Construimos soluciones digitales a medida: integraciones con SAP y Ecommerce, tableros, automatizaciones y apps.</p>
+      <p>Enfocados en performance, UX minimalista y resultados de negocio.</p>
+    </div>
+    """, unsafe_allow_html=True)
 
-    elif st.session_state.nav == "Clientes":
-        st.markdown("<div class='hairline'></div>", unsafe_allow_html=True)
-        st.markdown("""
-        <div class="section">
-          <h3>Clientes</h3>
-          <p>Trabajamos con compañías de retail, industria y servicios: Georgalos, Vicbor, ITPS, Biosidus, Glam, Espumas, Café Martínez, entre otros.</p>
-        </div>
-        """, unsafe_allow_html=True)
+    # ===== Sección: Clientes =====
+    st.markdown("<div id='clientes' class='section-anchor'></div>", unsafe_allow_html=True)
+    st.markdown("<div class='hairline'></div>", unsafe_allow_html=True)
+    st.markdown("""
+    <div class="section">
+      <h3>Clientes</h3>
+      <p>Trabajamos con compañías de retail, industria y servicios: Georgalos, Vicbor, ITPS, Biosidus, Glam, Espumas, Café Martínez, entre otros.</p>
+    </div>
+    """, unsafe_allow_html=True)
 
     st.markdown("</div>", unsafe_allow_html=True)
