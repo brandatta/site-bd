@@ -131,25 +131,37 @@ else:
       nav.subnav a:hover{ border-bottom-color:#111827; }
       nav.subnav a.active{ border-bottom-color:#111827; }
 
-      /* ===== Fila de servicios centrada y con espacio ===== */
-      .services-row{
-        display:flex; justify-content:center; align-items:stretch;
-        gap: 24px;           /* espacio entre tarjetas de la misma fila */
-        margin-bottom: 28px; /* espacio vertical entre filas */
-        flex-wrap: wrap;     /* responsive */
+      /* ===== Grid de Servicios (centrado y responsive) ===== */
+      .services-grid{
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 24px;                 /* espacio uniforme entre tarjetas */
+        max-width: 1320px;         /* ancho total de la grilla */
+        margin: 0 auto 32px;       /* centrada + espacio inferior */
+        justify-items: center;     /* centra cada tile dentro de su celda */
+        align-items: stretch;
+        overflow: visible;
       }
 
       /* Tarjetas */
-      .tile { width: 440px; margin: 0; position: relative; } /* gap maneja el espaciado */
-      @media (max-width: 1200px){ .tile{ width: 400px; } }
-      @media (max-width: 900px){  .tile{ width: 360px; } }
+      .tile {
+        width: 100%;
+        max-width: 440px;          /* tope de ancho por tarjeta */
+        position: relative;
+      }
+      @media (max-width: 1200px){ .tile{ max-width: 400px; } }
+      @media (max-width: 900px){  .tile{ max-width: 360px; } }
 
       .card-wrap { position: relative; }
-      .card { background:#ffffff; border:1px solid #d4fbd7; border-radius:0; height:110px; display:flex; align-items:center; justify-content:center; text-align:center; transition:border-color .12s ease, transform .12s ease, box-shadow .12s ease; }
+      .card {
+        background:#ffffff; border:1px solid #d4fbd7; border-radius:0; height:110px;
+        display:flex; align-items:center; justify-content:center; text-align:center;
+        transition:border-color .12s ease, transform .12s ease, box-shadow .12s ease;
+      }
       .card:hover{ border-color:#bff3c5; transform:translateY(-1px); box-shadow:0 12px 24px rgba(0,0,0,.06); }
       .card h3{ margin:0; font-size:1.05rem; font-weight:700; letter-spacing:.15px; color:#111827; line-height:1.25; padding:0 12px; }
 
-      .row-spacer { height: 10px; } /* ya hay margin-bottom en .services-row */
+      .row-spacer { height: 10px; }
       .title { text-align:center; font-weight:700; font-size:1.2rem; margin: 0 0 16px 0; }
       .hairline { border-top: 1px solid #e5e5e7; margin: 10px 0 14px 0; }
       .section h3 { margin: 0 0 6px 0; font-size: 1.05rem; font-weight:700; }
@@ -210,13 +222,12 @@ else:
             {"titulo": "Gestión de Stock", "desc1": "Inventario en tiempo real.", "desc2": "Alertas, valuación y KPIs."},
         ]
 
-        # Fila 1 (hover abajo en las tarjetas)
-        row1_html = "<div class='services-row'>" + "".join([_tile_html(servicios[i], below=True) for i in range(3)]) + "</div>"
-        st.markdown(row1_html, unsafe_allow_html=True)
-
-        # Fila 2 (hover arriba en las tarjetas)
-        row2_html = "<div class='services-row'>" + "".join([_tile_html(servicios[i], below=False) for i in range(3,6)]) + "</div>"
-        st.markdown(row2_html, unsafe_allow_html=True)
+        # Render: grilla única, primeras 3 con hover "below", siguientes 3 normal
+        tiles_html = []
+        for i, svc in enumerate(servicios):
+            tiles_html.append(_tile_html(svc, below=(i < 3)))
+        grid_html = "<div class='services-grid'>" + "".join(tiles_html) + "</div>"
+        st.markdown(grid_html, unsafe_allow_html=True)
 
     elif nav == "Contacto":
         st.markdown("<div class='hairline'></div>", unsafe_allow_html=True)
