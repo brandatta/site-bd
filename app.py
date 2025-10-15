@@ -101,14 +101,31 @@ else:
       .wrap { max-width: 1440px; margin: 0 auto; padding: 0 8px 16px; }
       [data-testid="stVerticalBlock"], [data-testid="column"], .wrap, .tile { overflow: visible !important; }
 
-      .nav-select .stSelectbox > div > div {
-        border-radius: 0 !important;
-        border: 1px solid #e5e5e7 !important;
+      /* ===== Header de navegación ===== */
+      #topnav { 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        gap: 8px; 
+        padding: 10px 8px 18px; 
+        border-bottom: 1px solid #e5e5e7;
+        margin-bottom: 12px;
       }
-      .nav-select [data-baseweb="select"] * {
-        font-family: 'Manjari', system-ui, sans-serif !important;
+      #topnav .stButton > button{
+        border-radius: 999px !important;
+        border: 1px solid #e5e5e7 !important;
+        background: #fff !important;
+        padding: 6px 14px !important;
+        font-weight: 700 !important;
+        letter-spacing: .2px;
+      }
+      /* activo */
+      #topnav .active > button{
+        background: #d4fbd7 !important;
+        border-color: #bff3c5 !important;
       }
 
+      /* ===== Tarjetas ===== */
       .tile { width: 440px; margin: 0 auto 28px; position: relative; }
       @media (max-width: 1200px){ .tile{ width: 400px; } }
       @media (max-width: 900px){  .tile{ width: 360px; } }
@@ -119,7 +136,7 @@ else:
         background: #ffffff;
         border: 1px solid #d4fbd7;
         border-radius: 0;
-        height: 110px; /* 🔹 mitad */
+        height: 110px; /* mitad */
         display: flex;
         align-items: center;
         justify-content: center;
@@ -148,6 +165,7 @@ else:
       .section h3 { margin: 0 0 6px 0; font-size: 1.05rem; font-weight:700; }
       .section p { margin: 0 0 4px 0; color: #333; font-size: 0.98rem; font-weight:400; }
 
+      /* ===== Hovercard ===== */
       .hovercard {
         position: absolute;
         left: 50%;
@@ -207,34 +225,31 @@ else:
         transform: translateX(-50%) translateY(0);
       }
 
-      .hovercard h4 {
-        margin: 0 0 6px 0;
-        font-size: 1rem;
-        font-weight: 700;
-        color: #0f172a;
-      }
-      .hovercard p {
-        margin: 0 0 4px 0;
-        font-size: .9rem;
-        color: #111827;
-      }
+      .hovercard h4 { margin: 0 0 6px 0; font-size: 1rem; font-weight: 700; color: #0f172a; }
+      .hovercard p  { margin: 0 0 4px 0; font-size: .9rem; color: #111827; }
     </style>
     """, unsafe_allow_html=True)
 
     st.markdown("<div class='wrap'>", unsafe_allow_html=True)
 
-    s1, s2, s3 = st.columns([1,2,1])
-    with s2:
-        st.markdown("<div class='nav-select'>", unsafe_allow_html=True)
-        nav_actual = st.session_state.get("nav", "Servicios")
-        try:
-            idx = opciones_nav.index(nav_actual)
-        except ValueError:
-            idx = 0
-        seleccion = st.selectbox("Navegación", opciones_nav, index=idx, key="nav_select", label_visibility="collapsed")
-        st.session_state.nav = seleccion
-        st.markdown("</div>", unsafe_allow_html=True)
+    # ===== Header de navegación (reemplaza al dropdown) =====
+    st.markdown("<div id='topnav'>", unsafe_allow_html=True)
+    cols = st.columns([1,1,1,1, 6])  # 4 botones + espacio flexible
+    labels = ["Servicios", "Contacto", "Acerca de Nosotros", "Clientes"]
+    keys   = ["nav_serv", "nav_cont", "nav_acerca", "nav_cli"]
 
+    for i, col in enumerate(cols[:4]):
+        with col:
+            # clase 'active' para el botón actual (solo para estilos CSS)
+            active_class = "active" if st.session_state.nav == labels[i] else ""
+            st.markdown(f"<div class='{active_class}'>", unsafe_allow_html=True)
+            if st.button(labels[i], key=keys[i]):
+                st.session_state.nav = labels[i]
+            st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+    # ===========================================
+
+    # -------- Contenido según selección --------
     if st.session_state.nav == "Servicios":
         st.markdown("<div class='title'>Servicios</div>", unsafe_allow_html=True)
         servicios = [
@@ -294,7 +309,7 @@ else:
         </div>
         """, unsafe_allow_html=True)
 
-    elif st.session_state.nav == "Acerca de nosotros":
+    elif st.session_state.nav == "Acerca de Nosotros":
         st.markdown("<div class='hairline'></div>", unsafe_allow_html=True)
         st.markdown("""
         <div class="section">
