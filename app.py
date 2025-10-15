@@ -26,9 +26,26 @@ def _qp_get() -> dict:
     except Exception:
         return {}
 
-# Resolver nav ANTES de pintar UI
+def _qp_set(d: dict):
+    clean = {k: v for k, v in d.items() if v is not None}
+    if hasattr(st, "query_params"):
+        try:
+            st.query_params.from_dict(clean); return
+        except Exception:
+            pass
+    try:
+        st.experimental_set_query_params(**clean)
+    except Exception:
+        pass
+
+# ====== Leer nav/ingresado desde la URL ANTES de renderizar ======
 qp = _qp_get()
 nav_qp = unquote(qp.get("nav")) if qp.get("nav") else None
+ing_qp = qp.get("ing")  # 🔸 ing=1 mantiene la sesión como ingresada
+
+if ing_qp == "1":
+    st.session_state.ingresado = True  # 🔸 fuerza sesión ingresada si la URL lo dice
+
 if nav_qp in OPCIONES:
     st.session_state.nav = nav_qp
 elif "nav" not in st.session_state or st.session_state.get("nav") not in OPCIONES:
@@ -49,24 +66,11 @@ if not st.session_state.ingresado:
     st.markdown("""
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&display=swap');
-      html, body, [data-testid="stAppViewContainer"] {
-        background: #d4fbd7 !important;
-        font-family: 'Manjari', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important;
-      }
+      html, body, [data-testid="stAppViewContainer"] { background: #d4fbd7 !important; font-family: 'Manjari', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important; }
       header, #MainMenu, footer { visibility: hidden; }
-      .block-container, [data-testid="block-container"] {
-        min-height: 100vh !important; display: flex !important; flex-direction: column !important;
-        padding-top: 0 !important; padding-bottom: 0 !important;
-      }
-      [data-testid="stVerticalBlock"]:first-of-type {
-        flex: 1 0 auto !important; display: flex !important; flex-direction: column !important;
-        align-items: center !important; justify-content: center !important; gap: 14px !important; width: 100% !important;
-      }
-      #hero .stButton > button {
-        display:block !important; margin:28px auto 0 auto !important; border-radius:0 !important;
-        border:1px solid rgba(0,0,0,0.15) !important; background:#fff !important; font-weight:700 !important;
-        font-family:'Manjari', system-ui, sans-serif !important; padding:10px 18px !important; cursor:pointer;
-      }
+      .block-container, [data-testid="block-container"] { min-height: 100vh !important; display: flex !important; flex-direction: column !important; padding-top: 0 !important; padding-bottom: 0 !important; }
+      [data-testid="stVerticalBlock"]:first-of-type { flex: 1 0 auto !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; gap: 14px !important; width: 100% !important; }
+      #hero .stButton > button { display:block !important; margin:28px auto 0 auto !important; border-radius:0 !important; border:1px solid rgba(0,0,0,0.15) !important; background:#fff !important; font-weight:700 !important; font-family:'Manjari', system-ui, sans-serif !important; padding:10px 18px !important; cursor:pointer; }
       @keyframes blink { 0%{opacity:1;transform:scale(1);} 50%{opacity:.35;transform:scale(1.02);} 100%{opacity:1;transform:scale(1);} }
       #hero .hero-logo { animation: blink 1.6s ease-in-out infinite; }
     </style>
@@ -79,6 +83,8 @@ if not st.session_state.ingresado:
     with c2:
         if st.button("Ingresar", key="ingresar_btn"):
             st.session_state.ingresado = True
+            # 🔸 Seteamos ing=1 y mantenemos nav actual en la URL para que no vuelva la portada
+            _qp_set({"nav": st.session_state.get("nav", "Servicios"), "ing": "1"})
 
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -95,22 +101,11 @@ else:
       .wrap { max-width: 1440px; margin: 0 auto; padding: 0 8px 16px; }
       [data-testid="stVerticalBlock"], [data-testid="column"], .wrap, .tile { overflow: visible !important; }
 
-      /* ===== MENÚ: <nav> con links (letras negras), horizontal, sticky ===== */
-      #topnav-wrap{
-        position: sticky; top: 0; z-index: 999;
-        background: #ffffff; border-bottom: 1px solid #e5e5e7; box-shadow: 0 1px 6px rgba(0,0,0,.04);
-      }
-      nav.topnav{
-        max-width: 1440px; margin: 0 auto; padding: 12px 16px;
-        display: flex; align-items: center; justify-content: center; gap: 32px;
-      }
-      /* Asegura que NO se muestren como lista y que no haya bullets ni márgenes raros */
+      /* ===== MENÚ: <nav> con links negros, horizontal, sticky ===== */
+      #topnav-wrap{ position: sticky; top: 0; z-index: 999; background: #ffffff; border-bottom: 1px solid #e5e5e7; box-shadow: 0 1px 6px rgba(0,0,0,.04); }
+      nav.topnav{ max-width: 1440px; margin: 0 auto; padding: 12px 16px; display: flex; align-items: center; justify-content: center; gap: 32px; }
       nav.topnav * { margin: 0; padding: 0; }
-      nav.topnav a{
-        display: inline-block; color: #0f0f0f; text-decoration: none;
-        padding: 8px 2px; border-bottom: 2px solid transparent;
-        text-transform: uppercase; font-weight: 700; letter-spacing: .03em; font-size: .95rem;
-      }
+      nav.topnav a{ display: inline-block; color: #0f0f0f; text-decoration: none; padding: 8px 2px; border-bottom: 2px solid transparent; text-transform: uppercase; font-weight: 700; letter-spacing: .03em; font-size: .95rem; }
       nav.topnav a:hover{ border-bottom-color: #0f0f0f; }
       nav.topnav a.active{ border-bottom-color: #0f0f0f; }
 
@@ -118,13 +113,8 @@ else:
       .tile { width: 440px; margin: 0 auto 28px; position: relative; }
       @media (max-width: 1200px){ .tile{ width: 400px; } }
       @media (max-width: 900px){  .tile{ width: 360px; } }
-
       .card-wrap { position: relative; }
-      .card {
-        background:#ffffff; border:1px solid #d4fbd7; border-radius:0; height:110px;
-        display:flex; align-items:center; justify-content:center; text-align:center;
-        transition:border-color .12s ease, transform .12s ease, box-shadow .12s ease;
-      }
+      .card { background:#ffffff; border:1px solid #d4fbd7; border-radius:0; height:110px; display:flex; align-items:center; justify-content:center; text-align:center; transition:border-color .12s ease, transform .12s ease, box-shadow .12s ease; }
       .card:hover{ border-color:#bff3c5; transform:translateY(-1px); box-shadow:0 12px 24px rgba(0,0,0,.06); }
       .card h3{ margin:0; font-size:1.05rem; font-weight:700; letter-spacing:.15px; color:#111827; line-height:1.25; padding:0 12px; }
 
@@ -135,15 +125,11 @@ else:
       .section p { margin: 0 0 4px 0; color: #333; font-size: 0.98rem; font-weight:400; }
 
       /* ===== Hovercard ===== */
-      .hovercard { position:absolute; left:50%; width:min(420px,90vw); background:rgba(255,255,255,0.8); backdrop-filter:blur(8px);
-                   border:1px solid #e5e5e7; border-radius:10px; padding:10px 14px; box-shadow:0 14px 28px rgba(0,0,0,.12);
-                   opacity:0; visibility:hidden; transition:opacity .14s ease, transform .14s ease, visibility .14s; z-index:50; pointer-events:none; }
+      .hovercard { position:absolute; left:50%; width:min(420px,90vw); background:rgba(255,255,255,0.8); backdrop-filter:blur(8px); border:1px solid #e5e5e7; border-radius:10px; padding:10px 14px; box-shadow:0 14px 28px rgba(0,0,0,.12); opacity:0; visibility:hidden; transition:opacity .14s ease, transform .14s ease, visibility .14s; z-index:50; pointer-events:none; }
       .card-wrap .hovercard { bottom:calc(100% + 10px); transform:translateX(-50%) translateY(6px); }
       .card-wrap:hover .hovercard { opacity:1; visibility:visible; transform:translateX(-50%) translateY(0); }
-      .card-wrap .hovercard::after{ content:""; position:absolute; top:100%; left:50%; transform:translateX(-50%);
-                                    border-width:7px; border-style:solid; border-color:#e5e5e7 transparent transparent transparent; }
-      .card-wrap .hovercard::before{ content:""; position:absolute; top:calc(100% - 1px); left:50%; transform:translateX(-50%);
-                                     border-width:6px; border-style:solid; border-color:#ffffff transparent transparent transparent; }
+      .card-wrap .hovercard::after{ content:""; position:absolute; top:100%; left:50%; transform:translateX(-50%); border-width:7px; border-style:solid; border-color:#e5e5e7 transparent transparent transparent; }
+      .card-wrap .hovercard::before{ content:""; position:absolute; top:calc(100% - 1px); left:50%; transform:translateX(-50%); border-width:6px; border-style:solid; border-color:#ffffff transparent transparent transparent; }
       .card-wrap.below .hovercard { top: calc(100% + 10px); bottom:auto; transform: translateX(-50%) translateY(-6px); }
       .card-wrap.below:hover .hovercard { opacity:1; visibility:visible; transform: translateX(-50%) translateY(0); }
       .hovercard h4 { margin:0 0 6px 0; font-size:1rem; font-weight:700; color:#0f172a; }
@@ -151,10 +137,14 @@ else:
     </style>
     """, unsafe_allow_html=True)
 
-    # ===== MENÚ (sin listas): un solo bloque HTML para evitar que Streamlit meta <p> intermedios =====
+    # ===== MENÚ (nav con ?nav=... y preserva ing=1) =====
     links_html = []
     for label in OPCIONES:
-        href = f"./?nav={quote(label)}"
+        # 🔸 Si ya estás ingresado, agregamos ing=1 para no perder el estado al navegar
+        if st.session_state.ingresado:
+            href = f"./?nav={quote(label)}&ing=1"
+        else:
+            href = f"./?nav={quote(label)}"
         active_cls = " active" if st.session_state.nav == label else ""
         links_html.append(f"<a class='{active_cls}' href='{href}' target='_self'>{label.upper()}</a>")
     nav_html = f"<div id='topnav-wrap'><nav class='topnav'>{''.join(links_html)}</nav></div>"
