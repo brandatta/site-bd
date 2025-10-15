@@ -18,7 +18,7 @@ if "soporte_user" not in st.session_state:
 OPCIONES = ["Servicios", "Contacto", "Acerca de Nosotros", "Clientes", "Soporte"]
 SOPORTE_OPCIONES = ["Cargar Ticket", "Documentación", "Manuales"]
 
-# -------- Query params (compat 1.30+ y previas) --------
+# -------- Query params helpers --------
 def _qp_get() -> dict:
     try:
         return {k: (v[0] if isinstance(v, list) else v) for k, v in st.query_params.items()}
@@ -38,7 +38,7 @@ def _qp_set(d: dict):
         except Exception:
             pass
 
-# ====== Leer nav/ing/snav/sp desde la URL ANTES de renderizar ======
+# ====== Leer query params ======
 qp = _qp_get()
 nav_qp  = unquote(qp.get("nav"))  if qp.get("nav")  else None
 ing_qp  = qp.get("ing")
@@ -60,7 +60,7 @@ if snav_qp in SOPORTE_OPCIONES:
 elif "snav" not in st.session_state or st.session_state.get("snav") not in SOPORTE_OPCIONES:
     st.session_state.snav = SOPORTE_OPCIONES[0]
 
-# ===== Helper: logo a <img> base64 =====
+# ===== Helper: logo en base64 =====
 def logo_html_src(path="logo.png", width_px=200):
     try:
         img = Image.open(path)
@@ -105,7 +105,7 @@ else:
       /* ===== Menú principal ===== */
       #topnav-wrap{ position: sticky; top: 0; z-index: 999; background: #ffffff; border-bottom: 1px solid #e5e5e7; box-shadow: 0 1px 6px rgba(0,0,0,.04); }
       nav.topnav{ max-width: 1440px; margin: 0 auto; padding: 12px 16px; display: flex; align-items: center; justify-content: center; gap: 32px; }
-      nav.topnav a{ color: #0f0f0f; text-decoration: none; padding: 8px 2px; border-bottom: 2px solid transparent; text-transform: uppercase; font-weight: 700; font-size: .95rem; }
+      nav.topnav a{ color: #0f0f0f; text-decoration: none; padding: 8px 2px; border-bottom: 2px solid transparent; text-transform: uppercase; font-weight: 700; font-size: .95rem; transition: border .15s; }
       nav.topnav a:hover{ border-bottom-color: #0f0f0f; }
       nav.topnav a.active{ border-bottom-color: #0f0f0f; }
 
@@ -137,7 +137,9 @@ else:
             params["sp"] = "1"
         href = "./?" + "&".join([f"{k}={quote(v)}" for k, v in params.items()])
         active = " active" if st.session_state.nav == label else ""
-        links_html.append(f"<a class='{active}' href='{href}'>{label.upper()}</a>")
+        # 🔹 Ahora forzamos que abra en la misma pestaña
+        links_html.append(f"<a class='{active}' href='{href}' target='_self'>{label.upper()}</a>")
+
     st.markdown(f"<div id='topnav-wrap'><nav class='topnav'>{''.join(links_html)}</nav></div>", unsafe_allow_html=True)
 
     st.markdown("<div class='wrap'>", unsafe_allow_html=True)
@@ -204,7 +206,7 @@ else:
                 params = {"nav": "Soporte", "snav": slabel, "ing": "1", "sp": "1"}
                 href = "./?" + "&".join([f"{k}={quote(v)}" for k, v in params.items()])
                 active = " active" if st.session_state.snav == slabel else ""
-                sub_links.append(f"<a class='{active}' href='{href}'>{slabel}</a>")
+                sub_links.append(f"<a class='{active}' href='{href}' target='_self'>{slabel}</a>")
             st.markdown(f"<div id='subnav-wrap'><nav class='subnav'>{''.join(sub_links)}</nav></div>", unsafe_allow_html=True)
 
             snav = st.session_state.snav
