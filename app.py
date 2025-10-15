@@ -60,7 +60,7 @@ if snav_qp in SOPORTE_OPCIONES:
 elif "snav" not in st.session_state or st.session_state.get("snav") not in SOPORTE_OPCIONES:
     st.session_state.snav = SOPORTE_OPCIONES[0]
 
-# ===== Helper: logo para portada =====
+# ===== Helper: logo portada (en base64) =====
 def logo_html_src(path="logo.png", width_px=200):
     try:
         img = Image.open(path)
@@ -70,7 +70,7 @@ def logo_html_src(path="logo.png", width_px=200):
     except Exception:
         return "<p style='text-align:center;font-weight:600;margin:0;'>Subí <code>logo.png</code> a la carpeta de la app.</p>"
 
-# ===== Helper: logo para header (base64) =====
+# ===== Helper: logo header (en base64) =====
 def header_logo_html(path="logooo (1).png"):
     try:
         img = Image.open(path)
@@ -78,7 +78,8 @@ def header_logo_html(path="logooo (1).png"):
         b64 = base64.b64encode(buf.getvalue()).decode()
         return f'<img id="brand-logo" src="data:image/png;base64,{b64}" alt="Brandatta" />'
     except Exception:
-        return "<div id='brand-logo' style='width:140px;height:48px;background:#eee;border:1px solid #ddd;border-radius:6px;'></div>"
+        # fallback si no existe el archivo
+        return "<div id='brand-logo' style='width:160px;height:60px;background:#eee;border:1px solid #ddd;border-radius:6px;'></div>"
 
 # ================== PORTADA ==================
 if not st.session_state.ingresado:
@@ -113,42 +114,42 @@ else:
       .block-container, [data-testid="block-container"]{ padding-top: 0 !important; padding-bottom: 0 !important; }
       [data-testid="stAppViewContainer"]{ padding-top: 0 !important; }
 
-      /* ===== Menú principal ===== */
+      /* ===== Header sticky con logo (solo MOD acá para tamaño logo) ===== */
       #topnav-wrap{
         position: sticky; top: 0; z-index: 1000;
-        background: #ffffff; border-bottom: 1px solid #e5e5e7; box-shadow: 0 1px 6px rgba(0,0,0,.04); margin-top: 0 !important;
+        background: #ffffff; border-bottom: 1px solid #e5e5e7; box-shadow: 0 1px 6px rgba(0,0,0,.04);
+        margin-top: 0 !important;
       }
       nav.topnav{
         max-width: 1440px; margin: 0 auto;
-        padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; gap: 16px;
+        padding: 8px 16px !important;
+        display: flex; align-items: center; justify-content: space-between; gap: 16px;
         position: relative;
       }
-      .nav-left{ display:flex; align-items:center; gap: 10px; min-width: 180px; }
-      .nav-center{ position:absolute; left:50%; transform:translateX(-50%); display:flex; gap: 30px; align-items:center; }
-      .nav-right{ min-width: 180px; }
+      .nav-left{ display:flex; align-items:center; gap:10px; min-width: 200px; }
+      .nav-center{ position:absolute; left:50%; transform:translateX(-50%); display:flex; gap:28px; align-items:center; }
+      .nav-right{ min-width: 200px; }
 
-      /* Logo responsive (más grande) */
-      #brand-logo{ height: 52px; width: auto; display:block; }
+      /* ===== LOGO más grande (60px) ===== */
+      #brand-logo{ height: 60px; width: auto; display:block; }
+
       @media (max-width: 1200px){
-        #brand-logo{ height: 42px; }
-        .nav-center{ gap: 28px; }
-        .nav-left, .nav-right { min-width: 200px; }
+        #brand-logo{ height: 52px; }
+        .nav-left, .nav-right { min-width: 180px; }
       }
       @media (max-width: 900px){
-        #brand-logo{ height: 36px; }
-        .nav-center{ gap: 20px; }
-        .nav-left, .nav-right { min-width: 140px; }
+        #brand-logo{ height: 44px; }
+        .nav-left, .nav-right { min-width: 160px; }
       }
       @media (max-width: 640px){
-        #brand-logo{ height: 30px; }
-        .nav-center{ gap: 16px; }
+        #brand-logo{ height: 36px; }
         .nav-left, .nav-right { min-width: 120px; }
       }
 
       /* Links del nav */
       .nav-center a{
         color: #0f0f0f; text-decoration: none; padding: 8px 2px;
-        border-bottom: 2px solid transparent; text-transform: uppercase; font-weight: 700; font-size: 1rem; transition: border .15s;
+        border-bottom: 2px solid transparent; text-transform: uppercase; font-weight: 700; font-size: .95rem; transition: border .15s;
         white-space: nowrap;
       }
       .nav-center a:hover{ border-bottom-color: #0f0f0f; }
@@ -172,7 +173,6 @@ else:
       .card:hover{ border-color:#bff3c5; transform:translateY(-2px); box-shadow:0 10px 24px rgba(0,0,0,.06); }
       .card h3{ font-size:1.05rem; font-weight:700; color:#111; margin:0; }
 
-      /* ===== Hovercards ===== */
       .hovercard{
         position:absolute; left:50%;
         background:rgba(255,255,255,0.97); backdrop-filter:blur(6px);
@@ -182,18 +182,15 @@ else:
         pointer-events: none; width: max(280px, 60%);
       }
       .card-wrap:hover .hovercard{ opacity:1; visibility:visible; }
-
       .hover-up{ bottom:calc(100% + 8px); transform:translateX(-50%) translateY(6px); }
       .card-wrap:hover .hover-up{ transform:translateX(-50%) translateY(0); }
-
       .hover-down{ top:calc(100% + 8px); transform:translateX(-50%) translateY(-6px); }
       .card-wrap:hover .hover-down{ transform:translateX(-50%) translateY(0); }
-
       .hovercard h4{ margin:0 0 4px; font-size:1rem; font-weight:700; }
       .hovercard p{ margin:0; font-size:.9rem; color:#111; }
 
       /* ===== Submenú Soporte ===== */
-      #subnav-wrap{ position: sticky; top: 58px; z-index: 900; background: #ffffff; border-bottom: 1px solid #f0f0f1; }
+      #subnav-wrap{ position: sticky; top: 48px; z-index: 900; background: #ffffff; border-bottom: 1px solid #f0f0f1; }
       nav.subnav{ max-width: 1000px; margin: 0 auto; padding: 8px 16px; display: flex; align-items: center; justify-content: center; gap: 22px; }
       nav.subnav a{ display:inline-block; color:#111827; text-decoration:none; padding:6px 2px; border-bottom:2px solid transparent; font-weight:600; font-size:.92rem; }
       nav.subnav a:hover{ border-bottom-color:#111827; }
@@ -201,7 +198,7 @@ else:
     </style>
     """, unsafe_allow_html=True)
 
-    # ===== HEADER (logo a la izquierda + menú centrado) =====
+    # ===== HEADER (logo izquierda + nav centrado) =====
     logo_left = header_logo_html("logooo (1).png")
     links_html = []
     for label in OPCIONES:
@@ -286,17 +283,13 @@ else:
                     st.error("Completá email y contraseña.")
         else:
             # Submenú Soporte (sticky y con persistencia)
-            st.markdown("""
-            <div id='subnav-wrap'>
-              <nav class='subnav'>
-            """, unsafe_allow_html=True)
             sub_links = []
             for slabel in SOPORTE_OPCIONES:
                 params = {"nav": "Soporte", "snav": slabel, "ing": "1", "sp": "1"}
                 href = "./?" + "&".join([f"{k}={quote(v)}" for k, v in params.items()])
                 active = " active" if st.session_state.snav == slabel else ""
                 sub_links.append(f"<a class='{active}' href='{href}' target='_self'>{slabel}</a>")
-            st.markdown("".join(sub_links) + "</nav></div>", unsafe_allow_html=True)
+            st.markdown(f"<div id='subnav-wrap'><nav class='subnav'>{''.join(sub_links)}</nav></div>", unsafe_allow_html=True)
 
             st.markdown("<div class='hairline' style='border-top:1px solid #e5e5e7;margin:10px 0 14px 0;'></div>", unsafe_allow_html=True)
 
@@ -317,12 +310,11 @@ else:
                 if enviar:
                     if not (email_t and asunto and descripcion):
                         st.error("Completá email, asunto y descripción.")
-                else:
-                    import uuid
-                    ticket_id = f"TCK-{uuid.uuid4().hex[:8].upper()}"
-                    st.success(f"✅ Ticket creado: **{ticket_id}**")
-                    st.info("Nuestro equipo te contactará a la brevedad. Revisá tu email para actualizaciones.")
-
+                    else:
+                        import uuid
+                        ticket_id = f"TCK-{uuid.uuid4().hex[:8].upper()}"
+                        st.success(f"✅ Ticket creado: **{ticket_id}**")
+                        st.info("Nuestro equipo te contactará a la brevedad. Revisá tu email para actualizaciones.")
 
             elif snav == "Documentación":
                 st.markdown("### Documentación")
