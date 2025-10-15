@@ -118,21 +118,23 @@ else:
         max-width: 1320px;
         margin: 20px auto 32px;
         justify-items: center;
+        overflow: visible !important; /* ✅ permite que los hover se vean fuera */
       }
-      .tile { width: 100%; max-width: 420px; position: relative; }
+      .tile { width: 100%; max-width: 420px; position: relative; overflow: visible !important; }
+      .card-wrap { position: relative; z-index: 10; overflow: visible !important; }
       .card { background:#fff; border:1px solid #d4fbd7; height:110px; display:flex; align-items:center; justify-content:center; transition:all .15s ease; }
       .card:hover{ border-color:#bff3c5; transform:translateY(-2px); box-shadow:0 10px 24px rgba(0,0,0,.06); }
       .card h3{ font-size:1.05rem; font-weight:700; color:#111; margin:0; }
 
-      /* ===== Hovercards generales ===== */
-      .hovercard{ position:absolute; left:50%; background:rgba(255,255,255,0.9); backdrop-filter:blur(6px); border:1px solid #e5e5e7; border-radius:10px; padding:10px 14px; opacity:0; visibility:hidden; transition:opacity .15s,transform .15s; }
+      /* ===== Hovercards ===== */
+      .hovercard{ position:absolute; left:50%; background:rgba(255,255,255,0.95); backdrop-filter:blur(6px); border:1px solid #e5e5e7; border-radius:10px; padding:10px 14px; opacity:0; visibility:hidden; transition:opacity .15s,transform .15s; z-index: 30; /* ✅ sobre todo */ box-shadow:0 10px 25px rgba(0,0,0,0.12); }
       .card-wrap:hover .hovercard{ opacity:1; visibility:visible; }
 
-      /* 🔹 Hover hacia arriba (por defecto) */
+      /* Hover hacia arriba */
       .hover-up{ bottom:calc(100% + 8px); transform:translateX(-50%) translateY(4px); }
       .card-wrap:hover .hover-up{ transform:translateX(-50%) translateY(0); }
 
-      /* 🔹 Hover hacia abajo (para las tarjetas superiores) */
+      /* Hover hacia abajo */
       .hover-down{ top:calc(100% + 8px); transform:translateX(-50%) translateY(-4px); }
       .card-wrap:hover .hover-down{ transform:translateX(-50%) translateY(0); }
 
@@ -170,7 +172,7 @@ else:
 
         html_cards = ""
         for i, svc in enumerate(servicios):
-            hover_class = "hover-down" if i < 3 else "hover-up"  # 🔹 las primeras 3 aparecen hacia abajo
+            hover_class = "hover-down" if i < 3 else "hover-up"
             html_cards += f"""
 <div class='tile'>
   <div class='card-wrap'>
@@ -189,12 +191,11 @@ else:
         st.markdown("<h3>Contacto</h3><p>Email: brandatta@brandatta.com.ar</p><p>Teléfono: +54 11 0000-0000</p>", unsafe_allow_html=True)
 
     elif nav == "Acerca de Nosotros":
-        st.markdown("<h3>Acerca de nosotros</h3><p>Construimos soluciones digitales a medida: integraciones con SAP y Ecommerce, tableros, automatizaciones y apps.</p>", unsafe_allow_html=True)
+        st.markdown("<h3>Acerca de nosotros</h3><p>Construimos soluciones digitales a medida...</p>", unsafe_allow_html=True)
 
     elif nav == "Clientes":
-        st.markdown("<h3>Clientes</h3><p>Trabajamos con compañías de retail, industria y servicios: Georgalos, Vicbor, ITPS, Biosidus, Glam, Espumas, Café Martínez, entre otros.</p>", unsafe_allow_html=True)
+        st.markdown("<h3>Clientes</h3><p>Trabajamos con compañías de retail, industria y servicios...</p>", unsafe_allow_html=True)
 
-    # ===== SOPORTE =====
     elif nav == "Soporte":
         if not st.session_state.soporte_authed:
             st.markdown("### Soporte — Iniciar sesión")
@@ -211,27 +212,4 @@ else:
                 else:
                     st.error("Completá email y contraseña.")
         else:
-            sub_links = []
-            for slabel in SOPORTE_OPCIONES:
-                params = {"nav": "Soporte", "snav": slabel, "ing": "1", "sp": "1"}
-                href = "./?" + "&".join([f"{k}={quote(v)}" for k, v in params.items()])
-                active = " active" if st.session_state.snav == slabel else ""
-                sub_links.append(f"<a class='{active}' href='{href}' target='_self'>{slabel}</a>")
-            st.markdown(f"<div id='subnav-wrap'><nav class='subnav'>{''.join(sub_links)}</nav></div>", unsafe_allow_html=True)
-
-            snav = st.session_state.snav
-            if snav == "Cargar Ticket":
-                st.markdown("### Cargar Ticket")
-                with st.form("form_ticket"):
-                    email_t = st.text_input("Tu email", value=st.session_state.soporte_user or "")
-                    asunto = st.text_input("Asunto")
-                    descripcion = st.text_area("Descripción del problema")
-                    enviar = st.form_submit_button("Enviar ticket")
-                if enviar:
-                    st.success("✅ Ticket enviado correctamente.")
-            elif snav == "Documentación":
-                st.markdown("### Documentación\n- APIs Brandatta\n- Integración con ERP (SAP)\n- Webhooks y Seguridad", unsafe_allow_html=True)
-            elif snav == "Manuales":
-                st.markdown("### Manuales\n- Manual de Operador de Planta\n- Manual de Ecommerce (Administrador)\n- Manual de Finanzas", unsafe_allow_html=True)
-
-    st.markdown("</div>", unsafe_allow_html=True)
+            st.markdown("### Soporte autenticado (en desarrollo)")
