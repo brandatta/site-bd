@@ -16,25 +16,21 @@ OPCIONES = ["Servicios", "Contacto", "Acerca de Nosotros", "Clientes"]
 # -------- Helpers query params (compat múltiples versiones) --------
 def _qp_get() -> dict:
     if hasattr(st, "query_params"):
-        # Streamlit 1.30+ Mapping-like
         try:
             qp = st.query_params
-            # convertir a dict normal
             return {k: (v[0] if isinstance(v, list) else v) for k, v in qp.items()}
         except Exception:
             pass
     try:
-        return {k: v[0] if isinstance(v, list) else v for k, v in st.experimental_get_query_params().items()}
+        return {k: (v[0] if isinstance(v, list) else v) for k, v in st.experimental_get_query_params().items()}
     except Exception:
         return {}
 
 def _qp_set(d: dict):
-    # limpia None
     clean = {k: v for k, v in d.items() if v is not None}
     if hasattr(st, "query_params"):
         try:
-            st.query_params.from_dict(clean)
-            return
+            st.query_params.from_dict(clean); return
         except Exception:
             pass
     try:
@@ -70,12 +66,18 @@ if not st.session_state.ingresado:
         font-family: 'Manjari', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important;
       }
       header, #MainMenu, footer { visibility: hidden; }
-      .block-container, [data-testid="block-container"] { min-height: 100vh !important; display: flex !important; flex-direction: column !important; padding-top: 0 !important; padding-bottom: 0 !important; }
-      [data-testid="stVerticalBlock"]:first-of-type { flex: 1 0 auto !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; gap: 14px !important; width: 100% !important; }
+      .block-container, [data-testid="block-container"] {
+        min-height: 100vh !important; display: flex !important; flex-direction: column !important;
+        padding-top: 0 !important; padding-bottom: 0 !important;
+      }
+      [data-testid="stVerticalBlock"]:first-of-type {
+        flex: 1 0 auto !important; display: flex !important; flex-direction: column !important;
+        align-items: center !important; justify-content: center !important; gap: 14px !important; width: 100% !important;
+      }
       #hero .stButton > button {
-        display: block !important; margin: 28px auto 0 auto !important; border-radius: 0 !important;
-        border: 1px solid rgba(0,0,0,0.15) !important; background: #fff !important; font-weight: 700 !important;
-        font-family: 'Manjari', system-ui, sans-serif !important; padding: 10px 18px !important; cursor: pointer;
+        display:block !important; margin:28px auto 0 auto !important; border-radius:0 !important;
+        border:1px solid rgba(0,0,0,0.15) !important; background:#fff !important; font-weight:700 !important;
+        font-family:'Manjari', system-ui, sans-serif !important; padding:10px 18px !important; cursor:pointer;
       }
       @keyframes blink { 0%{opacity:1;transform:scale(1);} 50%{opacity:.35;transform:scale(1.02);} 100%{opacity:1;transform:scale(1);} }
       #hero .hero-logo { animation: blink 1.6s ease-in-out infinite; }
@@ -98,7 +100,7 @@ else:
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&display=swap');
 
-      [data-testid="stAppViewContainer"] { background: #ffffff !important; font-family: 'Manjari', system-ui, sans-serif !important; }
+      [data-testid="stAppViewContainer"] { background:#ffffff !important; font-family:'Manjari', system-ui, sans-serif !important; }
       header, #MainMenu, footer {visibility: hidden;}
       .block-container, [data-testid="block-container"] { padding-top: 0 !important; padding-bottom: 0 !important; }
 
@@ -106,11 +108,26 @@ else:
       [data-testid="stVerticalBlock"], [data-testid="column"], .wrap, .tile { overflow: visible !important; }
 
       /* ===== Header texto clickeable (sin logo) ===== */
-      #topnav-wrap{ position: sticky; top: 0; z-index: 999; background: #ffffff; border-bottom: 1px solid #e5e5e7; box-shadow: 0 1px 6px rgba(0,0,0,.04); }
-      #topnav{ max-width: 1440px; margin: 0 auto; display: flex; align-items: center; justify-content: center; gap: 28px; padding: 12px 14px; }
-      #topnav a.navlink{ display:inline-block; text-decoration:none; color:#111827; padding:8px 2px; border-bottom:3px solid transparent; text-transform:uppercase; font-weight:800; letter-spacing:.04em; font-size:.9rem; }
-      #topnav a.navlink:hover{ text-decoration: underline; text-underline-offset: 3px; }
-      #topnav a.navlink.active{ border-bottom-color:#10b981; text-decoration:none; }
+      #topnav-wrap{
+        position: sticky; top: 0; z-index: 999;
+        background: #ffffff; border-bottom: 1px solid #e5e5e7; box-shadow: 0 1px 6px rgba(0,0,0,.04);
+      }
+      /* Importante: soportar que Streamlit inserte <p> dentro */
+      #topnav, #topnav > * {
+        max-width: 1440px; margin: 0 auto; display: flex; align-items: center; justify-content: center;
+        gap: 28px; padding: 12px 14px;
+      }
+      #topnav a.navlink{
+        display: inline-block; text-decoration: none; color: #111827;
+        padding: 8px 2px; border-bottom: 3px solid transparent;
+        text-transform: uppercase; font-weight: 800; letter-spacing: .04em; font-size: 0.9rem;
+      }
+      #topnav a.navlink:hover{
+        text-decoration: underline; text-underline-offset: 3px;
+      }
+      #topnav a.navlink.active{
+        border-bottom-color: #10b981; text-decoration: none;
+      }
 
       /* ===== Tarjetas ===== */
       .tile { width: 440px; margin: 0 auto 28px; position: relative; }
@@ -118,8 +135,12 @@ else:
       @media (max-width: 900px){  .tile{ width: 360px; } }
 
       .card-wrap { position: relative; }
-      .card { background:#ffffff; border:1px solid #d4fbd7; border-radius:0; height:110px; display:flex; align-items:center; justify-content:center; text-align:center; transition:border-color .12s ease, transform .12s ease, box-shadow .12s ease; }
-      .card:hover{ border-color:#bff3c5; transform:translateY(-1px); box-shadow:0 12px 24px rgba(0,0,0,.06); }
+      .card {
+        background:#ffffff; border:1px solid #d4fbd7; border-radius:0; height:110px;
+        display:flex; align-items:center; justify-content:center; text-align:center;
+        transition:border-color .12s ease, transform .12s ease, box-shadow .12s ease;
+      }
+      .card:hover { border-color:#bff3c5; transform:translateY(-1px); box-shadow:0 12px 24px rgba(0,0,0,.06); }
       .card h3{ margin:0; font-size:1.05rem; font-weight:700; letter-spacing:.15px; color:#111827; line-height:1.25; padding:0 12px; }
 
       .row-spacer { height: 36px; }
@@ -129,7 +150,15 @@ else:
       .section p { margin: 0 0 4px 0; color: #333; font-size: 0.98rem; font-weight:400; }
 
       /* ===== Hovercard ===== */
-      .hovercard { position:absolute; left:50%; width:min(420px,90vw); background:rgba(255,255,255,0.8); backdrop-filter:blur(8px); border:1px solid #e5e5e7; border-radius:10px; padding:10px 14px; box-shadow:0 14px 28px rgba(0,0,0,.12); opacity:0; visibility:hidden; transition:opacity .14s ease, transform .14s ease, visibility .14s; z-index:50; pointer-events:none; }
+      .hovercard {
+        position:absolute; left:50%; width:min(420px, 90vw);
+        background:rgba(255,255,255,0.8); backdrop-filter:blur(8px);
+        border:1px solid #e5e5e7; border-radius:10px; padding:10px 14px;
+        box-shadow:0 14px 28px rgba(0,0,0,.12);
+        opacity:0; visibility:hidden;
+        transition:opacity .14s ease, transform .14s ease, visibility .14s;
+        z-index:50; pointer-events:none;
+      }
       .card-wrap .hovercard { bottom:calc(100% + 10px); transform:translateX(-50%) translateY(6px); }
       .card-wrap:hover .hovercard { opacity:1; visibility:visible; transform:translateX(-50%) translateY(0); }
       .card-wrap .hovercard::after{ content:""; position:absolute; top:100%; left:50%; transform:translateX(-50%); border-width:7px; border-style:solid; border-color:#e5e5e7 transparent transparent transparent; }
@@ -141,14 +170,15 @@ else:
     </style>
     """, unsafe_allow_html=True)
 
-    # ===== Header (texto clickeable con ?nav=) =====
+    # ===== Header (texto clickeable estilo anteúltimo) con navegación por ?nav= =====
+    # Usamos un contenedor para evitar que Streamlit envuelva en <p> y rompa el gap; el CSS arriba lo contempla igual.
     st.markdown("<div id='topnav-wrap'><div id='topnav'>", unsafe_allow_html=True)
-    links = []
+    links_html = []
     for label in OPCIONES:
         href = f"?nav={quote(label)}"
-        active = " active" if st.session_state.nav == label else ""
-        links.append(f"<a class='navlink{active}' href='{href}'>{label.upper()}</a>")
-    st.markdown("".join(links), unsafe_allow_html=True)
+        active_cls = " active" if st.session_state.nav == label else ""
+        links_html.append(f"<a class='navlink{active_cls}' href='{href}'>{label.upper()}</a>")
+    st.markdown("".join(links_html), unsafe_allow_html=True)
     st.markdown("</div></div>", unsafe_allow_html=True)
 
     # ======= CONTENIDO: renderiza SOLO la sección elegida =======
