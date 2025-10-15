@@ -46,12 +46,14 @@ def _qp_set(d: dict):
 # ====== Leer nav/ing/snav/sp desde la URL ANTES de renderizar ======
 qp = _qp_get()
 nav_qp  = unquote(qp.get("nav"))  if qp.get("nav")  else None
-ing_qp  = qp.get("ing")
-snav_qp = unquote(qp.get("snav")) if qp.get("snav") else None
-sp_qp   = qp.get("sp")
+ing_qp  = qp.get("ing")           # ingreso general
+snav_qp = unquote(qp.get("snav")) if qp.get("snav") else None  # subnav soporte
+sp_qp   = qp.get("sp")            # login de soporte
 
 if ing_qp == "1":
     st.session_state.ingresado = True
+
+# Si la URL trae sp=1, forzamos soporte logueado (persistente)
 if sp_qp == "1":
     st.session_state.soporte_authed = True
 
@@ -132,13 +134,13 @@ else:
       /* ===== Fila de servicios centrada y con espacio ===== */
       .services-row{
         display:flex; justify-content:center; align-items:stretch;
-        gap: 24px;           /* ← espacio horizontal entre tarjetas */
+        gap: 24px;           /* espacio entre tarjetas de la misma fila */
         margin-bottom: 28px; /* espacio vertical entre filas */
-        flex-wrap: wrap;     /* para que en pantallas chicas se acomoden */
+        flex-wrap: wrap;     /* responsive */
       }
 
       /* Tarjetas */
-      .tile { width: 440px; margin: 0; position: relative; } /* margin 0: dejamos al gap manejar el espaciado */
+      .tile { width: 440px; margin: 0; position: relative; } /* gap maneja el espaciado */
       @media (max-width: 1200px){ .tile{ width: 400px; } }
       @media (max-width: 900px){  .tile{ width: 360px; } }
 
@@ -165,17 +167,17 @@ else:
     </style>
     """, unsafe_allow_html=True)
 
-# ===== MENÚ principal (preserva ing=1 y sp=1 si corresponde) =====
-links_html = []
-for label in OPCIONES:
-    params = {"nav": label, "ing": "1"}
-    if st.session_state.soporte_authed:
-        params["sp"] = "1"  # mantiene login de soporte en cualquier navegación
-    href = "./?" + "&".join([f"{k}={quote(v)}" for k, v in params.items()])
-    active_cls = " active" if st.session_state.nav == label else ""
-    links_html.append(f"<a class='{active_cls}' href='{href}' target='_self'>{label.upper()}</a>")
-nav_html = f"<div id='topnav-wrap'><nav class='topnav'>{''.join(links_html)}</nav></div>"
-st.markdown(nav_html, unsafe_allow_html=True)
+    # ===== MENÚ principal (preserva ing=1 y sp=1 si corresponde) =====
+    links_html = []
+    for label in OPCIONES:
+        params = {"nav": label, "ing": "1"}
+        if st.session_state.soporte_authed:
+            params["sp"] = "1"  # mantiene login de soporte en cualquier navegación
+        href = "./?" + "&".join([f"{k}={quote(v)}" for k, v in params.items()])
+        active_cls = " active" if st.session_state.nav == label else ""
+        links_html.append(f"<a class='{active_cls}' href='{href}' target='_self'>{label.upper()}</a>")
+    nav_html = f"<div id='topnav-wrap'><nav class='topnav'>{''.join(links_html)}</nav></div>"
+    st.markdown(nav_html, unsafe_allow_html=True)
 
     # ===== CONTENIDO =====
     st.markdown("<div class='wrap'>", unsafe_allow_html=True)
