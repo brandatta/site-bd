@@ -131,7 +131,7 @@ else:
       .nav-right{ min-width: 200px; }
 
       /* ===== LOGO más grande (60px) ===== */
-      #brand-logo{ height: 60px; width: auto; display:block; }
+      #brand-logo{ height: 70px; width: auto; display:block; }
 
       @media (max-width: 1200px){
         #brand-logo{ height: 52px; }
