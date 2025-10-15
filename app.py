@@ -315,13 +315,14 @@ else:
                     descripcion = st.text_area("Descripción del problema", height=160, placeholder="Contanos qué ocurrió, pasos para reproducir, capturas, etc.")
                     enviar = st.form_submit_button("Enviar ticket")
                 if enviar:
-                    if not (email_t and asunto y := asunto) or not descripcion:
+                    if not (email_t and asunto and descripcion):
                         st.error("Completá email, asunto y descripción.")
-                    else:
-                        import uuid
-                        ticket_id = f"TCK-{uuid.uuid4().hex[:8].upper()}"
-                        st.success(f"✅ Ticket creado: **{ticket_id}**")
-                        st.info("Nuestro equipo te contactará a la brevedad. Revisá tu email para actualizaciones.")
+                else:
+                    import uuid
+                    ticket_id = f"TCK-{uuid.uuid4().hex[:8].upper()}"
+                    st.success(f"✅ Ticket creado: **{ticket_id}**")
+                    st.info("Nuestro equipo te contactará a la brevedad. Revisá tu email para actualizaciones.")
+
 
             elif snav == "Documentación":
                 st.markdown("### Documentación")
