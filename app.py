@@ -43,21 +43,25 @@ def _qp_set(d: dict):
     except Exception:
         pass
 
-# ====== Leer nav/ing/snav desde la URL ANTES de renderizar ======
+# ====== Leer nav/ing/snav/sp desde la URL ANTES de renderizar ======
 qp = _qp_get()
-nav_qp = unquote(qp.get("nav")) if qp.get("nav") else None
-ing_qp = qp.get("ing")
-snav_qp = unquote(qp.get("snav")) if qp.get("snav") else None  # sub-navegación de soporte
+nav_qp  = unquote(qp.get("nav"))  if qp.get("nav")  else None
+ing_qp  = qp.get("ing")           # ingreso general
+snav_qp = unquote(qp.get("snav")) if qp.get("snav") else None  # subnav soporte
+sp_qp   = qp.get("sp")            # 🔸 login de soporte
 
 if ing_qp == "1":
     st.session_state.ingresado = True
+
+# 🔸 Si la URL trae sp=1, forzamos soporte logueado (persistente)
+if sp_qp == "1":
+    st.session_state.soporte_authed = True
 
 if nav_qp in OPCIONES:
     st.session_state.nav = nav_qp
 elif "nav" not in st.session_state or st.session_state.get("nav") not in OPCIONES:
     st.session_state.nav = "Servicios"
 
-# default subnav soporte
 if snav_qp in SOPORTE_OPCIONES:
     st.session_state.snav = snav_qp
 elif "snav" not in st.session_state or st.session_state.get("snav") not in SOPORTE_OPCIONES:
@@ -95,7 +99,7 @@ if not st.session_state.ingresado:
     with c2:
         if st.button("Ingresar", key="ingresar_btn"):
             st.session_state.ingresado = True
-            _qp_set({"nav": st.session_state.get("nav", "Servicios"), "ing": "1"})
+            _qp_set({"nav": st.session_state.get("nav", "Servicios"), "ing": "1", "sp": "1" if st.session_state.soporte_authed else None})
 
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -112,7 +116,7 @@ else:
       .wrap { max-width: 1440px; margin: 0 auto; padding: 0 8px 16px; }
       [data-testid="stVerticalBlock"], [data-testid="column"], .wrap, .tile { overflow: visible !important; }
 
-      /* ===== Menú principal: nav letras negras ===== */
+      /* ===== Menú principal ===== */
       #topnav-wrap{ position: sticky; top: 0; z-index: 999; background: #ffffff; border-bottom: 1px solid #e5e5e7; box-shadow: 0 1px 6px rgba(0,0,0,.04); }
       nav.topnav{ max-width: 1440px; margin: 0 auto; padding: 12px 16px; display: flex; align-items: center; justify-content: center; gap: 32px; }
       nav.topnav * { margin: 0; padding: 0; }
@@ -154,10 +158,13 @@ else:
     </style>
     """, unsafe_allow_html=True)
 
-    # ===== MENÚ principal (preserva ing=1) =====
+    # ===== MENÚ principal (preserva ing=1 y sp=1 si corresponde) =====
     links_html = []
     for label in OPCIONES:
-        href = f"./?nav={quote(label)}&ing=1" if st.session_state.ingresado else f"./?nav={quote(label)}"
+        params = {"nav": label, "ing": "1"}
+        if st.session_state.soporte_authed:
+            params["sp"] = "1"  # 🔸 mantiene login de soporte en cualquier navegación
+        href = "./?" + "&".join([f"{k}={quote(v)}" for k, v in params.items()])
         active_cls = " active" if st.session_state.nav == label else ""
         links_html.append(f"<a class='{active_cls}' href='{href}' target='_self'>{label.upper()}</a>")
     nav_html = f"<div id='topnav-wrap'><nav class='topnav'>{''.join(links_html)}</nav></div>"
@@ -244,7 +251,6 @@ else:
 
     # ============= SOPORTE (con login) =============
     elif nav == "Soporte":
-        # Submenú (solo visible si está autenticado)
         if not st.session_state.soporte_authed:
             st.markdown("<div class='hairline'></div>", unsafe_allow_html=True)
             st.markdown("### Soporte — Iniciar sesión")
@@ -256,23 +262,23 @@ else:
                 with col_a:
                     submit = st.form_submit_button("Entrar")
                 with col_b:
-                    st.caption("⚠️ Autenticación de muestra. Integre SSO/LDAP en prod.")
+                    st.caption("⚠️ Autenticación de ejemplo. Reemplazar por SSO/LDAP en producción.")
 
             if submit:
-                # Validación simple de ejemplo (en producción, reemplazar por SSO/LDAP/Backend)
                 if email and pwd:
                     st.session_state.soporte_authed = True
                     st.session_state.soporte_user = email
-                    # Mantener URL limpia y estado de ingreso
-                    _qp_set({"nav": "Soporte", "ing": "1", "snav": st.session_state.snav})
+                    # 🔸 set URL con sp=1 para persistir login de soporte
+                    _qp_set({"nav": "Soporte", "ing": "1", "sp": "1", "snav": st.session_state.snav})
                     st.success(f"Bienvenido/a, {email}")
                 else:
                     st.error("Completá email y contraseña.")
         else:
-            # Barra de subnavegación de Soporte
+            # Submenú Soporte (preserva sp=1 e ing=1)
             sub_links = []
             for slabel in SOPORTE_OPCIONES:
-                href = f"./?nav=Soporte&snav={quote(slabel)}&ing=1"
+                params = {"nav": "Soporte", "snav": slabel, "ing": "1", "sp": "1"}  # 🔸
+                href = "./?" + "&".join([f"{k}={quote(v)}" for k, v in params.items()])
                 active_s = " active" if st.session_state.snav == slabel else ""
                 sub_links.append(f"<a class='{active_s}' href='{href}' target='_self'>{slabel}</a>")
             st.markdown(f"<div id='subnav-wrap'><nav class='subnav'>{''.join(sub_links)}</nav></div>", unsafe_allow_html=True)
@@ -283,11 +289,12 @@ else:
                 if st.button("Cerrar sesión", key="logout_soporte"):
                     st.session_state.soporte_authed = False
                     st.session_state.soporte_user = None
-                    _qp_set({"nav": "Soporte", "ing": "1"})  # snav se limpia
+                    # 🔸 quitamos sp de la URL al salir
+                    _qp_set({"nav": "Soporte", "ing": "1"})
 
             st.markdown("<div class='hairline'></div>", unsafe_allow_html=True)
 
-            # Render de la sub-sección elegida
+            # Render de sub-sección
             snav = st.session_state.snav
 
             if snav == "Cargar Ticket":
@@ -308,8 +315,7 @@ else:
                     if not (email_t and asunto and descripcion):
                         st.error("Completá email, asunto y descripción.")
                     else:
-                        # Simulación de creación de ticket
-                        import uuid, datetime
+                        import uuid
                         ticket_id = f"TCK-{uuid.uuid4().hex[:8].upper()}"
                         st.success(f"✅ Ticket creado: **{ticket_id}**")
                         st.info("Nuestro equipo te contactará a la brevedad. Revisá tu email para actualizaciones.")
