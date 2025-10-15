@@ -60,7 +60,7 @@ if snav_qp in SOPORTE_OPCIONES:
 elif "snav" not in st.session_state or st.session_state.get("snav") not in SOPORTE_OPCIONES:
     st.session_state.snav = SOPORTE_OPCIONES[0]
 
-# ===== Helper: logo en base64 =====
+# ===== Helper: logo para portada =====
 def logo_html_src(path="logo.png", width_px=200):
     try:
         img = Image.open(path)
@@ -69,6 +69,18 @@ def logo_html_src(path="logo.png", width_px=200):
         return f'<img src="data:image/png;base64,{b64}" alt="logo" style="width:{width_px}px;max-width:{width_px}px;height:auto;display:block;margin:0 auto;" />'
     except Exception:
         return "<p style='text-align:center;font-weight:600;margin:0;'>Subí <code>logo.png</code> a la carpeta de la app.</p>"
+
+# ===== Helper: logo para header (base64) =====
+def header_logo_html(path="logooo (1).png"):
+    try:
+        img = Image.open(path)
+        buf = BytesIO(); img.save(buf, format="PNG")
+        b64 = base64.b64encode(buf.getvalue()).decode()
+        # No seteamos width fijo; usamos height por CSS para hacerlo responsive
+        return f'<img id="brand-logo" src="data:image/png;base64,{b64}" alt="Brandatta" />'
+    except Exception:
+        # Fallback simple si no está el archivo
+        return "<div id='brand-logo' style='width:120px;height:36px;background:#eee;border:1px solid #ddd;border-radius:6px;'></div>"
 
 # ================== PORTADA ==================
 if not st.session_state.ingresado:
@@ -104,11 +116,34 @@ else:
       [data-testid="stAppViewContainer"]{ padding-top: 0 !important; }
 
       /* ===== Menú principal ===== */
-      #topnav-wrap{ position: sticky; top: 0; z-index: 1000; background: #ffffff; border-bottom: 1px solid #e5e5e7; box-shadow: 0 1px 6px rgba(0,0,0,.04); margin-top: 0 !important; }
-      nav.topnav{ max-width: 1440px; margin: 0 auto; padding: 8px 16px !important; display: flex; align-items: center; justify-content: center; gap: 28px !important; }
-      nav.topnav a{ color: #0f0f0f; text-decoration: none; padding: 8px 2px; border-bottom: 2px solid transparent; text-transform: uppercase; font-weight: 700; font-size: .95rem; transition: border .15s; }
-      nav.topnav a:hover{ border-bottom-color: #0f0f0f; }
-      nav.topnav a.active{ border-bottom-color: #0f0f0f; }
+      #topnav-wrap{
+        position: sticky; top: 0; z-index: 1000;
+        background: #ffffff; border-bottom: 1px solid #e5e5e7; box-shadow: 0 1px 6px rgba(0,0,0,.04); margin-top: 0 !important;
+      }
+      nav.topnav{
+        max-width: 1440px; margin: 0 auto;
+        padding: 8px 16px; display: flex; align-items: center; justify-content: space-between; gap: 16px;
+        position: relative;
+      }
+      /* Estructura: izquierda logo, centro nav, derecha spacer para centrar real */
+      .nav-left{ display:flex; align-items:center; gap: 10px; min-width: 120px; }
+      .nav-center{ position:absolute; left:50%; transform:translateX(-50%); display:flex; gap: 28px; align-items:center; }
+      .nav-right{ min-width: 120px; } /* spacer simétrico al logo */
+
+      /* Logo responsive */
+      #brand-logo{ height: 36px; width: auto; display:block; }
+      @media (max-width: 1200px){ #brand-logo{ height: 32px; } .nav-center{ gap: 24px; } }
+      @media (max-width: 900px){  #brand-logo{ height: 28px; } .nav-center{ gap: 18px; } }
+      @media (max-width: 640px){  #brand-logo{ height: 24px; } .nav-center{ gap: 14px; } }
+
+      /* Links del nav */
+      .nav-center a{
+        color: #0f0f0f; text-decoration: none; padding: 8px 2px;
+        border-bottom: 2px solid transparent; text-transform: uppercase; font-weight: 700; font-size: .95rem; transition: border .15s;
+        white-space: nowrap;
+      }
+      .nav-center a:hover{ border-bottom-color: #0f0f0f; }
+      .nav-center a.active{ border-bottom-color: #0f0f0f; }
 
       /* ===== Grilla de Servicios ===== */
       .services-grid {
@@ -118,13 +153,11 @@ else:
         max-width: 1320px;
         margin: 20px auto 32px;
         justify-items: center;
-        overflow: visible !important;   /* permite overflow */
+        overflow: visible !important;
       }
 
-      /* Cada tile crea un stacking context y sube al hover */
       .tile { width: 100%; max-width: 420px; position: relative; overflow: visible !important; z-index: 0; }
-      .tile:hover { z-index: 200; }     /* eleva el tile activo sobre sus vecinos */
-
+      .tile:hover { z-index: 200; }
       .card-wrap { position: relative; overflow: visible !important; }
       .card { background:#fff; border:1px solid #d4fbd7; height:110px; display:flex; align-items:center; justify-content:center; transition:all .15s ease; }
       .card:hover{ border-color:#bff3c5; transform:translateY(-2px); box-shadow:0 10px 24px rgba(0,0,0,.06); }
@@ -136,18 +169,14 @@ else:
         background:rgba(255,255,255,0.97); backdrop-filter:blur(6px);
         border:1px solid #e5e5e7; border-radius:10px; padding:10px 14px;
         opacity:0; visibility:hidden; transition:opacity .15s, transform .15s;
-        z-index: 300;                    /* por encima de otros tiles */
-        box-shadow:0 12px 28px rgba(0,0,0,0.14);
-        pointer-events: none;            /* no roba el hover al salir */
-        width: max(280px, 60%);
+        z-index: 300; box-shadow:0 12px 28px rgba(0,0,0,0.14);
+        pointer-events: none; width: max(280px, 60%);
       }
       .card-wrap:hover .hovercard{ opacity:1; visibility:visible; }
 
-      /* Hacia arriba (segundas 3 tarjetas) */
       .hover-up{ bottom:calc(100% + 8px); transform:translateX(-50%) translateY(6px); }
       .card-wrap:hover .hover-up{ transform:translateX(-50%) translateY(0); }
 
-      /* Hacia abajo (primeras 3 tarjetas) */
       .hover-down{ top:calc(100% + 8px); transform:translateX(-50%) translateY(-6px); }
       .card-wrap:hover .hover-down{ transform:translateX(-50%) translateY(0); }
 
@@ -163,7 +192,9 @@ else:
     </style>
     """, unsafe_allow_html=True)
 
-    # ===== HEADER =====
+    # ===== HEADER (logo a la izquierda + menú centrado) =====
+    logo_left = header_logo_html("logooo (1).png")
+    # Links
     links_html = []
     for label in OPCIONES:
         params = {"nav": label, "ing": "1"}
@@ -172,15 +203,29 @@ else:
         href = "./?" + "&".join([f"{k}={quote(v)}" for k, v in params.items()])
         active = " active" if st.session_state.nav == label else ""
         links_html.append(f"<a class='{active}' href='{href}' target='_self'>{label.upper()}</a>")
-    st.markdown(f"<div id='topnav-wrap'><nav class='topnav'>{''.join(links_html)}</nav></div>", unsafe_allow_html=True)
 
+    header_html = f"""
+<div id='topnav-wrap'>
+  <nav class='topnav'>
+    <div class='nav-left'>
+      <a href='./?nav=Servicios&ing=1{"&sp=1" if st.session_state.soporte_authed else ""}' target='_self'>{logo_left}</a>
+    </div>
+    <div class='nav-center'>
+      {''.join(links_html)}
+    </div>
+    <div class='nav-right'></div>
+  </nav>
+</div>
+"""
+    st.markdown(header_html, unsafe_allow_html=True)
+
+    # ===== CONTENEDOR =====
     st.markdown("<div class='wrap' style='padding-top:8px;'>", unsafe_allow_html=True)
     nav = st.session_state.nav
 
     # ===== SERVICIOS =====
     if nav == "Servicios":
         st.markdown("<div class='title' style='text-align:center;font-weight:700;font-size:1.2rem;margin:20px 0;'>Servicios</div>", unsafe_allow_html=True)
-
         servicios = [
             {"titulo": "APIs", "desc1": "Diseño y desarrollo de APIs escalables.", "desc2": "Autenticación, rate limiting y monitoreo."},
             {"titulo": "Software para Industrias", "desc1": "Sistemas a medida para planta/producción.", "desc2": "Integración con ERP y tableros."},
@@ -189,7 +234,6 @@ else:
             {"titulo": "Finanzas", "desc1": "Forecasting y conciliaciones automáticas.", "desc2": "Reportes y auditoría."},
             {"titulo": "Gestión de Stock", "desc1": "Inventario en tiempo real.", "desc2": "Alertas, valuación y KPIs."},
         ]
-
         html_cards = ""
         for i, svc in enumerate(servicios):
             hover_class = "hover-down" if i < 3 else "hover-up"
