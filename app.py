@@ -100,15 +100,8 @@ else:
       @import url('https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&display=swap');
       [data-testid="stAppViewContainer"] { background:#fff !important; font-family:'Manjari', system-ui, sans-serif !important; }
       header, #MainMenu, footer {visibility: hidden;}
-
-      /* 🔹 Quitamos padding superior */
-      .block-container, [data-testid="block-container"]{
-        padding-top: 0 !important;
-        padding-bottom: 0 !important;
-      }
-      [data-testid="stAppViewContainer"]{
-        padding-top: 0 !important;
-      }
+      .block-container, [data-testid="block-container"]{ padding-top: 0 !important; padding-bottom: 0 !important; }
+      [data-testid="stAppViewContainer"]{ padding-top: 0 !important; }
 
       /* ===== Menú principal ===== */
       #topnav-wrap{ position: sticky; top: 0; z-index: 999; background: #ffffff; border-bottom: 1px solid #e5e5e7; box-shadow: 0 1px 6px rgba(0,0,0,.04); margin-top: 0 !important; }
@@ -130,8 +123,19 @@ else:
       .card { background:#fff; border:1px solid #d4fbd7; height:110px; display:flex; align-items:center; justify-content:center; transition:all .15s ease; }
       .card:hover{ border-color:#bff3c5; transform:translateY(-2px); box-shadow:0 10px 24px rgba(0,0,0,.06); }
       .card h3{ font-size:1.05rem; font-weight:700; color:#111; margin:0; }
-      .hovercard{ position:absolute; left:50%; bottom:calc(100% + 8px); transform:translateX(-50%); background:rgba(255,255,255,0.9); backdrop-filter:blur(6px); border:1px solid #e5e5e7; border-radius:10px; padding:10px 14px; opacity:0; visibility:hidden; transition:opacity .15s,transform .15s; }
-      .card-wrap:hover .hovercard{ opacity:1; visibility:visible; transform:translateX(-50%) translateY(-4px); }
+
+      /* ===== Hovercards generales ===== */
+      .hovercard{ position:absolute; left:50%; background:rgba(255,255,255,0.9); backdrop-filter:blur(6px); border:1px solid #e5e5e7; border-radius:10px; padding:10px 14px; opacity:0; visibility:hidden; transition:opacity .15s,transform .15s; }
+      .card-wrap:hover .hovercard{ opacity:1; visibility:visible; }
+
+      /* 🔹 Hover hacia arriba (por defecto) */
+      .hover-up{ bottom:calc(100% + 8px); transform:translateX(-50%) translateY(4px); }
+      .card-wrap:hover .hover-up{ transform:translateX(-50%) translateY(0); }
+
+      /* 🔹 Hover hacia abajo (para las tarjetas superiores) */
+      .hover-down{ top:calc(100% + 8px); transform:translateX(-50%) translateY(-4px); }
+      .card-wrap:hover .hover-down{ transform:translateX(-50%) translateY(0); }
+
       .hovercard h4{ margin:0 0 4px; font-size:1rem; font-weight:700; }
       .hovercard p{ margin:0; font-size:.9rem; color:#111; }
     </style>
@@ -146,7 +150,6 @@ else:
         href = "./?" + "&".join([f"{k}={quote(v)}" for k, v in params.items()])
         active = " active" if st.session_state.nav == label else ""
         links_html.append(f"<a class='{active}' href='{href}' target='_self'>{label.upper()}</a>")
-
     st.markdown(f"<div id='topnav-wrap'><nav class='topnav'>{''.join(links_html)}</nav></div>", unsafe_allow_html=True)
 
     st.markdown("<div class='wrap' style='padding-top:8px;'>", unsafe_allow_html=True)
@@ -167,11 +170,12 @@ else:
 
         html_cards = ""
         for i, svc in enumerate(servicios):
+            hover_class = "hover-down" if i < 3 else "hover-up"  # 🔹 las primeras 3 aparecen hacia abajo
             html_cards += f"""
 <div class='tile'>
   <div class='card-wrap'>
     <div class='card'><h3>{svc["titulo"]}</h3></div>
-    <div class='hovercard'>
+    <div class='hovercard {hover_class}'>
       <h4>{svc["titulo"]}</h4>
       <p>• {svc["desc1"]}</p>
       <p>• {svc["desc2"]}</p>
