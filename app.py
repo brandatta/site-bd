@@ -46,14 +46,12 @@ def _qp_set(d: dict):
 # ====== Leer nav/ing/snav/sp desde la URL ANTES de renderizar ======
 qp = _qp_get()
 nav_qp  = unquote(qp.get("nav"))  if qp.get("nav")  else None
-ing_qp  = qp.get("ing")           # ingreso general
-snav_qp = unquote(qp.get("snav")) if qp.get("snav") else None  # subnav soporte
-sp_qp   = qp.get("sp")            # 🔸 login de soporte
+ing_qp  = qp.get("ing")
+snav_qp = unquote(qp.get("snav")) if qp.get("snav") else None
+sp_qp   = qp.get("sp")
 
 if ing_qp == "1":
     st.session_state.ingresado = True
-
-# 🔸 Si la URL trae sp=1, forzamos soporte logueado (persistente)
 if sp_qp == "1":
     st.session_state.soporte_authed = True
 
@@ -131,17 +129,26 @@ else:
       nav.subnav a:hover{ border-bottom-color:#111827; }
       nav.subnav a.active{ border-bottom-color:#111827; }
 
-      /* ===== Tarjetas ===== */
-      .tile { width: 440px; margin: 0 auto 28px; position: relative; }
+      /* ===== Fila de servicios centrada y con espacio ===== */
+      .services-row{
+        display:flex; justify-content:center; align-items:stretch;
+        gap: 24px;           /* ← espacio horizontal entre tarjetas */
+        margin-bottom: 28px; /* espacio vertical entre filas */
+        flex-wrap: wrap;     /* para que en pantallas chicas se acomoden */
+      }
+
+      /* Tarjetas */
+      .tile { width: 440px; margin: 0; position: relative; } /* margin 0: dejamos al gap manejar el espaciado */
       @media (max-width: 1200px){ .tile{ width: 400px; } }
       @media (max-width: 900px){  .tile{ width: 360px; } }
+
       .card-wrap { position: relative; }
       .card { background:#ffffff; border:1px solid #d4fbd7; border-radius:0; height:110px; display:flex; align-items:center; justify-content:center; text-align:center; transition:border-color .12s ease, transform .12s ease, box-shadow .12s ease; }
       .card:hover{ border-color:#bff3c5; transform:translateY(-1px); box-shadow:0 12px 24px rgba(0,0,0,.06); }
       .card h3{ margin:0; font-size:1.05rem; font-weight:700; letter-spacing:.15px; color:#111827; line-height:1.25; padding:0 12px; }
 
-      .row-spacer { height: 36px; }
-      .title { text-align:center; font-weight:700; font-size:1.2rem; margin: 0 0 10px 0; }
+      .row-spacer { height: 10px; } /* ya hay margin-bottom en .services-row */
+      .title { text-align:center; font-weight:700; font-size:1.2rem; margin: 0 0 16px 0; }
       .hairline { border-top: 1px solid #e5e5e7; margin: 10px 0 14px 0; }
       .section h3 { margin: 0 0 6px 0; font-size: 1.05rem; font-weight:700; }
       .section p { margin: 0 0 4px 0; color: #333; font-size: 0.98rem; font-weight:400; }
@@ -160,10 +167,13 @@ else:
 
     # ===== MENÚ principal (preserva ing=1 y sp=1 si corresponde) =====
     links_html = []
+    for label in OP CIONES if False else OPCIONES:
+        pass
+    links_html = []
     for label in OPCIONES:
         params = {"nav": label, "ing": "1"}
         if st.session_state.soporte_authed:
-            params["sp"] = "1"  # 🔸 mantiene login de soporte en cualquier navegación
+            params["sp"] = "1"
         href = "./?" + "&".join([f"{k}={quote(v)}" for k, v in params.items()])
         active_cls = " active" if st.session_state.nav == label else ""
         links_html.append(f"<a class='{active_cls}' href='{href}' target='_self'>{label.upper()}</a>")
@@ -173,6 +183,22 @@ else:
     # ===== CONTENIDO =====
     st.markdown("<div class='wrap'>", unsafe_allow_html=True)
     nav = st.session_state.nav
+
+    # Helper: HTML de una tarjeta
+    def _tile_html(svc, below=False):
+        place_cls = "below" if below else ""
+        return f"""
+        <div class='tile'>
+          <div class='card-wrap {place_cls}'>
+            <div class='card'><h3>{svc["titulo"]}</h3></div>
+            <div class='hovercard'>
+              <h4>{svc["titulo"]}</h4>
+              <p>• {svc["desc1"]}</p>
+              <p>• {svc["desc2"]}</p>
+            </div>
+          </div>
+        </div>
+        """
 
     if nav == "Servicios":
         st.markdown("<div class='title'>Servicios</div>", unsafe_allow_html=True)
@@ -184,40 +210,14 @@ else:
             {"titulo": "Finanzas", "desc1": "Forecasting y conciliaciones automáticas.", "desc2": "Reportes y auditoría."},
             {"titulo": "Gestión de Stock", "desc1": "Inventario en tiempo real.", "desc2": "Alertas, valuación y KPIs."},
         ]
-        cols = st.columns(3, gap="large")
-        for i, col in enumerate(cols):
-            with col:
-                svc = servicios[i]
-                st.markdown(f"""
-                <div class='tile'>
-                  <div class='card-wrap below'>
-                    <div class='card'><h3>{svc["titulo"]}</h3></div>
-                    <div class='hovercard'>
-                      <h4>{svc["titulo"]}</h4>
-                      <p>• {svc["desc1"]}</p>
-                      <p>• {svc["desc2"]}</p>
-                    </div>
-                  </div>
-                </div>
-                """, unsafe_allow_html=True)
-        st.markdown("<div class='row-spacer'></div>", unsafe_allow_html=True)
-        cols2 = st.columns(3, gap="large")
-        for j, col in enumerate(cols2):
-            idx2 = 3 + j
-            with col:
-                svc = servicios[idx2]
-                st.markdown(f"""
-                <div class='tile'>
-                  <div class='card-wrap'>
-                    <div class='card'><h3>{svc["titulo"]}</h3></div>
-                    <div class='hovercard'>
-                      <h4>{svc["titulo"]}</h4>
-                      <p>• {svc["desc1"]}</p>
-                      <p>• {svc["desc2"]}</p>
-                    </div>
-                  </div>
-                </div>
-                """, unsafe_allow_html=True)
+
+        # Fila 1 (hover abajo en las tarjetas)
+        row1_html = "<div class='services-row'>" + "".join([_tile_html(servicios[i], below=True) for i in range(3)]) + "</div>"
+        st.markdown(row1_html, unsafe_allow_html=True)
+
+        # Fila 2 (hover arriba en las tarjetas)
+        row2_html = "<div class='services-row'>" + "".join([_tile_html(servicios[i], below=False) for i in range(3,6)]) + "</div>"
+        st.markdown(row2_html, unsafe_allow_html=True)
 
     elif nav == "Contacto":
         st.markdown("<div class='hairline'></div>", unsafe_allow_html=True)
@@ -268,7 +268,6 @@ else:
                 if email and pwd:
                     st.session_state.soporte_authed = True
                     st.session_state.soporte_user = email
-                    # 🔸 set URL con sp=1 para persistir login de soporte
                     _qp_set({"nav": "Soporte", "ing": "1", "sp": "1", "snav": st.session_state.snav})
                     st.success(f"Bienvenido/a, {email}")
                 else:
@@ -277,7 +276,7 @@ else:
             # Submenú Soporte (preserva sp=1 e ing=1)
             sub_links = []
             for slabel in SOPORTE_OPCIONES:
-                params = {"nav": "Soporte", "snav": slabel, "ing": "1", "sp": "1"}  # 🔸
+                params = {"nav": "Soporte", "snav": slabel, "ing": "1", "sp": "1"}
                 href = "./?" + "&".join([f"{k}={quote(v)}" for k, v in params.items()])
                 active_s = " active" if st.session_state.snav == slabel else ""
                 sub_links.append(f"<a class='{active_s}' href='{href}' target='_self'>{slabel}</a>")
@@ -289,7 +288,6 @@ else:
                 if st.button("Cerrar sesión", key="logout_soporte"):
                     st.session_state.soporte_authed = False
                     st.session_state.soporte_user = None
-                    # 🔸 quitamos sp de la URL al salir
                     _qp_set({"nav": "Soporte", "ing": "1"})
 
             st.markdown("<div class='hairline'></div>", unsafe_allow_html=True)
