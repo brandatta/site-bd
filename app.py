@@ -128,11 +128,11 @@ else:
       .nav-right{ min-width: 180px; }
 
       /* Logo responsive (más grande) */
-      #brand-logo{ height: 48px; width: auto; display:block; }
+      #brand-logo{ height: 52px; width: auto; display:block; }
       @media (max-width: 1200px){
         #brand-logo{ height: 42px; }
         .nav-center{ gap: 28px; }
-        .nav-left, .nav-right { min-width: 160px; }
+        .nav-left, .nav-right { min-width: 200px; }
       }
       @media (max-width: 900px){
         #brand-logo{ height: 36px; }
