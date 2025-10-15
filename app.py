@@ -15,6 +15,7 @@ OPCIONES = ["Servicios", "Contacto", "Acerca de Nosotros", "Clientes"]
 
 # -------- Helpers query params (compat múltiples versiones) --------
 def _qp_get() -> dict:
+    # Streamlit 1.30+ tiene st.query_params; en anteriores, experimental_get_query_params
     if hasattr(st, "query_params"):
         try:
             qp = st.query_params
@@ -26,7 +27,7 @@ def _qp_get() -> dict:
     except Exception:
         return {}
 
-# Resolver nav desde query params
+# Resolver nav desde query params (antes de pintar UI)
 qp = _qp_get()
 nav_qp = unquote(qp.get("nav")) if qp.get("nav") else None
 if nav_qp in OPCIONES:
@@ -121,37 +122,37 @@ else:
       .wrap { max-width: 1440px; margin: 0 auto; padding: 0 8px 16px; }
       [data-testid="stVerticalBlock"], [data-testid="column"], .wrap, .tile { overflow: visible !important; }
 
-      /* ===== Header texto clickeable (letras negras) ===== */
+      /* ===== HEADER: letras negras, texto clickeable, sticky ===== */
       #topnav-wrap{
         position: sticky; top: 0; z-index: 999;
         background: #ffffff; 
         border-bottom: 1px solid #e5e5e7;
         box-shadow: 0 1px 6px rgba(0,0,0,.04);
       }
-      /* Aseguramos flex aunque Streamlit inserte <p> envolviendo contenido */
-      #topnav, #topnav > * {
-        max-width: 1440px; margin: 0 auto;
+      #topnav{
+        max-width: 1440px; margin: 0 auto; padding: 12px 16px;
+      }
+      #topnav .menu{
+        /* usamos UL/LI para que el gap funcione siempre, aunque Streamlit envuelva en <p> */
         display: flex; align-items: center; justify-content: center;
-        gap: 32px; padding: 12px 16px;
+        list-style: none; padding: 0; margin: 0; gap: 28px;
       }
-      #topnav a.navlink{
+      #topnav .menu > li { margin: 0; padding: 0; }
+      #topnav .menu > li > a{
         display: inline-block;
-        text-decoration: none;
-        color: #0f0f0f;             /* 🔴 letras negras */
+        color: #0f0f0f; text-decoration: none;
         padding: 8px 2px;
-        border-bottom: 2px solid transparent;  /* barra inferior (solo activa/hover) */
+        border-bottom: 2px solid transparent;
         text-transform: uppercase;
-        font-weight: 700;           /* menos “pesado” que 800 */
+        font-weight: 700;
         letter-spacing: .03em;
-        font-size: 0.95rem;
+        font-size: .95rem;
       }
-      #topnav a.navlink:hover{
-        border-bottom-color: #0f0f0f;  /* subrayado negro al hover */
-        text-decoration: none;
+      #topnav .menu > li > a:hover{
+        border-bottom-color: #0f0f0f; /* hover con barra negra */
       }
-      #topnav a.navlink.active{
-        border-bottom-color: #0f0f0f;  /* activa con barra negra */
-        text-decoration: none;
+      #topnav .menu > li > a.active{
+        border-bottom-color: #0f0f0f; /* activo con barra negra */
       }
 
       /* ===== Tarjetas ===== */
@@ -213,15 +214,19 @@ else:
     </style>
     """, unsafe_allow_html=True)
 
-    # ===== Header (texto clickeable) con navegación por ?nav= =====
-    st.markdown("<div id='topnav-wrap'><div id='topnav'>", unsafe_allow_html=True)
-    links_html = []
+    # ===== Header (nav con UL/LI y ?nav=) =====
+    st.markdown("<div id='topnav-wrap'>", unsafe_allow_html=True)
+    st.markdown("<nav id='topnav'><ul class='menu'>", unsafe_allow_html=True)
+
     for label in OPCIONES:
-        href = f"?nav={quote(label)}"
+        href = f"./?nav={quote(label)}"   # importante: ruta relativa explícita
         active_cls = " active" if st.session_state.nav == label else ""
-        links_html.append(f"<a class='navlink{active_cls}' href='{href}'>{label.upper()}</a>")
-    st.markdown("".join(links_html), unsafe_allow_html=True)
-    st.markdown("</div></div>", unsafe_allow_html=True)
+        st.markdown(
+            f"<li><a class='navlink{active_cls}' href='{href}' target='_self'>{label.upper()}</a></li>",
+            unsafe_allow_html=True
+        )
+
+    st.markdown("</ul></nav></div>", unsafe_allow_html=True)
 
     # ======= CONTENIDO: SOLO la sección elegida =======
     st.markdown("<div class='wrap'>", unsafe_allow_html=True)
