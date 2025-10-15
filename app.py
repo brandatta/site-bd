@@ -10,8 +10,13 @@ st.set_page_config(page_title="Brandatta - Servicios", layout="wide")
 # ================== STATE ==================
 if "ingresado" not in st.session_state:
     st.session_state.ingresado = False
+if "soporte_authed" not in st.session_state:
+    st.session_state.soporte_authed = False
+if "soporte_user" not in st.session_state:
+    st.session_state.soporte_user = None
 
-OPCIONES = ["Servicios", "Contacto", "Acerca de Nosotros", "Clientes"]
+OPCIONES = ["Servicios", "Contacto", "Acerca de Nosotros", "Clientes", "Soporte"]
+SOPORTE_OPCIONES = ["Cargar Ticket", "Documentación", "Manuales"]
 
 # -------- Query params (compat 1.30+ y previas) --------
 def _qp_get() -> dict:
@@ -38,18 +43,25 @@ def _qp_set(d: dict):
     except Exception:
         pass
 
-# ====== Leer nav/ingresado desde la URL ANTES de renderizar ======
+# ====== Leer nav/ing/snav desde la URL ANTES de renderizar ======
 qp = _qp_get()
 nav_qp = unquote(qp.get("nav")) if qp.get("nav") else None
-ing_qp = qp.get("ing")  # 🔸 ing=1 mantiene la sesión como ingresada
+ing_qp = qp.get("ing")
+snav_qp = unquote(qp.get("snav")) if qp.get("snav") else None  # sub-navegación de soporte
 
 if ing_qp == "1":
-    st.session_state.ingresado = True  # 🔸 fuerza sesión ingresada si la URL lo dice
+    st.session_state.ingresado = True
 
 if nav_qp in OPCIONES:
     st.session_state.nav = nav_qp
 elif "nav" not in st.session_state or st.session_state.get("nav") not in OPCIONES:
     st.session_state.nav = "Servicios"
+
+# default subnav soporte
+if snav_qp in SOPORTE_OPCIONES:
+    st.session_state.snav = snav_qp
+elif "snav" not in st.session_state or st.session_state.get("snav") not in SOPORTE_OPCIONES:
+    st.session_state.snav = SOPORTE_OPCIONES[0]
 
 # ===== Helper: logo a <img> base64 =====
 def logo_html_src(path="logo.png", width_px=200):
@@ -79,11 +91,10 @@ if not st.session_state.ingresado:
     st.markdown("<div id='hero'>", unsafe_allow_html=True)
     st.markdown(logo_html_src(width_px=200).replace("<img ", "<img class='hero-logo' "), unsafe_allow_html=True)
 
-    c1, c2, c3 = st.columns([1,2,1])
+    _, c2, _ = st.columns([1,2,1])
     with c2:
         if st.button("Ingresar", key="ingresar_btn"):
             st.session_state.ingresado = True
-            # 🔸 Seteamos ing=1 y mantenemos nav actual en la URL para que no vuelva la portada
             _qp_set({"nav": st.session_state.get("nav", "Servicios"), "ing": "1"})
 
     st.markdown("</div>", unsafe_allow_html=True)
@@ -101,13 +112,20 @@ else:
       .wrap { max-width: 1440px; margin: 0 auto; padding: 0 8px 16px; }
       [data-testid="stVerticalBlock"], [data-testid="column"], .wrap, .tile { overflow: visible !important; }
 
-      /* ===== MENÚ: <nav> con links negros, horizontal, sticky ===== */
+      /* ===== Menú principal: nav letras negras ===== */
       #topnav-wrap{ position: sticky; top: 0; z-index: 999; background: #ffffff; border-bottom: 1px solid #e5e5e7; box-shadow: 0 1px 6px rgba(0,0,0,.04); }
       nav.topnav{ max-width: 1440px; margin: 0 auto; padding: 12px 16px; display: flex; align-items: center; justify-content: center; gap: 32px; }
       nav.topnav * { margin: 0; padding: 0; }
       nav.topnav a{ display: inline-block; color: #0f0f0f; text-decoration: none; padding: 8px 2px; border-bottom: 2px solid transparent; text-transform: uppercase; font-weight: 700; letter-spacing: .03em; font-size: .95rem; }
       nav.topnav a:hover{ border-bottom-color: #0f0f0f; }
       nav.topnav a.active{ border-bottom-color: #0f0f0f; }
+
+      /* ===== Submenú Soporte ===== */
+      #subnav-wrap{ position: sticky; top: 50px; z-index: 998; background: #ffffff; border-bottom: 1px solid #f0f0f1; }
+      nav.subnav{ max-width: 1000px; margin: 0 auto; padding: 8px 16px; display: flex; align-items: center; justify-content: center; gap: 22px; }
+      nav.subnav a{ display:inline-block; color:#111827; text-decoration:none; padding:6px 2px; border-bottom:2px solid transparent; font-weight:600; font-size:.92rem; }
+      nav.subnav a:hover{ border-bottom-color:#111827; }
+      nav.subnav a.active{ border-bottom-color:#111827; }
 
       /* ===== Tarjetas ===== */
       .tile { width: 440px; margin: 0 auto 28px; position: relative; }
@@ -124,7 +142,6 @@ else:
       .section h3 { margin: 0 0 6px 0; font-size: 1.05rem; font-weight:700; }
       .section p { margin: 0 0 4px 0; color: #333; font-size: 0.98rem; font-weight:400; }
 
-      /* ===== Hovercard ===== */
       .hovercard { position:absolute; left:50%; width:min(420px,90vw); background:rgba(255,255,255,0.8); backdrop-filter:blur(8px); border:1px solid #e5e5e7; border-radius:10px; padding:10px 14px; box-shadow:0 14px 28px rgba(0,0,0,.12); opacity:0; visibility:hidden; transition:opacity .14s ease, transform .14s ease, visibility .14s; z-index:50; pointer-events:none; }
       .card-wrap .hovercard { bottom:calc(100% + 10px); transform:translateX(-50%) translateY(6px); }
       .card-wrap:hover .hovercard { opacity:1; visibility:visible; transform:translateX(-50%) translateY(0); }
@@ -137,20 +154,16 @@ else:
     </style>
     """, unsafe_allow_html=True)
 
-    # ===== MENÚ (nav con ?nav=... y preserva ing=1) =====
+    # ===== MENÚ principal (preserva ing=1) =====
     links_html = []
     for label in OPCIONES:
-        # 🔸 Si ya estás ingresado, agregamos ing=1 para no perder el estado al navegar
-        if st.session_state.ingresado:
-            href = f"./?nav={quote(label)}&ing=1"
-        else:
-            href = f"./?nav={quote(label)}"
+        href = f"./?nav={quote(label)}&ing=1" if st.session_state.ingresado else f"./?nav={quote(label)}"
         active_cls = " active" if st.session_state.nav == label else ""
         links_html.append(f"<a class='{active_cls}' href='{href}' target='_self'>{label.upper()}</a>")
     nav_html = f"<div id='topnav-wrap'><nav class='topnav'>{''.join(links_html)}</nav></div>"
     st.markdown(nav_html, unsafe_allow_html=True)
 
-    # ===== CONTENIDO: SOLO la sección elegida =====
+    # ===== CONTENIDO =====
     st.markdown("<div class='wrap'>", unsafe_allow_html=True)
     nav = st.session_state.nav
 
@@ -228,5 +241,105 @@ else:
           <p>Trabajamos con compañías de retail, industria y servicios: Georgalos, Vicbor, ITPS, Biosidus, Glam, Espumas, Café Martínez, entre otros.</p>
         </div>
         """, unsafe_allow_html=True)
+
+    # ============= SOPORTE (con login) =============
+    elif nav == "Soporte":
+        # Submenú (solo visible si está autenticado)
+        if not st.session_state.soporte_authed:
+            st.markdown("<div class='hairline'></div>", unsafe_allow_html=True)
+            st.markdown("### Soporte — Iniciar sesión")
+
+            with st.form("login_soporte"):
+                email = st.text_input("Email corporativo")
+                pwd = st.text_input("Contraseña", type="password")
+                col_a, col_b = st.columns([1,2])
+                with col_a:
+                    submit = st.form_submit_button("Entrar")
+                with col_b:
+                    st.caption("⚠️ Autenticación de muestra. Integre SSO/LDAP en prod.")
+
+            if submit:
+                # Validación simple de ejemplo (en producción, reemplazar por SSO/LDAP/Backend)
+                if email and pwd:
+                    st.session_state.soporte_authed = True
+                    st.session_state.soporte_user = email
+                    # Mantener URL limpia y estado de ingreso
+                    _qp_set({"nav": "Soporte", "ing": "1", "snav": st.session_state.snav})
+                    st.success(f"Bienvenido/a, {email}")
+                else:
+                    st.error("Completá email y contraseña.")
+        else:
+            # Barra de subnavegación de Soporte
+            sub_links = []
+            for slabel in SOPORTE_OPCIONES:
+                href = f"./?nav=Soporte&snav={quote(slabel)}&ing=1"
+                active_s = " active" if st.session_state.snav == slabel else ""
+                sub_links.append(f"<a class='{active_s}' href='{href}' target='_self'>{slabel}</a>")
+            st.markdown(f"<div id='subnav-wrap'><nav class='subnav'>{''.join(sub_links)}</nav></div>", unsafe_allow_html=True)
+
+            # Botón salir (cierra sesión de soporte)
+            right = st.columns([1,1,1,1,1,1,1,1,1,1])[9]
+            with right:
+                if st.button("Cerrar sesión", key="logout_soporte"):
+                    st.session_state.soporte_authed = False
+                    st.session_state.soporte_user = None
+                    _qp_set({"nav": "Soporte", "ing": "1"})  # snav se limpia
+
+            st.markdown("<div class='hairline'></div>", unsafe_allow_html=True)
+
+            # Render de la sub-sección elegida
+            snav = st.session_state.snav
+
+            if snav == "Cargar Ticket":
+                st.markdown("### Cargar Ticket")
+                with st.form("form_ticket", clear_on_submit=True):
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        email_t = st.text_input("Tu email", value=st.session_state.soporte_user or "")
+                        asunto = st.text_input("Asunto")
+                        severidad = st.selectbox("Severidad", ["Baja", "Media", "Alta", "Crítica"])
+                    with col2:
+                        area = st.selectbox("Área", ["Ecommerce", "Finanzas", "Industria", "Infraestructura", "Otro"])
+                        archivo = st.file_uploader("Adjuntar archivo (opcional)")
+                    descripcion = st.text_area("Descripción del problema", height=160, placeholder="Contanos qué ocurrió, pasos para reproducir, capturas, etc.")
+                    enviar = st.form_submit_button("Enviar ticket")
+
+                if enviar:
+                    if not (email_t and asunto and descripcion):
+                        st.error("Completá email, asunto y descripción.")
+                    else:
+                        # Simulación de creación de ticket
+                        import uuid, datetime
+                        ticket_id = f"TCK-{uuid.uuid4().hex[:8].upper()}"
+                        st.success(f"✅ Ticket creado: **{ticket_id}**")
+                        st.info("Nuestro equipo te contactará a la brevedad. Revisá tu email para actualizaciones.")
+
+            elif snav == "Documentación":
+                st.markdown("### Documentación")
+                st.write("Acceso a guías, FAQs y artículos:")
+                doc_cols = st.columns(2)
+                with doc_cols[0]:
+                    st.markdown("- Introducción a APIs Brandatta")
+                    st.markdown("- Integración con ERP (SAP)")
+                    st.markdown("- Webhooks: mejores prácticas")
+                    st.markdown("- Seguridad y autenticación")
+                with doc_cols[1]:
+                    st.markdown("- Métricas y monitoreo")
+                    st.markdown("- Trazabilidad y tracking")
+                    st.markdown("- E-commerce: Checkout & pagos")
+                    st.markdown("- Resolución de errores comunes")
+
+            elif snav == "Manuales":
+                st.markdown("### Manuales")
+                st.write("Manuales de usuario y de operación:")
+                man_cols = st.columns(2)
+                with man_cols[0]:
+                    st.markdown("- Manual de Operador de Planta")
+                    st.markdown("- Manual de Ecommerce (Administrador)")
+                    st.markdown("- Manual de Finanzas (Conciliaciones)")
+                with man_cols[1]:
+                    st.markdown("- Manual de KPIs & Dashboards")
+                    st.markdown("- Manual de Gestión de Stock")
+                    st.markdown("- Manual de Alertas y SLA")
 
     st.markdown("</div>", unsafe_allow_html=True)
