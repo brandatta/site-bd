@@ -168,9 +168,6 @@ else:
     # ===== MENÚ principal (preserva ing=1 y sp=1 si corresponde) =====
     links_html = []
     for label in OP CIONES if False else OPCIONES:
-        pass
-    links_html = []
-    for label in OPCIONES:
         params = {"nav": label, "ing": "1"}
         if st.session_state.soporte_authed:
             params["sp"] = "1"
