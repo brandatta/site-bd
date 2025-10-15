@@ -28,47 +28,36 @@ def logo_html_src(path="logo.png", width_px=200):
 if not st.session_state.ingresado:
     st.markdown("""
     <style>
-      /* Manjari */
       @import url('https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&display=swap');
 
       html, body, [data-testid="stAppViewContainer"] {
         background: #d4fbd7 !important;
-        font-family: 'Manjari', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important;
+        font-family: 'Manjari', system-ui, sans-serif !important;
       }
-      header {visibility: hidden;}  #MainMenu {visibility: hidden;}  footer {visibility: hidden;}
+      header, #MainMenu, footer {visibility: hidden;}
 
-      /* contenedor full alto y centrado */
       .block-container, [data-testid="block-container"] {
         min-height: 100vh !important;
         display: flex !important;
         flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
         padding-top: 0 !important;
         padding-bottom: 0 !important;
       }
-      [data-testid="stVerticalBlock"]:first-of-type {
-        flex: 1 0 auto !important;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        justify-content: center !important;
-        gap: 14px !important;
-        width: 100% !important;
-      }
 
-      /* botón ingresar */
-      [data-testid="stVerticalBlock"]:first-of-type .stButton > button {
+      .stButton > button {
         display: block !important;
         margin: 28px auto 0 auto !important;
         border-radius: 0 !important;
         border: 1px solid rgba(0,0,0,0.15) !important;
         background: #fff !important;
         font-weight: 700 !important;
-        font-family: 'Manjari', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important;
+        font-family: 'Manjari', system-ui, sans-serif !important;
         padding: 10px 18px !important;
         cursor: pointer;
       }
 
-      /* logo titilando */
       @keyframes blink { 0%{opacity:1;transform:scale(1);} 50%{opacity:.35;transform:scale(1.02);} 100%{opacity:1;transform:scale(1);} }
       .hero-logo { animation: blink 1.6s ease-in-out infinite; }
     </style>
@@ -82,59 +71,66 @@ if not st.session_state.ingresado:
 else:
     st.markdown("""
     <style>
-      /* Manjari */
       @import url('https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&display=swap');
 
       [data-testid="stAppViewContainer"] {
         background: #ffffff !important;
-        font-family: 'Manjari', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important;
+        font-family: 'Manjari', system-ui, sans-serif !important;
       }
-      header {visibility: hidden;}  #MainMenu {visibility: hidden;}  footer {visibility: hidden;}
+      header, #MainMenu, footer {visibility: hidden;}
       .block-container, [data-testid="block-container"] { padding-top: 0 !important; padding-bottom: 0 !important; }
 
-      /* contenedor ancho para 3 columnas grandes */
       .wrap { max-width: 1440px; margin: 0 auto; padding: 0 8px 16px; }
-
-      /* Evitar recortes del hover */
       [data-testid="stVerticalBlock"], [data-testid="column"], .wrap, .tile { overflow: visible !important; }
 
-      /* Dropdown minimal */
       .nav-select .stSelectbox > div > div {
         border-radius: 0 !important;
         border: 1px solid #e5e5e7 !important;
       }
       .nav-select [data-baseweb="select"] * {
-        font-family: 'Manjari', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important;
+        font-family: 'Manjari', system-ui, sans-serif !important;
       }
 
-      /* Tarjetas (dobles) con más separación */
+      /* Tarjetas con mismo ancho y mitad de altura */
       .tile { width: 440px; margin: 0 auto 28px; position: relative; }
       @media (max-width: 1200px){ .tile{ width: 400px; } }
       @media (max-width: 900px){  .tile{ width: 360px; } }
 
-      .card-wrap { position: relative; } /* para posicionar el hovercard */
+      .card-wrap { position: relative; }
 
       .card {
         background: #ffffff;
         border: 1px solid #d4fbd7;
         border-radius: 0;
-        height: 220px;
-        display: flex; align-items: center; justify-content: center; text-align: center;
+        height: 110px; /* 🔹 mitad de la altura original */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
         transition: border-color .12s ease, transform .12s ease, box-shadow .12s ease;
       }
-      .card:hover { border-color: #bff3c5; transform: translateY(-1px); box-shadow: 0 12px 24px rgba(0,0,0,.06); }
-
-      .card, .card * { font-family: 'Manjari', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important; }
+      .card:hover {
+        border-color: #bff3c5;
+        transform: translateY(-1px);
+        box-shadow: 0 12px 24px rgba(0,0,0,.06);
+      }
 
       .card h3 {
-        margin: 0; font-size: 1.05rem; font-weight: 700;
-        letter-spacing: .15px; color: #111827; line-height: 1.25; padding: 0 12px;
+        margin: 0;
+        font-size: 1.05rem;
+        font-weight: 700;
+        letter-spacing: .15px;
+        color: #111827;
+        line-height: 1.25;
+        padding: 0 12px;
       }
 
       .row-spacer { height: 36px; }
       .title {
-        text-align:center; font-weight:700; font-size:1.2rem; margin: 0 0 10px 0;
-        font-family: 'Manjari', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important;
+        text-align:center;
+        font-weight:700;
+        font-size:1.2rem;
+        margin: 0 0 10px 0;
       }
       .hairline   { border-top: 1px solid #e5e5e7; margin: 10px 0 14px 0; }
       .section h3 { margin: 0 0 6px 0; font-size: 1.05rem; font-weight:700; }
@@ -145,59 +141,93 @@ else:
         position: absolute;
         left: 50%;
         width: min(420px, 90vw);
-        background: rgba(255,255,255,0.72);
+        background: rgba(255,255,255,0.8);
         backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
         border: 1px solid #e5e5e7;
-        border-radius: 12px;
-        padding: 12px 14px;
-        box-shadow: 0 18px 38px rgba(0,0,0,.14);
-        opacity: 0; visibility: hidden;
+        border-radius: 10px;
+        padding: 10px 14px;
+        box-shadow: 0 14px 28px rgba(0,0,0,.12);
+        opacity: 0;
+        visibility: hidden;
         transition: opacity .14s ease, transform .14s ease, visibility .14s;
         z-index: 50;
         pointer-events: none;
       }
 
-      /* Por defecto (fila de ABAJO): aparece ARRIBA de la tarjeta */
       .card-wrap .hovercard {
-        bottom: calc(100% + 12px);
+        bottom: calc(100% + 10px);
         transform: translateX(-50%) translateY(6px);
       }
       .card-wrap:hover .hovercard {
-        opacity: 1; visibility: visible;
+        opacity: 1;
+        visibility: visible;
         transform: translateX(-50%) translateY(0);
       }
+
       .card-wrap .hovercard::after {
-        content: ""; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
-        border-width: 8px; border-style: solid; border-color: #e5e5e7 transparent transparent transparent;
-        filter: drop-shadow(0 2px 2px rgba(0,0,0,.05));
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border-width: 7px;
+        border-style: solid;
+        border-color: #e5e5e7 transparent transparent transparent;
       }
       .card-wrap .hovercard::before {
-        content: ""; position: absolute; top: calc(100% - 1px); left: 50%; transform: translateX(-50%);
-        border-width: 7px; border-style: solid; border-color: #ffffff transparent transparent transparent;
+        content: "";
+        position: absolute;
+        top: calc(100% - 1px);
+        left: 50%;
+        transform: translateX(-50%);
+        border-width: 6px;
+        border-style: solid;
+        border-color: #ffffff transparent transparent transparent;
       }
 
-      /* Para la fila de ARRIBA: aparece DEBAJO de la tarjeta */
       .card-wrap.below .hovercard {
-        top: calc(100% + 12px);
+        top: calc(100% + 10px);
         bottom: auto;
         transform: translateX(-50%) translateY(-6px);
       }
       .card-wrap.below:hover .hovercard {
-        opacity: 1; visibility: visible;
+        opacity: 1;
+        visibility: visible;
         transform: translateX(-50%) translateY(0);
       }
+
       .card-wrap.below .hovercard::after {
-        content: ""; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%) rotate(180deg);
-        border-width: 8px; border-style: solid; border-color: #e5e5e7 transparent transparent transparent;
+        content: "";
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%) rotate(180deg);
+        border-width: 7px;
+        border-style: solid;
+        border-color: #e5e5e7 transparent transparent transparent;
       }
       .card-wrap.below .hovercard::before {
-        content: ""; position: absolute; bottom: calc(100% - 1px); left: 50%; transform: translateX(-50%) rotate(180deg);
-        border-width: 7px; border-style: solid; border-color: #ffffff transparent transparent transparent;
+        content: "";
+        position: absolute;
+        bottom: calc(100% - 1px);
+        left: 50%;
+        transform: translateX(-50%) rotate(180deg);
+        border-width: 6px;
+        border-style: solid;
+        border-color: #ffffff transparent transparent transparent;
       }
 
-      .hovercard h4 { margin: 0 0 6px 0; font-size: 1.02rem; font-weight: 700; color: #0f172a; }
-      .hovercard p  { margin: 0 0 4px 0; font-size: .95rem; color: #111827; }
+      .hovercard h4 {
+        margin: 0 0 6px 0;
+        font-size: 1rem;
+        font-weight: 700;
+        color: #0f172a;
+      }
+      .hovercard p {
+        margin: 0 0 4px 0;
+        font-size: .9rem;
+        color: #111827;
+      }
     </style>
     """, unsafe_allow_html=True)
 
@@ -229,50 +259,44 @@ else:
             {"titulo": "Gestión de Stock", "desc1": "Inventario en tiempo real.", "desc2": "Alertas, valuación y KPIs."},
         ]
 
-        # Fila 1 (arriba) — hover abajo
+        # Fila 1 (arriba)
         cols = st.columns(3, gap="large")
         for i, col in enumerate(cols):
             with col:
                 svc = servicios[i]
-                st.markdown(
-                    f"""
-                    <div class='tile'>
-                      <div class='card-wrap below'>
-                        <div class='card'><h3>{svc["titulo"]}</h3></div>
-                        <div class='hovercard'>
-                          <h4>{svc["titulo"]}</h4>
-                          <p>• {svc["desc1"]}</p>
-                          <p>• {svc["desc2"]}</p>
-                        </div>
-                      </div>
+                st.markdown(f"""
+                <div class='tile'>
+                  <div class='card-wrap below'>
+                    <div class='card'><h3>{svc["titulo"]}</h3></div>
+                    <div class='hovercard'>
+                      <h4>{svc["titulo"]}</h4>
+                      <p>• {svc["desc1"]}</p>
+                      <p>• {svc["desc2"]}</p>
                     </div>
-                    """,
-                    unsafe_allow_html=True
-                )
+                  </div>
+                </div>
+                """, unsafe_allow_html=True)
 
         st.markdown("<div class='row-spacer'></div>", unsafe_allow_html=True)
 
-        # Fila 2 (abajo) — hover arriba
+        # Fila 2 (abajo)
         cols2 = st.columns(3, gap="large")
         for j, col in enumerate(cols2):
             idx2 = 3 + j
             with col:
                 svc = servicios[idx2]
-                st.markdown(
-                    f"""
-                    <div class='tile'>
-                      <div class='card-wrap'>
-                        <div class='card'><h3>{svc["titulo"]}</h3></div>
-                        <div class='hovercard'>
-                          <h4>{svc["titulo"]}</h4>
-                          <p>• {svc["desc1"]}</p>
-                          <p>• {svc["desc2"]}</p>
-                        </div>
-                      </div>
+                st.markdown(f"""
+                <div class='tile'>
+                  <div class='card-wrap'>
+                    <div class='card'><h3>{svc["titulo"]}</h3></div>
+                    <div class='hovercard'>
+                      <h4>{svc["titulo"]}</h4>
+                      <p>• {svc["desc1"]}</p>
+                      <p>• {svc["desc2"]}</p>
                     </div>
-                    """,
-                    unsafe_allow_html=True
-                )
+                  </div>
+                </div>
+                """, unsafe_allow_html=True)
 
     elif st.session_state.nav == "Contacto":
         st.markdown("<div class='hairline'></div>", unsafe_allow_html=True)
