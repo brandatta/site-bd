@@ -100,11 +100,19 @@ else:
       @import url('https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&display=swap');
       [data-testid="stAppViewContainer"] { background:#fff !important; font-family:'Manjari', system-ui, sans-serif !important; }
       header, #MainMenu, footer {visibility: hidden;}
-      .wrap { max-width: 1440px; margin: 0 auto; padding: 0 8px 16px; }
+
+      /* 🔹 Quitamos padding superior */
+      .block-container, [data-testid="block-container"]{
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+      }
+      [data-testid="stAppViewContainer"]{
+        padding-top: 0 !important;
+      }
 
       /* ===== Menú principal ===== */
-      #topnav-wrap{ position: sticky; top: 0; z-index: 999; background: #ffffff; border-bottom: 1px solid #e5e5e7; box-shadow: 0 1px 6px rgba(0,0,0,.04); }
-      nav.topnav{ max-width: 1440px; margin: 0 auto; padding: 12px 16px; display: flex; align-items: center; justify-content: center; gap: 32px; }
+      #topnav-wrap{ position: sticky; top: 0; z-index: 999; background: #ffffff; border-bottom: 1px solid #e5e5e7; box-shadow: 0 1px 6px rgba(0,0,0,.04); margin-top: 0 !important; }
+      nav.topnav{ max-width: 1440px; margin: 0 auto; padding: 8px 16px !important; display: flex; align-items: center; justify-content: center; gap: 28px !important; }
       nav.topnav a{ color: #0f0f0f; text-decoration: none; padding: 8px 2px; border-bottom: 2px solid transparent; text-transform: uppercase; font-weight: 700; font-size: .95rem; transition: border .15s; }
       nav.topnav a:hover{ border-bottom-color: #0f0f0f; }
       nav.topnav a.active{ border-bottom-color: #0f0f0f; }
@@ -115,7 +123,7 @@ else:
         grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
         gap: 24px;
         max-width: 1320px;
-        margin: 0 auto 32px;
+        margin: 20px auto 32px;
         justify-items: center;
       }
       .tile { width: 100%; max-width: 420px; position: relative; }
@@ -137,12 +145,11 @@ else:
             params["sp"] = "1"
         href = "./?" + "&".join([f"{k}={quote(v)}" for k, v in params.items()])
         active = " active" if st.session_state.nav == label else ""
-        # 🔹 Ahora forzamos que abra en la misma pestaña
         links_html.append(f"<a class='{active}' href='{href}' target='_self'>{label.upper()}</a>")
 
     st.markdown(f"<div id='topnav-wrap'><nav class='topnav'>{''.join(links_html)}</nav></div>", unsafe_allow_html=True)
 
-    st.markdown("<div class='wrap'>", unsafe_allow_html=True)
+    st.markdown("<div class='wrap' style='padding-top:8px;'>", unsafe_allow_html=True)
     nav = st.session_state.nav
 
     # ===== SERVICIOS =====
@@ -160,10 +167,9 @@ else:
 
         html_cards = ""
         for i, svc in enumerate(servicios):
-            place_cls = " below" if i < 3 else ""
             html_cards += f"""
 <div class='tile'>
-  <div class='card-wrap{place_cls}'>
+  <div class='card-wrap'>
     <div class='card'><h3>{svc["titulo"]}</h3></div>
     <div class='hovercard'>
       <h4>{svc["titulo"]}</h4>
