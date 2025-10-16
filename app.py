@@ -44,7 +44,7 @@ nav_qp  = unquote(qp.get("nav"))  if qp.get("nav")  else None
 ing_qp  = qp.get("ing")
 snav_qp = unquote(qp.get("snav")) if qp.get("snav") else None
 sp_qp   = qp.get("sp")
-sel_qp  = unquote(qp.get("sel")) if qp.get("sel") else None  # <-- tarjeta seleccionada (ya no se usa para abrir detalle)
+sel_qp  = unquote(qp.get("sel")) if qp.get("sel") else None  # no se usa para modal, lo dejamos por compatibilidad
 
 if ing_qp == "1":
     st.session_state.ingresado = True
@@ -118,48 +118,48 @@ if not st.session_state.ingresado:
 # ================== CONTENIDO ==================
 else:
     # ====== CSS General + Servicios + Modal ======
-    detail_open_class = ""  # (lo dejé vacío: ahora el detalle abre en modal)
-    st.markdown(f"""
+    # IMPORTANTE: string normal (sin f) para evitar errores con llaves { } en CSS
+    st.markdown("""
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&display=swap');
-      [data-testid="stAppViewContainer"] {{ background:#fff !important; font-family:'Manjari', system-ui, sans-serif !important; }}
-      header, #MainMenu, footer {{visibility: hidden;}}
-      .block-container, [data-testid="block-container"]{{ padding-top: 0 !important; padding-bottom: 0 !important; }}
-      [data-testid="stAppViewContainer"]{{ padding-top: 0 !important; }}
+      [data-testid="stAppViewContainer"] { background:#fff !important; font-family:'Manjari', system-ui, sans-serif !important; }
+      header, #MainMenu, footer {visibility: hidden;}
+      .block-container, [data-testid="block-container"]{ padding-top: 0 !important; padding-bottom: 0 !important; }
+      [data-testid="stAppViewContainer"]{ padding-top: 0 !important; }
 
       /* ===== Header sticky con logo ===== */
-      #topnav-wrap{{ position: sticky; top: 0; z-index: 1000; background: #ffffff; border-bottom: 1px solid #e5e5e7; box-shadow: 0 1px 6px rgba(0,0,0,.04); margin-top: 0 !important; }}
-      nav.topnav{{ max-width: 1440px; margin: 0 auto; padding: 8px 16px !important; display: flex; align-items: center; justify-content: space-between; gap: 16px; position: relative; }}
-      .nav-left{{ display:flex; align-items:center; gap:10px; min-width: 200px; }}
-      .nav-center{{ position:absolute; left:50%; transform:translateX(-50%); display:flex; gap:28px; align-items:center; }}
-      .nav-right{{ min-width: 200px; }}
-      #brand-logo{{ height: 70px; width: auto; display:block; }}
-      @media (max-width: 1200px){{ #brand-logo{{ height: 52px; }} .nav-left, .nav-right {{ min-width: 180px; }} }}
-      @media (max-width: 900px){{ #brand-logo{{ height: 44px; }} .nav-left, .nav-right {{ min-width: 160px; }} }}
-      @media (max-width: 640px){{ #brand-logo{{ height: 36px; }} .nav-left, .nav-right {{ min-width: 120px; }} }}
-      .nav-center a{{ color: #0f0f0f; text-decoration: none; padding: 8px 2px; border-bottom: 2px solid transparent; text-transform: uppercase; font-weight: 700; font-size: .95rem; transition: border .15s; white-space: nowrap; }}
-      .nav-center a:hover{{ border-bottom-color: #0f0f0f; }}
-      .nav-center a.active{{ border-bottom-color: #0f0f0f; }}
+      #topnav-wrap{ position: sticky; top: 0; z-index: 1000; background: #ffffff; border-bottom: 1px solid #e5e5e7; box-shadow: 0 1px 6px rgba(0,0,0,.04); margin-top: 0 !important; }
+      nav.topnav{ max-width: 1440px; margin: 0 auto; padding: 8px 16px !important; display: flex; align-items: center; justify-content: space-between; gap: 16px; position: relative; }
+      .nav-left{ display:flex; align-items:center; gap:10px; min-width: 200px; }
+      .nav-center{ position:absolute; left:50%; transform:translateX(-50%); display:flex; gap:28px; align-items:center; }
+      .nav-right{ min-width: 200px; }
+      #brand-logo{ height: 70px; width: auto; display:block; }
+      @media (max-width: 1200px){ #brand-logo{ height: 52px; } .nav-left, .nav-right { min-width: 180px; } }
+      @media (max-width: 900px){ #brand-logo{ height: 44px; } .nav-left, .nav-right { min-width: 160px; } }
+      @media (max-width: 640px){ #brand-logo{ height: 36px; } .nav-left, .nav-right { min-width: 120px; } }
+      .nav-center a{ color: #0f0f0f; text-decoration: none; padding: 8px 2px; border-bottom: 2px solid transparent; text-transform: uppercase; font-weight: 700; font-size: .95rem; transition: border .15s; white-space: nowrap; }
+      .nav-center a:hover{ border-bottom-color: #0f0f0f; }
+      .nav-center a.active{ border-bottom-color: #0f0f0f; }
 
       /* ===== Grilla de Servicios ===== */
-      .services-area {{ max-width: 1320px; margin: 20px auto 12px; }}
-      .services-grid {{
+      .services-area { max-width: 1320px; margin: 20px auto 12px; }
+      .services-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
         gap: 24px;
         justify-items: center;
         transition: transform .25s ease;
-      }}
+      }
 
-      .tile {{ width: 100%; max-width: 420px; position: relative; overflow: visible !important; z-index: 0; cursor:pointer; }}
-      .tile:hover {{ z-index: 200; transform: translateX(-6px); transition: transform .2s ease; }}
-      .card-wrap {{ position: relative; overflow: visible !important; }}
-      .card {{ background:#fff; border:1px solid #d4fbd7; height:110px; display:flex; align-items:center; justify-content:center; transition:all .15s ease; box-sizing: border-box; border-radius:10px; }}
-      .card:hover{{ border-color:#bff3c5; box-shadow:0 10px 24px rgba(0,0,0,.06); }}
-      .card h3{{ font-size:1.05rem; font-weight:700; color:#111; margin:0; }}
+      .tile { width: 100%; max-width: 420px; position: relative; overflow: visible !important; z-index: 0; cursor:pointer; }
+      .tile:hover { z-index: 200; transform: translateX(-6px); transition: transform .2s ease; }
+      .card-wrap { position: relative; overflow: visible !important; }
+      .card { background:#fff; border:1px solid #d4fbd7; height:110px; display:flex; align-items:center; justify-content:center; transition:all .15s ease; box-sizing: border-box; border-radius:10px; }
+      .card:hover{ border-color:#bff3c5; box-shadow:0 10px 24px rgba(0,0,0,.06); }
+      .card h3{ font-size:1.05rem; font-weight:700; color:#111; margin:0; }
 
       /* Hovercard (no altera layout) */
-      .hovercard{{
+      .hovercard{
         position:absolute; left:50%;
         background:rgba(255,255,255,0.97); backdrop-filter:blur(6px);
         border:1px solid #e5e5e7; border-radius:10px; padding:10px 14px;
@@ -167,15 +167,15 @@ else:
         z-index: 300; box-shadow:0 12px 28px rgba(0,0,0,0.14);
         pointer-events: none; width: max(280px, 60%);
         text-align:left;
-      }}
-      .card-wrap:hover .hovercard{{ opacity:1; visibility:visible; }}
-      .hover-up{{ bottom:calc(100% + 8px); transform:translateX(-50%) translateY(6px); }}
-      .card-wrap:hover .hover-up{{ transform:translateX(-50%) translateY(0); }}
-      .hover-down{{ top:calc(100% + 8px); transform:translateX(-50%) translateY(-6px); }}
-      .card-wrap:hover .hover-down{{ transform:translateX(-50%) translateY(0); }}
-      .hovercard h4{{ margin:0 0 4px; font-size:1rem; font-weight:700; }}
-      .hovercard p{{ margin:0; font-size:.9rem; color:#111; }}
-      .hover-img{{ display:block; width:100%; max-height:120px; object-fit:contain; margin:0 0 8px 0; background:#fff; border:1px solid #eef2f3; border-radius:8px; }}
+      }
+      .card-wrap:hover .hovercard{ opacity:1; visibility:visible; }
+      .hover-up{ bottom:calc(100% + 8px); transform:translateX(-50%) translateY(6px); }
+      .card-wrap:hover .hover-up{ transform:translateX(-50%) translateY(0); }
+      .hover-down{ top:calc(100% + 8px); transform:translateX(-50%) translateY(-6px); }
+      .card-wrap:hover .hover-down{ transform:translateX(-50%) translateY(0); }
+      .hovercard h4{ margin:0 0 4px; font-size:1rem; font-weight:700; }
+      .hovercard p{ margin:0; font-size:.9rem; color:#111; }
+      .hover-img{ display:block; width:100%; max-height:120px; object-fit:contain; margin:0 0 8px 0; background:#fff; border:1px solid #eef2f3; border-radius:8px; }
 
       /* ===== MODAL (CSS-only con :target) ===== */
       .modal{ position: fixed; inset: 0; background: rgba(0,0,0,.45); display:none; align-items:center; justify-content:center; z-index: 9999; padding:20px; }
@@ -188,10 +188,10 @@ else:
       .modal-body p{ margin:.4rem 0; }
       .modal-img{ display:block; width:100%; max-height:220px; object-fit:contain; margin:4px 0 10px 0; border:1px solid #eef2f3; border-radius:10px; background:#fff; }
 
-      @keyframes fadeIn {{
-        from {{opacity:0; transform: translateY(8px);}}
-        to   {{opacity:1; transform: translateY(0);}}
-      }}
+      @keyframes fadeIn {
+        from {opacity:0; transform: translateY(8px);}
+        to   {opacity:1; transform: translateY(0);}
+      }
     </style>
     """, unsafe_allow_html=True)
 
@@ -282,7 +282,7 @@ else:
         ]
 
         # Contenedor de tarjetas
-        st.markdown(f"<div class='services-area {detail_open_class}'>", unsafe_allow_html=True)
+        st.markdown("<div class='services-area'>", unsafe_allow_html=True)
 
         # Render de tarjetas clickeables -> abren MODAL con #svc-<id>
         html_cards = ""
@@ -363,7 +363,7 @@ else:
             st.markdown("""
             <style>
               #subnav-wrap{ position: sticky; top: 48px; z-index: 900; background: #ffffff; border-bottom: 1px solid #f0f0f1; }
-              nav.subnav{ max-width: 1000px; margin: 0 auto; padding: 8px 16px; display: flex; align-items: center; justify-content: center; gap: 22px; }
+              nav.subnav{ max_width: 1000px; margin: 0 auto; padding: 8px 16px; display: flex; align-items: center; justify-content: center; gap: 22px; }
               nav.subnav a{ display:inline-block; color:#111827; text-decoration:none; padding:6px 2px; border-bottom:2px solid transparent; font-weight:600; font-size:.92rem; }
               nav.subnav a:hover{ border-bottom-color:#111827; }
               nav.subnav a.active{ border-bottom-color:#111827; }
