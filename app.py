@@ -128,7 +128,7 @@ else:
 
       /* ===== Header sticky con logo ===== */
       #topnav-wrap{ position: sticky; top: 0; z-index: 1000; background: #ffffff; border-bottom: 1px solid #e5e5e7; box-shadow: 0 1px 6px rgba(0,0,0,.04); margin-top: 0 !important; }
-      nav.topnav{ max-width: 1440px; margin: 0 auto; padding: 8px 16px !important; display: flex; align-items: center; justify-content: space_between; gap: 16px; position: relative; }
+      nav.topnav{ max-width: 1440px; margin: 0 auto; padding: 8px 16px !important; display: flex; align-items: center; justify-content: space-between; gap: 16px; position: relative; }
       .nav-left{ display:flex; align-items:center; gap:10px; min-width: 200px; }
       .nav-center{ position:absolute; left:50%; transform:translateX(-50%); display:flex; gap:28px; align-items:center; }
       .nav-right{ min-width: 200px; }
@@ -157,7 +157,7 @@ else:
       .card:hover{ border-color:#bff3c5; box-shadow:0 10px 24px rgba(0,0,0,.06); }
       .card h3{ font-size:1.05rem; font-weight:700; color:#111; margin:0; }
 
-      /* Hovercard (no altera layout) */
+      /* Hovercard (solo imagen arriba) */
       .hovercard{
         position:absolute; left:50%;
         background:rgba(255,255,255,0.97); backdrop-filter:blur(6px);
@@ -172,9 +172,7 @@ else:
       .card-wrap:hover .hover-up{ transform:translateX(-50%) translateY(0); }
       .hover-down{ top:calc(100% + 8px); transform:translateX(-50%) translateY(-6px); }
       .card-wrap:hover .hover-down{ transform:translateX(-50%) translateY(0); }
-      .hovercard h4{ margin:0 0 4px; font-size:1rem; font-weight:700; }
-      .hovercard p{ margin:0; font-size:.9rem; color:#111; }
-      .hover-img{ display:block; width:100%; max-height:120px; object-fit:contain; margin:0 0 8px 0; background:#fff; border:1px solid #eef2f3; border-radius:8px; }
+      .hover-img{ display:block; width:100%; max-height:120px; object-fit:contain; margin:0; background:#fff; border:1px solid #eef2f3; border-radius:8px; }
 
       /* ===== MODAL (CSS-only con :target) ===== */
       .modal{ position: fixed; inset: 0; background: rgba(0,0,0,.45); display:none; align-items:center; justify-content:center; z-index: 9999; padding:20px; }
@@ -228,13 +226,11 @@ else:
     if nav == "Servicios":
         st.markdown("<div class='title' style='text-align:center;font-weight:700;font-size:1.2rem;margin:20px 0;'>Servicios</div>", unsafe_allow_html=True)
 
-        # Definición de servicios con textos largos provistos
+        # Definición de servicios (sin desc1/desc2)
         servicios = [
             {
                 "id": "interfaces",
                 "titulo": "Interfaces",
-                "desc1": "Diseño y desarrollo de Interfaces escalables.",
-                "desc2": "Autenticación, rate limiting y monitoreo.",
                 "img": "download.png",
                 "long": """Diseñamos y desarrollamos interfaces para la integración de sistemas empresariales heterogéneos, garantizando la coherencia, seguridad y trazabilidad de los datos a lo largo de todo el ecosistema tecnológico de la organización.
 
@@ -264,8 +260,6 @@ Garantizar un flujo de información unificado, confiable y auditable entre los d
             {
                 "id": "industria",
                 "titulo": "Producción Industrial",
-                "desc1": "Digitalización, trazabilidad y control operativo.",
-                "desc2": "Datos en tiempo real desde planta y ERP.",
                 "img": "download.png",
                 "long": """Desarrollamos soluciones tecnológicas orientadas a la digitalización, trazabilidad y control operativo de procesos industriales, integrando datos en tiempo real desde planta, ERP, sistemas periféricos y archivos ad-hoc.
 
@@ -293,8 +287,6 @@ Brindar una infraestructura digital sólida para la gestión integral de la prod
             {
                 "id": "fuerza",
                 "titulo": "Fuerza de Ventas",
-                "desc1": "Gestión y optimización de la operación comercial.",
-                "desc2": "Web y móvil con sincronización bidireccional.",
                 "img": "download.png",
                 "long": """Desarrollamos plataformas y herramientas diseñadas para gestionar, monitorear y optimizar la operación comercial de las organizaciones, integrando en un mismo entorno la información proveniente de ERP, CRM, e-commerce, sistemas logísticos y módulos documentales.
 
@@ -324,8 +316,6 @@ Proveer una plataforma robusta y escalable que centralice la gestión comercial,
             {
                 "id": "ecommerce",
                 "titulo": "E-commerce",
-                "desc1": "B2B integrado con sistemas centrales.",
-                "desc2": "Promos y reglas comerciales avanzadas.",
                 "img": "download.png",
                 "long": """Desarrollamos y administramos plataformas de comercio electrónico B2B integradas con los sistemas centrales de gestión empresarial, garantizando la consistencia de precios, stock, condiciones comerciales y documentación transaccional en tiempo real.
 
@@ -358,8 +348,6 @@ Ofrecer una infraestructura de comercio electrónico totalmente integrada, capaz
             {
                 "id": "finanzas",
                 "titulo": "Finanzas",
-                "desc1": "Automatización e integración financiera.",
-                "desc2": "Consolidación en tiempo real y auditoría.",
                 "img": "download.png",
                 "long": """Desarrollamos soluciones orientadas a la automatización, integración y control de los procesos financieros y contables, garantizando la coherencia y trazabilidad de la información entre los distintos sistemas corporativos.
 
@@ -389,8 +377,6 @@ Proveer una infraestructura financiera integrada, auditable y en tiempo real, qu
             {
                 "id": "stock",
                 "titulo": "Gestión de Stock",
-                "desc1": "Inventario en tiempo real y trazabilidad.",
-                "desc2": "App móvil online/offline y WMS/ERP.",
                 "img": "download.png",
                 "long": """Gestión Integral de Stock
 
@@ -439,9 +425,6 @@ Proveer una plataforma integral para la gestión de stock que combine infraestru
     </a>
     <div class='hovercard {hover_class}'>
       {img_html}
-      <h4>{svc["titulo"]}</h4>
-      <p>• {svc["desc1"]}</p>
-      <p>• {svc["desc2"]}</p>
     </div>
   </div>
 </div>
@@ -462,7 +445,6 @@ Proveer una plataforma integral para la gestión de stock que combine infraestru
     </div>
     <div class='modal-body'>
       {modal_img}
-      <p class='meta'>• {svc["desc1"]}<br/>• {svc["desc2"]}</p>
       <p>{svc["long"].replace(chr(10), "<br/>")}</p>
       <div style='margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;'>
         <a href='#' class='modal-close'>Cerrar</a>
@@ -503,7 +485,7 @@ Proveer una plataforma integral para la gestión de stock que combine infraestru
             st.markdown("""
             <style>
               #subnav-wrap{ position: sticky; top: 48px; z-index: 900; background: #ffffff; border-bottom: 1px solid #f0f0f1; }
-              nav.subnav{ max_width: 1000px; margin: 0 auto; padding: 8px 16px; display: flex; align-items: center; justify-content: center; gap: 22px; }
+              nav.subnav{ max-width: 1000px; margin: 0 auto; padding: 8px 16px; display: flex; align-items: center; justify-content: center; gap: 22px; }
               nav.subnav a{ display:inline-block; color:#111827; text-decoration:none; padding:6px 2px; border-bottom:2px solid transparent; font-weight:600; font-size:.92rem; }
               nav.subnav a:hover{ border-bottom-color:#111827; }
               nav.subnav a.active{ border-bottom-color:#111827; }
