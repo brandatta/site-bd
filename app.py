@@ -232,16 +232,16 @@ else:
         # Definición de servicios (con 'id' y 'long' para modal)
         servicios = [
             {
-                "id": "apis",
-                "titulo": "APIs",
-                "desc1": "Diseño y desarrollo de APIs escalables.",
+                "id": "interfaces",
+                "titulo": "Interfaces",
+                "desc1": "Diseño y desarrollo de Interfaces escalables.",
                 "desc2": "Autenticación, rate limiting y monitoreo.",
                 "img": "download.png",
                 "long": "Diseñamos APIs REST/GraphQL con seguridad (OAuth2/JWT), versionado, observabilidad, pruebas contractuales y SLAs claros. Integración con gateways y mensajería."
             },
             {
                 "id": "industria",
-                "titulo": "Software para Industrias",
+                "titulo": "Produccion Industrial",
                 "desc1": "Sistemas a medida para planta/producción.",
                 "desc2": "Integración con ERP y tableros.",
                 "img": "download.png",
