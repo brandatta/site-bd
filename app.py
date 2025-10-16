@@ -44,7 +44,7 @@ nav_qp  = unquote(qp.get("nav"))  if qp.get("nav")  else None
 ing_qp  = qp.get("ing")
 snav_qp = unquote(qp.get("snav")) if qp.get("snav") else None
 sp_qp   = qp.get("sp")
-sel_qp  = unquote(qp.get("sel")) if qp.get("sel") else None  # <-- tarjeta seleccionada
+sel_qp  = unquote(qp.get("sel")) if qp.get("sel") else None  # <-- tarjeta seleccionada (ya no se usa para abrir detalle)
 
 if ing_qp == "1":
     st.session_state.ingresado = True
@@ -82,7 +82,7 @@ def header_logo_html(path="logooo (1).png"):
         # fallback si no existe el archivo
         return "<div id='brand-logo' style='width:160px;height:60px;background:#eee;border:1px solid #ddd;border-radius:6px;'></div>"
 
-# ===== Helper: imagen para hover (en base64) =====
+# ===== Helper: imagen para hover/modal (en base64) =====
 def hover_img_html(path, alt="img"):
     try:
         img = Image.open(path)
@@ -117,8 +117,8 @@ if not st.session_state.ingresado:
 
 # ================== CONTENIDO ==================
 else:
-    # ====== CSS General + Servicios ======
-    detail_open_class = "detail-open" if sel_qp else ""
+    # ====== CSS General + Servicios + Modal ======
+    detail_open_class = ""  # (lo dejé vacío: ahora el detalle abre en modal)
     st.markdown(f"""
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&display=swap');
@@ -143,7 +143,6 @@ else:
 
       /* ===== Grilla de Servicios ===== */
       .services-area {{ max-width: 1320px; margin: 20px auto 12px; }}
-      .services-area.detail-open .services-grid {{ transform: translateX(-10px); }} /* slide left leve al abrir detalle */
       .services-grid {{
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -178,27 +177,21 @@ else:
       .hovercard p{{ margin:0; font-size:.9rem; color:#111; }}
       .hover-img{{ display:block; width:100%; max-height:120px; object-fit:contain; margin:0 0 8px 0; background:#fff; border:1px solid #eef2f3; border-radius:8px; }}
 
-      /* ===== Panel de detalle (slide-in) ===== */
-      .svc-detail-wrap {{ max-width:1320px; margin: 0 auto 24px; }}
-      .svc-detail {{
-        border:1px solid #e5e5e7; border-radius:12px; padding:16px 18px;
-        box-shadow:0 10px 24px rgba(0,0,0,.06);
-        transform: translateX(14px); opacity:0; max-height:0; overflow:hidden;
-        transition: transform .25s ease, opacity .25s ease, max-height .25s ease;
-        background:#fff;
+      /* ===== MODAL (CSS-only con :target) ===== */
+      .modal{ position: fixed; inset: 0; background: rgba(0,0,0,.45); display:none; align-items:center; justify-content:center; z-index: 9999; padding:20px; }
+      .modal:target{ display:flex; }
+      .modal-card{ background:#fff; color:#111; width:min(820px, 94vw); max-height:86vh; overflow:auto;
+                   border:1px solid #e5e5e7; border-radius:14px; box-shadow:0 18px 44px rgba(0,0,0,.22); padding:18px 20px; animation: fadeIn .2s ease; }
+      .modal-header{ display:flex; align-items:center; justify-content:space-between; gap:12px; border-bottom:1px solid #f0f0f2; padding-bottom:8px; margin-bottom:12px; }
+      .modal-close{ display:inline-block; text-decoration:none; border:1px solid #e5e5e7; border-radius:8px; padding:6px 10px; background:#fafafa; color:#111; font-weight:600; }
+      .modal-close:hover{ background:#f1f1f3; }
+      .modal-body p{ margin:.4rem 0; }
+      .modal-img{ display:block; width:100%; max-height:220px; object-fit:contain; margin:4px 0 10px 0; border:1px solid #eef2f3; border-radius:10px; background:#fff; }
+
+      @keyframes fadeIn {{
+        from {{opacity:0; transform: translateY(8px);}}
+        to   {{opacity:1; transform: translateY(0);}}
       }}
-      .services-area.detail-open + .svc-detail-wrap .svc-detail {{
-        transform: translateX(0); opacity:1; max-height:600px;
-      }}
-      .svc-detail h3 {{ margin:0 0 6px 0; font-size:1.15rem; }}
-      .svc-detail p  {{ margin:.25rem 0; }}
-      .svc-detail .meta {{ font-size:.9rem; color:#444; }}
-      .svc-actions {{ display:flex; gap:10px; margin-top:10px; }}
-      .btn-ghost {{
-        display:inline-block; padding:8px 12px; border:1px solid #e5e5e7; border-radius:8px;
-        text-decoration:none; color:#111; font-weight:600; background:#fafafa; cursor:pointer;
-      }}
-      .btn-ghost:hover {{ background:#f1f1f3; }}
     </style>
     """, unsafe_allow_html=True)
 
@@ -236,7 +229,7 @@ else:
     if nav == "Servicios":
         st.markdown("<div class='title' style='text-align:center;font-weight:700;font-size:1.2rem;margin:20px 0;'>Servicios</div>", unsafe_allow_html=True)
 
-        # Definición de servicios (con 'id' seguro para URL y 'long' para detalle)
+        # Definición de servicios (con 'id' y 'long' para modal)
         servicios = [
             {
                 "id": "apis",
@@ -287,27 +280,19 @@ else:
                 "long": "App móvil de inventario, ubicación por sectores, reposición, lote/serie, valuación y KPIs operativos. Integración con WMS y ERP."
             },
         ]
-        servicios_by_id = {s["id"]: s for s in servicios}
 
-        # Contenedor con clase condicional para animación
+        # Contenedor de tarjetas
         st.markdown(f"<div class='services-area {detail_open_class}'>", unsafe_allow_html=True)
 
-        # Render de tarjetas clickeables (ENLACE REAL, sin JS)
+        # Render de tarjetas clickeables -> abren MODAL con #svc-<id>
         html_cards = ""
         for i, svc in enumerate(servicios):
             hover_class = "hover-down" if i < 3 else "hover-up"
             img_html = hover_img_html(svc.get("img"), alt=svc["titulo"]) if svc.get("img") else ""
-
-            # armar href preservando flags y agregando sel
-            params = {"nav": "Servicios", "ing": "1", "sel": svc["id"]}
-            if st.session_state.soporte_authed:
-                params["sp"] = "1"
-            href = "./?" + "&".join([f"{k}={quote(str(v))}" for k, v in params.items()])
-
             html_cards += f"""
 <div class='tile'>
   <div class='card-wrap'>
-    <a class='card-link' href='{href}' target='_self' style='text-decoration:none;color:inherit;display:block;'>
+    <a class='card-link' href='#svc-{svc["id"]}' style='text-decoration:none;color:inherit;display:block;'>
       <div class='card'><h3>{svc["titulo"]}</h3></div>
     </a>
     <div class='hovercard {hover_class}'>
@@ -322,33 +307,31 @@ else:
         st.markdown(f"<div class='services-grid'>{html_cards}</div>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)  # cierre .services-area
 
-        # Panel de detalle si hay ?sel=
-        if sel_qp and sel_qp in servicios_by_id:
-            svc = servicios_by_id[sel_qp]
-
-            # href para cerrar (quita sel y mantiene flags)
-            close_params = {"nav": "Servicios", "ing": "1"}
-            if st.session_state.soporte_authed:
-                close_params["sp"] = "1"
-            close_href = "./?" + "&".join([f"{k}={quote(str(v))}" for k, v in close_params.items()])
-
-            detail_html = f"""
-<div class='svc-detail-wrap'>
-  <div class='svc-detail'>
-    <div style='display:flex; gap:18px; align-items:flex-start; flex-wrap:wrap;'>
-      <div style='flex:1 1 320px; min-width:280px;'>
-        <h3>{svc["titulo"]}</h3>
-        <p class='meta'>• {svc["desc1"]}<br/>• {svc["desc2"]}</p>
-        <p>{svc["long"]}</p>
-        <div class='svc-actions'>
-          <a class='btn-ghost' href='{close_href}' target='_self'>← Cerrar</a>
-        </div>
+        # ===== Modales por servicio (CSS :target) =====
+        modals_html = ""
+        for svc in servicios:
+            modal_img = hover_img_html(svc.get("img"), alt=svc["titulo"]).replace("hover-img", "modal-img") if svc.get("img") else ""
+            modals_html += f"""
+<div id='svc-{svc["id"]}' class='modal'>
+  <div class='modal-card' role='dialog' aria-modal='true' aria-labelledby='svc-title-{svc["id"]}'>
+    <div class='modal-header'>
+      <h3 id='svc-title-{svc["id"]}' style='margin:0;font-size:1.1rem;'>{svc["titulo"]}</h3>
+      <a href='#' class='modal-close' aria-label='Cerrar'>×</a>
+    </div>
+    <div class='modal-body'>
+      {modal_img}
+      <p class='meta'>• {svc["desc1"]}<br/>• {svc["desc2"]}</p>
+      <p>{svc["long"]}</p>
+      <div style='margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;'>
+        <a href='#' class='modal-close'>Cerrar</a>
+        <a href='./?nav=Contacto&ing=1{"&sp=1" if st.session_state.soporte_authed else ""}'
+           class='modal-close' style='text-decoration:none;border:1px solid #0f0f0f;border-radius:8px;padding:6px 10px;'>Contactar</a>
       </div>
     </div>
   </div>
 </div>
 """
-            st.markdown(detail_html, unsafe_allow_html=True)
+        st.markdown(modals_html, unsafe_allow_html=True)
 
     elif nav == "Contacto":
         st.markdown("<h3>Contacto</h3><p>Email: brandatta@brandatta.com.ar</p><p>Teléfono: +54 11 0000-0000</p><p>Dirección: Buenos Aires, Argentina</p>", unsafe_allow_html=True)
