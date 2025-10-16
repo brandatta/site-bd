@@ -410,7 +410,7 @@ else:
                     descripcion = st.text_area("Descripción del problema", height=160, placeholder="Contanos qué ocurrió, pasos para reproducir, capturas, etc.")
                     enviar = st.form_submit_button("Enviar ticket")
                 if enviar:
-                    if not (email_t and asunto y descripcion):
+                    if not (email_t and asunto and descripcion):
                         st.error("Completá email, asunto y descripción.")
                     else:
                         import uuid
