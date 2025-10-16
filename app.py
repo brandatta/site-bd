@@ -238,134 +238,133 @@ else:
     nav = st.session_state.nav
 
     # ===== SERVICIOS =====
-    if nav == "Servicios":
-        st.markdown("<div class='title' style='text-align:center;font-weight:700;font-size:1.2rem;margin:20px 0;'>Servicios</div>", unsafe_allow_html=True)
+if nav == "Servicios":
+    st.markdown("<div class='title' style='text-align:center;font-weight:700;font-size:1.2rem;margin:20px 0;'>Servicios</div>", unsafe_allow_html=True)
 
-        # Definición de servicios (sumé 'long' para la descripción ampliada)
-        servicios = [
-            {
-                "titulo": "APIs",
-                "desc1": "Diseño y desarrollo de APIs escalables.",
-                "desc2": "Autenticación, rate limiting y monitoreo.",
-                "img": "download.png",
-                "long": "Diseñamos APIs REST/GraphQL con seguridad (OAuth2/JWT), versionado, observabilidad, pruebas contractuales y SLAs claros. Integración con gateways y mensajería."
-            },
-            {
-                "titulo": "Software para Industrias",
-                "desc1": "Sistemas a medida para planta/producción.",
-                "desc2": "Integración con ERP y tableros.",
-                "img": "download.png",
-                "long": "MES/SCADA liviano, captura de datos en línea, controles de calidad y OEE. Integración con SAP/Produmex, dashboards en tiempo real y trazabilidad completa."
-            },
-            {
-                "titulo": "Tracking de Pedidos",
-                "desc1": "Trazabilidad punta a punta.",
-                "desc2": "Notificaciones y SLA visibles.",
-                "img": "download.png",
-                "long": "Visibilidad e2e: toma de pedido → preparación → despacho → entrega. Notificaciones proactivas, auditoría y paneles con métricas de cumplimiento por canal/cliente."
-            },
-            {
-                "titulo": "Ecommerce",
-                "desc1": "Tiendas headless / integradas.",
-                "desc2": "Pagos, logística y analytics.",
-                "img": "download.png",
-                "long": "Arquitecturas headless, promociones avanzadas, OMS y sincronización con ERP/WMS. Checkout optimizado y data layer para analítica/atribución."
-            },
-            {
-                "titulo": "Finanzas",
-                "desc1": "Forecasting y conciliaciones automáticas.",
-                "desc2": "Reportes y auditoría.",
-                "img": "download.png",
-                "long": "Flujos de conciliación bancaria, aging y cashflow, integración contable, reportería multiempresa y reglas de auditoría con alertas."
-            },
-            {
-                "titulo": "Gestión de Stock",
-                "desc1": "Inventario en tiempo real.",
-                "desc2": "Alertas, valuación y KPIs.",
-                "img": "download.png",
-                "long": "App móvil de inventario, ubicación por sectores, reposición, lote/serie, valuación y KPIs operativos. Integración con WMS y ERP."
-            },
-        ]
+    # ---- Definición de servicios ----
+    servicios = [
+        {
+            "titulo": "APIs",
+            "desc1": "Diseño y desarrollo de APIs escalables.",
+            "desc2": "Autenticación, rate limiting y monitoreo.",
+            "img": "download.png",
+            "long": "Diseñamos e implementamos APIs REST y GraphQL seguras y observables, integradas con SAP, WMS y plataformas externas."
+        },
+        {
+            "titulo": "Software para Industrias",
+            "desc1": "Sistemas a medida para planta/producción.",
+            "desc2": "Integración con ERP y tableros.",
+            "img": "download.png",
+            "long": "Aplicaciones de planta, captura de datos en línea, OEE, control de calidad, y tableros integrados con SAP y Produmex."
+        },
+        {
+            "titulo": "Tracking de Pedidos",
+            "desc1": "Trazabilidad punta a punta.",
+            "desc2": "Notificaciones y SLA visibles.",
+            "img": "download.png",
+            "long": "Desde la carga del pedido hasta la entrega final. Paneles de trazabilidad, métricas de cumplimiento y alertas automáticas."
+        },
+        {
+            "titulo": "Ecommerce",
+            "desc1": "Tiendas headless / integradas.",
+            "desc2": "Pagos, logística y analytics.",
+            "img": "download.png",
+            "long": "Arquitecturas headless, integraciones ERP/WMS, gestión avanzada de promociones y experiencia de checkout optimizada."
+        },
+        {
+            "titulo": "Finanzas",
+            "desc1": "Forecasting y conciliaciones automáticas.",
+            "desc2": "Reportes y auditoría.",
+            "img": "download.png",
+            "long": "Modelos financieros, conciliación bancaria automatizada, aging y reportería multiempresa."
+        },
+        {
+            "titulo": "Gestión de Stock",
+            "desc1": "Inventario en tiempo real.",
+            "desc2": "Alertas, valuación y KPIs.",
+            "img": "download.png",
+            "long": "App móvil para inventario, control por lote y ubicación, reposición y valuación dinámica conectada a ERP."
+        },
+    ]
 
-        # Encontrar índice seleccionado (si viene por query param)
-        selected_idx = None
-        if sel_qp:
-            for i, s in enumerate(servicios):
-                if s["titulo"] == sel_qp:
-                    selected_idx = i
-                    break
+    # ---- Estado de selección ----
+    if "servicio_seleccionado" not in st.session_state:
+        st.session_state.servicio_seleccionado = None
 
-        # Contenedor con clase condicional para animación
-        st.markdown(f"<div class='services-area {detail_open}'>", unsafe_allow_html=True)
+    seleccionado = st.session_state.servicio_seleccionado
 
-        # Render de tarjetas clickeables (anchor que setea ?sel=...)
-        html_cards = ""
-        for i, svc in enumerate(servicios):
-            hover_class = "hover-down" if i < 3 else "hover-up"
+    # ---- Mostrar detalle si hay selección ----
+    if seleccionado:
+        svc = next((s for s in servicios if s["titulo"] == seleccionado), None)
+        if svc:
+            st.markdown(f"""
+            <div class='svc-detail' style='border:1px solid #e5e5e7;border-radius:12px;padding:16px 18px;
+                 box-shadow:0 10px 24px rgba(0,0,0,.06);animation:slideIn .3s ease;'>
+                <h3 style='margin-bottom:4px'>{svc["titulo"]}</h3>
+                <p style='margin-top:0;color:#444;'>• {svc["desc1"]}<br>• {svc["desc2"]}</p>
+                <p>{svc["long"]}</p>
+                <button onclick="window.parent.postMessage({{type:'closeServicio'}}, '*')" 
+                        style='border:1px solid #ddd;border-radius:8px;padding:8px 12px;cursor:pointer;background:#fafafa;'>
+                    ← Volver
+                </button>
+            </div>
+            """, unsafe_allow_html=True)
+
+            # Reset del estado desde JS (necesario al click en volver)
+            st.markdown("""
+            <script>
+            window.addEventListener("message", (e)=>{
+                if(e.data.type==="closeServicio"){
+                    const streamlitDoc = window.parent.document;
+                    const btn = streamlitDoc.querySelector('button[data-testid="close-servicio"]');
+                    if(btn){ btn.click(); }
+                }
+            });
+            </script>
+            """, unsafe_allow_html=True)
+
+            # Botón invisible para cerrar desde el frontend
+            st.button("Cerrar", key="close-servicio", on_click=lambda: st.session_state.update({"servicio_seleccionado": None}))
+    else:
+        # ---- Render del grid de tarjetas ----
+        st.markdown("<div class='services-grid'>", unsafe_allow_html=True)
+        for svc in servicios:
+            hover_class = "hover-down"
             img_html = hover_img_html(svc.get("img"), alt=svc["titulo"]) if svc.get("img") else ""
-            # construir href preservando flags
-            params = {"nav": "Servicios", "ing": "1", "sel": svc["titulo"]}
-            if st.session_state.soporte_authed:
-                params["sp"] = "1"
-            href = "./?" + "&".join([f"{k}={quote(str(v))}" for k, v in params.items()])
+            st.markdown(f"""
+            <div class='tile' style='cursor:pointer;transition:all .25s ease;' 
+                 onmouseover="this.style.transform='translateX(-6px)';" 
+                 onmouseout="this.style.transform='translateX(0)';" 
+                 onclick="window.parent.postMessage({{type:'selectServicio', titulo:'{svc['titulo']}' }}, '*')">
+                <div class='card-wrap'>
+                    <div class='card'><h3>{svc["titulo"]}</h3></div>
+                    <div class='hovercard {hover_class}'>
+                        {img_html}
+                        <h4>{svc["titulo"]}</h4>
+                        <p>• {svc["desc1"]}</p>
+                        <p>• {svc["desc2"]}</p>
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
 
-            html_cards += f"""
-<div class='tile'>
-  <div class='card-wrap'>
-    <a class='card-link' href='{href}' target='_self'>
-      <div class='card'><h3>{svc["titulo"]}</h3></div>
-    </a>
-    <div class='hovercard {hover_class}'>
-      {img_html}
-      <h4>{svc["titulo"]}</h4>
-      <p>• {svc["desc1"]}</p>
-      <p>• {svc["desc2"]}</p>
-    </div>
-  </div>
-</div>
-"""
-        st.markdown(f"<div class='services-grid'>{html_cards}</div>", unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)  # cierre .services-area
+        # ---- Script para comunicar selección al backend ----
+        st.markdown("""
+        <script>
+        window.addEventListener("message", (e)=>{
+            if(e.data.type==="selectServicio"){
+                const svc = e.data.titulo;
+                window.parent.postMessage({type:"streamlit:setComponentValue", key:"servicioSeleccionado", value:svc}, "*");
+            }
+        });
+        </script>
+        """, unsafe_allow_html=True)
 
-        # ===== Panel de Detalle (aparece si hay selección) =====
-        if selected_idx is not None:
-            svc = servicios[selected_idx]
-            # link para cerrar (remueve ?sel)
-            close_params = {"nav": "Servicios", "ing": "1"}
-            if st.session_state.soporte_authed:
-                close_params["sp"] = "1"
-            close_href = "./?" + "&".join([f"{k}={quote(str(v))}" for k, v in close_params.items()])
-
-            detail_html = f"""
-<div class='svc-detail-wrap'>
-  <div class='svc-detail'>
-    <div style='display:flex; gap:18px; align-items:flex-start; flex-wrap:wrap;'>
-      <div style='flex:1 1 320px; min-width:280px;'>
-        <h3>{svc["titulo"]}</h3>
-        <p class='meta'>• {svc["desc1"]}<br/>• {svc["desc2"]}</p>
-        <p>{svc["long"]}</p>
-        <div class='svc-actions'>
-          <a class='btn-ghost' href='{close_href}' target='_self'>Cerrar</a>
-        </div>
-      </div>
-      <div style='flex:0 0 360px; max-width:360px;'>
-        {"<img style='width:100%;height:auto;border:1px solid #eef2f3;border-radius:10px;' src='data:image/png;base64," + base64.b64encode(Image.open(svc["img"]).tobytes() if False else b"").decode() + "'/>" if False else ""}
-      </div>
-    </div>
-  </div>
-</div>
-"""
-            # Nota: arriba dejé reservado un bloque si quisieras incrustar otra imagen.
-            st.markdown(detail_html, unsafe_allow_html=True)
-
-    elif nav == "Contacto":
-        st.markdown("<h3>Contacto</h3><p>Email: brandatta@brandatta.com.ar</p><p>Teléfono: +54 11 0000-0000</p><p>Dirección: Buenos Aires, Argentina</p>", unsafe_allow_html=True)
-
-    elif nav == "Acerca de Nosotros":
-        st.markdown("<h3>Acerca de nosotros</h3><p>Construimos soluciones digitales a medida: integraciones con SAP y Ecommerce, tableros, automatizaciones y apps. Enfocados en performance, UX minimalista y resultados de negocio.</p>", unsafe_allow_html=True)
-
-    elif nav == "Clientes":
-        st.markdown("<h3>Clientes</h3><p>Trabajamos con compañías de retail, industria y servicios: Georgalos, Vicbor, ITPS, Biosidus, Glam, Espumas, Café Martínez, entre otros.</p>", unsafe_allow_html=True)
+        # Captura del valor de la selección
+        servicio = st.session_state.get("servicioSeleccionado")
+        if servicio:
+            st.session_state.servicio_seleccionado = servicio
 
     # ===== SOPORTE =====
     elif nav == "Soporte":
