@@ -245,7 +245,28 @@ else:
                 "desc1": "Sistemas a medida para planta/producción.",
                 "desc2": "Integración con ERP y tableros.",
                 "img": "download.png",
-                "long": "MES/SCADA liviano, captura de datos en línea, controles de calidad y OEE. Integración con SAP/Produmex, dashboards en tiempo real y trazabilidad completa."
+                "long": "Desarrollamos soluciones tecnológicas orientadas a la digitalización, trazabilidad y control operativo de procesos industriales, integrando datos en tiempo real desde planta, ERP, sistemas periféricos y archivos ad-hoc.
+
+Nuestras herramientas permiten monitorear, registrar y optimizar la producción mediante la captura automatizada de información desde líneas, equipos y operadores, generando visibilidad completa sobre la eficiencia, el rendimiento y el cumplimiento de estándares productivos.
+
+Conectando sensores, terminales de producción, sistemas de gestión de calidad, control de stock y mantenimiento, generamos una integración continua entre los multiples sectores de la empresa que consumen y analizan la informacion de planta.
+
+Implementamos módulos específicos para seguimiento de órdenes de producción, control de paradas, gestión de lotes, trazabilidad de materiales y análisis de OEE (Overall Equipment Effectiveness), con tableros configurables que consolidan los indicadores clave de desempeño en tiempo real.
+
+Características técnicas destacadas:
+
+Integración directa con el ERP
+
+Captura automática de datos desde terminales o dispositivos IoT
+
+Modelos de datos normalizados para análisis histórico y predictivo
+
+Protocolos seguros de comunicación y redundancia de información
+
+Implementación bajo esquemas modulares y escalables
+
+Nuestro Objetivo Técnico:
+Brindar una infraestructura digital sólida para la gestión integral de la producción industrial, que garantice trazabilidad, disponibilidad de datos en tiempo real y soporte a la toma de decisiones basada en información confiable."
             },
             {
                 "id": "tracking",
