@@ -44,7 +44,7 @@ nav_qp  = unquote(qp.get("nav"))  if qp.get("nav")  else None
 ing_qp  = qp.get("ing")
 snav_qp = unquote(qp.get("snav")) if qp.get("snav") else None
 sp_qp   = qp.get("sp")
-sel_qp  = unquote(qp.get("sel")) if qp.get("sel") else None  # no se usa para modal, lo dejamos por compatibilidad
+sel_qp  = unquote(qp.get("sel")) if qp.get("sel") else None  # compat
 
 if ing_qp == "1":
     st.session_state.ingresado = True
@@ -128,13 +128,13 @@ else:
 
       /* ===== Header sticky con logo ===== */
       #topnav-wrap{ position: sticky; top: 0; z-index: 1000; background: #ffffff; border-bottom: 1px solid #e5e5e7; box-shadow: 0 1px 6px rgba(0,0,0,.04); margin-top: 0 !important; }
-      nav.topnav{ max-width: 1440px; margin: 0 auto; padding: 8px 16px !important; display: flex; align-items: center; justify-content: space-between; gap: 16px; position: relative; }
+      nav.topnav{ max-width: 1440px; margin: 0 auto; padding: 8px 16px !important; display: flex; align-items: center; justify-content: space_between; gap: 16px; position: relative; }
       .nav-left{ display:flex; align-items:center; gap:10px; min-width: 200px; }
       .nav-center{ position:absolute; left:50%; transform:translateX(-50%); display:flex; gap:28px; align-items:center; }
       .nav-right{ min-width: 200px; }
       #brand-logo{ height: 70px; width: auto; display:block; }
       @media (max-width: 1200px){ #brand-logo{ height: 52px; } .nav-left, .nav-right { min-width: 180px; } }
-      @media (max-width: 900px){ #brand-logo{ height: 44px; } .nav-left, .nav-right { min_width: 160px; } }
+      @media (max-width: 900px){ #brand-logo{ height: 44px; } .nav-left, .nav-right { min-width: 160px; } }
       @media (max-width: 640px){ #brand-logo{ height: 36px; } .nav-left, .nav-right { min-width: 120px; } }
       .nav-center a{ color: #0f0f0f; text-decoration: none; padding: 8px 2px; border-bottom: 2px solid transparent; text-transform: uppercase; font-weight: 700; font-size: .95rem; transition: border .15s; white-space: nowrap; }
       .nav-center a:hover{ border-bottom-color: #0f0f0f; }
@@ -228,7 +228,7 @@ else:
     if nav == "Servicios":
         st.markdown("<div class='title' style='text-align:center;font-weight:700;font-size:1.2rem;margin:20px 0;'>Servicios</div>", unsafe_allow_html=True)
 
-        # Definición de servicios (con 'id' y 'long' para modal)
+        # Definición de servicios con textos largos provistos
         servicios = [
             {
                 "id": "interfaces",
@@ -236,47 +236,190 @@ else:
                 "desc1": "Diseño y desarrollo de Interfaces escalables.",
                 "desc2": "Autenticación, rate limiting y monitoreo.",
                 "img": "download.png",
-                "long": "Diseñamos APIs REST/GraphQL con seguridad (OAuth2/JWT), versionado, observabilidad, pruebas contractuales y SLAs claros. Integración con gateways y mensajería."
+                "long": """Diseñamos y desarrollamos interfaces para la integración de sistemas empresariales heterogéneos, garantizando la coherencia, seguridad y trazabilidad de los datos a lo largo de todo el ecosistema tecnológico de la organización.
+
+Con una trayectoria consolidada y cientos de interfaces desarrolladas en diversos entornos productivos, contamos con la experiencia necesaria para abordar escenarios de integración complejos, multiempresa y multiplataforma.
+
+Nuestras soluciones permiten la interoperabilidad entre plataformas ERP, e-commerce, sistemas logísticos y servicios en la nube, asegurando la continuidad operativa y reduciendo la intervención manual en los flujos de información.
+
+Utilizamos arquitecturas basadas en APIs REST, SOAP, conectores ODBC/JDBC y microservicios, diseñadas según los requerimientos de cada entorno y alineadas con las mejores prácticas de escalabilidad, versionado y monitoreo.
+
+Con una visión de mantenimiento evolutivo, damos soporte tanto transacciones en tiempo real como procesos batch controlados, incorporando mecanismos de validación, auditoría y recuperación ante fallos.
+
+Ejemplos de integraciónes:
+
+SAP ↔ WooCommerce / Planexware / Mercado Libre
+
+Sincronización bidireccional de pedidos, facturación y stock
+
+Interfaces contables y de cobranza entre ERP y sistemas externos
+
+Captura automática de datos desde terminales o dispositivos IoT
+
+Consolidación de datos operativos en entornos analíticos y dashboards
+
+Nuestro Objetivo Técnico:
+Garantizar un flujo de información unificado, confiable y auditable entre los distintos sistemas críticos de la empresa, bajo un esquema modular, escalable y mantenible."""
             },
             {
                 "id": "industria",
-                "titulo": "Produccion Industrial",
-                "desc1": "Sistemas a medida para planta/producción.",
-                "desc2": "Integración con ERP y tableros.",
+                "titulo": "Producción Industrial",
+                "desc1": "Digitalización, trazabilidad y control operativo.",
+                "desc2": "Datos en tiempo real desde planta y ERP.",
                 "img": "download.png",
-                "long": "MES/SCADA liviano, captura de datos en línea, controles de calidad y OEE. Integración con SAP/Produmex, dashboards en tiempo real y trazabilidad completa."
+                "long": """Desarrollamos soluciones tecnológicas orientadas a la digitalización, trazabilidad y control operativo de procesos industriales, integrando datos en tiempo real desde planta, ERP, sistemas periféricos y archivos ad-hoc.
+
+Nuestras herramientas permiten monitorear, registrar y optimizar la producción mediante la captura automatizada de información desde líneas, equipos y operadores, generando visibilidad completa sobre la eficiencia, el rendimiento y el cumplimiento de estándares productivos.
+
+Conectando sensores, terminales de producción, sistemas de gestión de calidad, control de stock y mantenimiento, generamos una integración continua entre los multiples sectores de la empresa que consumen y analizan la informacion de planta.
+
+Implementamos módulos específicos para seguimiento de órdenes de producción, control de paradas, gestión de lotes, trazabilidad de materiales y análisis de OEE (Overall Equipment Effectiveness), con tableros configurables que consolidan los indicadores clave de desempeño en tiempo real.
+
+Características técnicas destacadas:
+
+Integración directa con el ERP
+
+Captura automática de datos desde terminales o dispositivos IoT
+
+Modelos de datos normalizados para análisis histórico y predictivo
+
+Protocolos seguros de comunicación y redundancia de información
+
+Implementación bajo esquemas modulares y escalables
+
+Nuestro Objetivo Técnico:
+Brindar una infraestructura digital sólida para la gestión integral de la producción industrial, que garantice trazabilidad, disponibilidad de datos en tiempo real y soporte a la toma de decisiones basada en información confiable."""
             },
             {
-                "id": "tracking",
-                "titulo": "Tracking de Pedidos",
-                "desc1": "Trazabilidad punta a punta.",
-                "desc2": "Notificaciones y SLA visibles.",
+                "id": "fuerza",
+                "titulo": "Fuerza de Ventas",
+                "desc1": "Gestión y optimización de la operación comercial.",
+                "desc2": "Web y móvil con sincronización bidireccional.",
                 "img": "download.png",
-                "long": "Visibilidad e2e: toma de pedido → preparación → despacho → entrega. Notificaciones proactivas, auditoría y paneles con métricas de cumplimiento."
+                "long": """Desarrollamos plataformas y herramientas diseñadas para gestionar, monitorear y optimizar la operación comercial de las organizaciones, integrando en un mismo entorno la información proveniente de ERP, CRM, e-commerce, sistemas logísticos y módulos documentales.
+
+Con el objetivo de abastecer integralmente las necesidades de informacion a consumir por los equipos de ventas, contemplamos desde la planificación de objetivos y seguimiento de desempeño hasta la automatización de pedidos, cotizaciones, cobranzas y reportes en tiempo real.
+
+Implementamos entornos web y móviles adaptados a los diferentes perfiles de usuario —vendedores, supervisores, gerentes y back-office— garantizando acceso seguro, disponibilidad permanente y sincronización bidireccional con sistemas centrales.
+
+Incorporamos además mecanismos de integración documental que permiten vincular automáticamente cotizaciones, órdenes, remitos y facturas dentro del flujo comercial, asegurando trazabilidad completa entre documentos y su correspondencia en el ERP.
+
+Los desarrollos incluyen módulos de seguimiento de clientes, condiciones comerciales, histórico de ventas, control de cartera, análisis de rentabilidad y métricas de desempeño, todo sobre una base de datos centralizada y auditable.
+
+Características técnicas destacadas:
+
+Integración directa con el ERP
+
+Sincronización online/offline con dispositivos móviles
+
+APIs de conexión con plataformas e-commerce, pasarelas de pago y sistemas documentales
+
+Arquitectura modular con control de accesos por roles y niveles jerárquicos
+
+Dashboards analíticos para monitoreo de desempeño individual y global
+
+Nuestr Objetivo técnico:
+Proveer una plataforma robusta y escalable que centralice la gestión comercial, asegure la integridad de la información y brinde visibilidad completa sobre la operación de ventas, integrando la documentación transaccional para una trazabilidad comercial total."""
             },
             {
                 "id": "ecommerce",
-                "titulo": "Ecommerce",
-                "desc1": "Tiendas headless / integradas.",
-                "desc2": "Pagos, logística y analytics.",
+                "titulo": "E-commerce",
+                "desc1": "B2B integrado con sistemas centrales.",
+                "desc2": "Promos y reglas comerciales avanzadas.",
                 "img": "download.png",
-                "long": "Arquitecturas headless, promociones avanzadas, OMS y sincronización con ERP/WMS. Checkout optimizado y data layer para analítica."
+                "long": """Desarrollamos y administramos plataformas de comercio electrónico B2B integradas con los sistemas centrales de gestión empresarial, garantizando la consistencia de precios, stock, condiciones comerciales y documentación transaccional en tiempo real.
+
+Nuestras soluciones de e-commerce están diseñadas para operar sobre entornos complejos, multiempresa y multilistado, con una arquitectura capaz de sincronizar información proveniente de ERP, catálogos externos y sistemas logísticos.
+
+Proveemos una plataforma avanzada de gestión de promociones y reglas comerciales, que permite modelar estructuras complejas de descuentos, bonificaciones y condiciones dinámicas según múltiples variables:
+cliente, rol, lista de precios, familia de productos, tipo de pedido, fechas de vigencia y prioridades combinadas.
+
+Estas promociones se procesan mediante un motor lógico parametrizable que puede operar tanto de forma automática (auto-aplicación de cupones o reglas) como manual, respetando las políticas comerciales y segmentaciones definidas por la organización.
+
+El sistema incluye además mecanismos de control y auditoría que garantizan la trazabilidad completa de cada promoción, desde su definición hasta su aplicación efectiva en los pedidos y documentos asociados.
+
+Características técnicas destacadas:
+
+Integración directa con el ERP
+
+Sincronización bidireccional de precios, stock, pedidos y facturación
+
+Motor de reglas para gestión dinámica de promociones y condiciones comerciales
+
+Soporte para múltiples roles, listas de precios y jerarquías de clientes
+
+Integración con gateways de pago, logística y sistemas documentales
+
+Arquitectura modular y escalable con monitoreo de transacciones y logs de aplicación
+
+Objetivo técnico:
+Ofrecer una infraestructura de comercio electrónico totalmente integrada, capaz de administrar en tiempo real la información comercial, los flujos transaccionales y la aplicación controlada de promociones complejas, asegurando precisión, coherencia y trazabilidad en cada operación."""
             },
             {
                 "id": "finanzas",
                 "titulo": "Finanzas",
-                "desc1": "Forecasting y conciliaciones automáticas.",
-                "desc2": "Reportes y auditoría.",
+                "desc1": "Automatización e integración financiera.",
+                "desc2": "Consolidación en tiempo real y auditoría.",
                 "img": "download.png",
-                "long": "Flujos de conciliación bancaria, aging y cashflow, integración contable, reportería multiempresa y reglas de auditoría con alertas."
+                "long": """Desarrollamos soluciones orientadas a la automatización, integración y control de los procesos financieros y contables, garantizando la coherencia y trazabilidad de la información entre los distintos sistemas corporativos.
+
+Nuestras herramientas permiten consolidar en tiempo real los datos provenientes de ERP, bancos, sistemas de cobranzas, plataformas de facturación electrónica y portales de clientes, brindando una visión unificada del estado financiero de la organización.
+
+Diseñamos módulos y dashboards que asisten en la gestión de cuentas corrientes, conciliaciones, aging de saldos, proyecciones de flujo de fondos y análisis de rentabilidad, incorporando modelos de datos estructurados para seguimiento histórico, auditoría y análisis predictivo.
+
+Implementamos interfaces financieras robustas que sincronizan movimientos entre SAP, sistemas externos de facturación o cobro, y fuentes de datos auxiliares, asegurando consistencia contable y reducción de carga operativa.
+
+Además, nuestras soluciones integran mecanismos de alertas automáticas, conciliaciones parametrizables y reglas de negocio configurables, permitiendo detectar desvíos, anticipar vencimientos y facilitar la toma de decisiones sobre base informada.
+
+Algunos de nuestros Entregables:
+
+Dashboards de aging, cobranzas y flujo de fondos consolidado
+
+Interfaces de facturación electrónica y conciliación automática de pagos
+
+Modelos de datos financieros normalizados y auditables
+
+Automatización de reportes y generación de indicadores financieros clave
+
+Control de acceso por roles y registro completo de operaciones
+
+Objetivo técnico:
+Proveer una infraestructura financiera integrada, auditable y en tiempo real, que unifique los procesos contables, bancarios y de cobranza, reduciendo la intervención manual y fortaleciendo la confiabilidad de la información económica de la empresa."""
             },
             {
                 "id": "stock",
                 "titulo": "Gestión de Stock",
-                "desc1": "Inventario en tiempo real.",
-                "desc2": "Alertas, valuación y KPIs.",
+                "desc1": "Inventario en tiempo real y trazabilidad.",
+                "desc2": "App móvil online/offline y WMS/ERP.",
                 "img": "download.png",
-                "long": "App móvil de inventario, ubicación por sectores, reposición, lote/serie, valuación y KPIs operativos. Integración con WMS y ERP."
+                "long": """Gestión Integral de Stock
+
+Desarrollamos soluciones tecnológicas para la administración, control y trazabilidad completa del inventario, integrando en tiempo real los movimientos físicos y contables entre sistemas ERP, plataformas logísticas, e-commerce y herramientas operativas de planta o depósito.
+
+Nuestras aplicaciones permiten gestionar el ciclo completo del stock, desde la recepción de materiales hasta la expedición del producto final, contemplando control de ubicaciones, lotes, series, vencimientos y políticas de rotación.
+
+Uno de los pilares de nuestra solución es la aplicación móvil de gestión de stock, utilizada diariamente en entornos operativos de alta demanda.
+Diseñada para terminales industriales o dispositivos móviles convencionales, permite registrar movimientos, conteos, transferencias y ajustes en tiempo real, incluso en modo offline, sincronizando automáticamente con los sistemas centrales una vez restablecida la conexión.
+
+La app se integra de forma nativa con los módulos ERP y WMS, reduciendo la carga administrativa y asegurando la consistencia de los datos entre el inventario físico y el inventario contable.
+Incluye además mecanismos de validación, control de usuario, lectura de códigos de barras y reportes instantáneos de disponibilidad y movimientos.
+
+Características técnicas destacadas:
+
+Integración directa con el ERP
+
+Aplicación móvil con soporte online/offline y sincronización automática
+
+Control de lotes, series, vencimientos y ubicaciones (bin locations)
+
+Interfaces con sistemas de gestión de depósitos (WMS) y producción (MES)
+
+Dashboards de stock valorizado, cobertura y rotación
+
+Monitoreo en tiempo real de movimientos, transferencias y ajustes
+
+Nuestr Objetivo técnico:
+Proveer una plataforma integral para la gestión de stock que combine infraestructura centralizada con herramientas móviles operativas, garantizando trazabilidad total, coherencia contable y disponibilidad de información en tiempo real."""
             },
         ]
 
@@ -320,7 +463,7 @@ else:
     <div class='modal-body'>
       {modal_img}
       <p class='meta'>• {svc["desc1"]}<br/>• {svc["desc2"]}</p>
-      <p>{svc["long"]}</p>
+      <p>{svc["long"].replace(chr(10), "<br/>")}</p>
       <div style='margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;'>
         <a href='#' class='modal-close'>Cerrar</a>
       </div>
