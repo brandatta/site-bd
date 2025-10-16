@@ -118,7 +118,6 @@ if not st.session_state.ingresado:
 # ================== CONTENIDO ==================
 else:
     # ====== CSS General + Servicios + Modal ======
-    # IMPORTANTE: string normal (sin f) para evitar errores con llaves { } en CSS
     st.markdown("""
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&display=swap');
@@ -135,7 +134,7 @@ else:
       .nav-right{ min-width: 200px; }
       #brand-logo{ height: 70px; width: auto; display:block; }
       @media (max-width: 1200px){ #brand-logo{ height: 52px; } .nav-left, .nav-right { min-width: 180px; } }
-      @media (max-width: 900px){ #brand-logo{ height: 44px; } .nav-left, .nav-right { min-width: 160px; } }
+      @media (max-width: 900px){ #brand-logo{ height: 44px; } .nav-left, .nav-right { min_width: 160px; } }
       @media (max-width: 640px){ #brand-logo{ height: 36px; } .nav-left, .nav-right { min-width: 120px; } }
       .nav-center a{ color: #0f0f0f; text-decoration: none; padding: 8px 2px; border-bottom: 2px solid transparent; text-transform: uppercase; font-weight: 700; font-size: .95rem; transition: border .15s; white-space: nowrap; }
       .nav-center a:hover{ border-bottom-color: #0f0f0f; }
@@ -324,8 +323,6 @@ else:
       <p>{svc["long"]}</p>
       <div style='margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;'>
         <a href='#' class='modal-close'>Cerrar</a>
-        <a href='./?nav=Contacto&ing=1{"&sp=1" if st.session_state.soporte_authed else ""}'
-           class='modal-close' style='text-decoration:none;border:1px solid #0f0f0f;border-radius:8px;padding:6px 10px;'>Contactar</a>
       </div>
     </div>
   </div>
