@@ -233,8 +233,6 @@ else:
             {
                 "id": "interfaces",
                 "titulo": "Interfaces",
-                "desc1": "Diseño y desarrollo de Interfaces escalables.",
-                "desc2": "Autenticación, rate limiting y monitoreo.",
                 "img": "download.png",
                 "long": """Diseñamos y desarrollamos interfaces para la integración de sistemas empresariales heterogéneos, garantizando la coherencia, seguridad y trazabilidad de los datos a lo largo de todo el ecosistema tecnológico de la organización.
 
@@ -264,8 +262,6 @@ Garantizar un flujo de información unificado, confiable y auditable entre los d
             {
                 "id": "industria",
                 "titulo": "Producción Industrial",
-                "desc1": "Digitalización, trazabilidad y control operativo.",
-                "desc2": "Datos en tiempo real desde planta y ERP.",
                 "img": "download.png",
                 "long": """Desarrollamos soluciones tecnológicas orientadas a la digitalización, trazabilidad y control operativo de procesos industriales, integrando datos en tiempo real desde planta, ERP, sistemas periféricos y archivos ad-hoc.
 
@@ -293,8 +289,6 @@ Brindar una infraestructura digital sólida para la gestión integral de la prod
             {
                 "id": "fuerza",
                 "titulo": "Fuerza de Ventas",
-                "desc1": "Gestión y optimización de la operación comercial.",
-                "desc2": "Web y móvil con sincronización bidireccional.",
                 "img": "download.png",
                 "long": """Desarrollamos plataformas y herramientas diseñadas para gestionar, monitorear y optimizar la operación comercial de las organizaciones, integrando en un mismo entorno la información proveniente de ERP, CRM, e-commerce, sistemas logísticos y módulos documentales.
 
@@ -324,8 +318,6 @@ Proveer una plataforma robusta y escalable que centralice la gestión comercial,
             {
                 "id": "ecommerce",
                 "titulo": "E-commerce",
-                "desc1": "B2B integrado con sistemas centrales.",
-                "desc2": "Promos y reglas comerciales avanzadas.",
                 "img": "download.png",
                 "long": """Desarrollamos y administramos plataformas de comercio electrónico B2B integradas con los sistemas centrales de gestión empresarial, garantizando la consistencia de precios, stock, condiciones comerciales y documentación transaccional en tiempo real.
 
@@ -358,8 +350,6 @@ Ofrecer una infraestructura de comercio electrónico totalmente integrada, capaz
             {
                 "id": "finanzas",
                 "titulo": "Finanzas",
-                "desc1": "Automatización e integración financiera.",
-                "desc2": "Consolidación en tiempo real y auditoría.",
                 "img": "download.png",
                 "long": """Desarrollamos soluciones orientadas a la automatización, integración y control de los procesos financieros y contables, garantizando la coherencia y trazabilidad de la información entre los distintos sistemas corporativos.
 
@@ -389,8 +379,6 @@ Proveer una infraestructura financiera integrada, auditable y en tiempo real, qu
             {
                 "id": "stock",
                 "titulo": "Gestión de Stock",
-                "desc1": "Inventario en tiempo real y trazabilidad.",
-                "desc2": "App móvil online/offline y WMS/ERP.",
                 "img": "download.png",
                 "long": """Gestión Integral de Stock
 
