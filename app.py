@@ -20,6 +20,7 @@ SOPORTE_OPCIONES = ["Cargar Ticket", "Documentación", "Manuales"]
 
 # -------- Query params helpers --------
 def _qp_get() -> dict:
+    # Devuelve dict plano {k: v}
     try:
         return {k: (v[0] if isinstance(v, list) else v) for k, v in st.query_params.items()}
     except Exception:
@@ -29,6 +30,7 @@ def _qp_get() -> dict:
             return {}
 
 def _qp_set(d: dict):
+    # Setea params limpiando None
     clean = {k: v for k, v in d.items() if v is not None}
     try:
         st.query_params.from_dict(clean)
@@ -44,6 +46,7 @@ nav_qp  = unquote(qp.get("nav"))  if qp.get("nav")  else None
 ing_qp  = qp.get("ing")
 snav_qp = unquote(qp.get("snav")) if qp.get("snav") else None
 sp_qp   = qp.get("sp")
+sel_qp  = unquote(qp.get("sel")) if qp.get("sel") else None  # tarjeta seleccionada (id)
 
 if ing_qp == "1":
     st.session_state.ingresado = True
@@ -78,7 +81,6 @@ def header_logo_html(path="logooo (1).png"):
         b64 = base64.b64encode(buf.getvalue()).decode()
         return f'<img id="brand-logo" src="data:image/png;base64,{b64}" alt="Brandatta" />'
     except Exception:
-        # fallback si no existe el archivo
         return "<div id='brand-logo' style='width:160px;height:60px;background:#eee;border:1px solid #ddd;border-radius:6px;'></div>"
 
 # ===== Helper: imagen para hover (en base64) =====
@@ -116,107 +118,93 @@ if not st.session_state.ingresado:
 
 # ================== CONTENIDO ==================
 else:
-    st.markdown("""
+    # ====== CSS General + Servicios con animaciones ======
+    detail_open_class = "detail-open" if sel_qp else ""
+    st.markdown(f"""
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&display=swap');
-      [data-testid="stAppViewContainer"] { background:#fff !important; font-family:'Manjari', system-ui, sans-serif !important; }
-      header, #MainMenu, footer {visibility: hidden;}
-      .block-container, [data-testid="block-container"]{ padding-top: 0 !important; padding-bottom: 0 !important; }
-      [data-testid="stAppViewContainer"]{ padding-top: 0 !important; }
+      [data-testid="stAppViewContainer"] {{ background:#fff !important; font-family:'Manjari', system-ui, sans-serif !important; }}
+      header, #MainMenu, footer {{visibility: hidden;}}
+      .block-container, [data-testid="block-container"]{{ padding-top: 0 !important; padding-bottom: 0 !important; }}
+      [data-testid="stAppViewContainer"]{{ padding-top: 0 !important; }}
 
-      /* ===== Header sticky con logo (solo MOD acá para tamaño logo) ===== */
-      #topnav-wrap{
-        position: sticky; top: 0; z-index: 1000;
-        background: #ffffff; border-bottom: 1px solid #e5e5e7; box-shadow: 0 1px 6px rgba(0,0,0,.04);
-        margin-top: 0 !important;
-      }
-      nav.topnav{
-        max-width: 1440px; margin: 0 auto;
-        padding: 8px 16px !important;
-        display: flex; align-items: center; justify-content: space-between; gap: 16px;
-        position: relative;
-      }
-      .nav-left{ display:flex; align-items:center; gap:10px; min-width: 200px; }
-      .nav-center{ position:absolute; left:50%; transform:translateX(-50%); display:flex; gap:28px; align-items:center; }
-      .nav-right{ min-width: 200px; }
+      /* ===== Header sticky ===== */
+      #topnav-wrap{{ position: sticky; top: 0; z-index: 1000; background: #ffffff; border-bottom: 1px solid #e5e5e7; box-shadow: 0 1px 6px rgba(0,0,0,.04); margin-top: 0 !important; }}
+      nav.topnav{{ max-width: 1440px; margin: 0 auto; padding: 8px 16px !important; display: flex; align-items: center; justify-content: space-between; gap: 16px; position: relative; }}
+      .nav-left{{ display:flex; align-items:center; gap:10px; min-width: 200px; }}
+      .nav-center{{ position:absolute; left:50%; transform:translateX(-50%); display:flex; gap:28px; align-items:center; }}
+      .nav-right{{ min-width: 200px; }}
+      #brand-logo{{ height: 70px; width: auto; display:block; }}
+      @media (max-width: 1200px){{ #brand-logo{{ height: 52px; }} .nav-left, .nav-right {{ min-width: 180px; }} }}
+      @media (max-width: 900px){{ #brand-logo{{ height: 44px; }} .nav-left, .nav-right {{ min-width: 160px; }} }}
+      @media (max-width: 640px){{ #brand-logo{{ height: 36px; }} .nav-left, .nav-right {{ min-width: 120px; }} }}
+      .nav-center a{{ color: #0f0f0f; text-decoration: none; padding: 8px 2px; border-bottom: 2px solid transparent; text-transform: uppercase; font-weight: 700; font-size: .95rem; transition: border .15s; white-space: nowrap; }}
+      .nav-center a:hover{{ border-bottom-color: #0f0f0f; }}
+      .nav-center a.active{{ border-bottom-color: #0f0f0f; }}
 
-      /* ===== LOGO más grande (60px) ===== */
-      #brand-logo{ height: 70px; width: auto; display:block; }
-
-      @media (max-width: 1200px){
-        #brand-logo{ height: 52px; }
-        .nav-left, .nav-right { min-width: 180px; }
-      }
-      @media (max-width: 900px){
-        #brand-logo{ height: 44px; }
-        .nav-left, .nav-right { min-width: 160px; }
-      }
-      @media (max-width: 640px){
-        #brand-logo{ height: 36px; }
-        .nav-left, .nav-right { min-width: 120px; }
-      }
-
-      /* Links del nav */
-      .nav-center a{
-        color: #0f0f0f; text-decoration: none; padding: 8px 2px;
-        border-bottom: 2px solid transparent; text-transform: uppercase; font-weight: 700; font-size: .95rem; transition: border .15s;
-        white-space: nowrap;
-      }
-      .nav-center a:hover{ border-bottom-color: #0f0f0f; }
-      .nav-center a.active{ border-bottom-color: #0f0f0f; }
-
-      /* ===== Grilla de Servicios ===== */
-      .services-grid {
+      /* ===== Servicios Area ===== */
+      .services-area {{ max-width: 1320px; margin: 20px auto 12px; }}
+      .services-area.detail-open .services-grid {{ transform: translateX(-10px); }} /* slide left leve */
+      .services-grid {{
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
         gap: 24px;
-        max-width: 1320px;
-        margin: 20px auto 32px;
         justify-items: center;
-        overflow: visible !important;
-      }
+        transition: transform .25s ease;
+      }}
 
-      .tile { width: 100%; max-width: 420px; position: relative; overflow: visible !important; z-index: 0; }
-      .tile:hover { z-index: 200; }
-      .card-wrap { position: relative; overflow: visible !important; }
-      .card { background:#fff; border:1px solid #d4fbd7; height:110px; display:flex; align-items:center; justify-content:center; transition:all .15s ease; }
-      .card:hover{ border-color:#bff3c5; transform:translateY(-2px); box-shadow:0 10px 24px rgba(0,0,0,.06); }
-      .card h3{ font-size:1.05rem; font-weight:700; color:#111; margin:0; }
+      .tile {{ width: 100%; max-width: 420px; position: relative; overflow: visible !important; z-index: 0; }}
+      .tile:hover {{ z-index: 200; }}
+      .card-wrap {{ position: relative; overflow: visible !important; }}
 
-      .hovercard{
+      /* tarjeta base */
+      .card {{ background:#fff; border:1px solid #d4fbd7; height:110px; display:flex; align-items:center; justify-content:center; transition:all .15s ease; box-sizing: border-box; }}
+      .card:hover{{ border-color:#bff3c5; transform:translateY(-2px); box-shadow:0 10px 24px rgba(0,0,0,.06); }}
+      .card h3{{ font-size:1.05rem; font-weight:700; color:#111; margin:0; }}
+
+      /* link ocupando toda la tarjeta */
+      .card-link {{ display:block; width:100%; height:100%; text-decoration:none; color:inherit; }}
+
+      /* hovercard (no altera layout) */
+      .hovercard{{
         position:absolute; left:50%;
         background:rgba(255,255,255,0.97); backdrop-filter:blur(6px);
         border:1px solid #e5e5e7; border-radius:10px; padding:10px 14px;
         opacity:0; visibility:hidden; transition:opacity .15s, transform .15s;
         z-index: 300; box-shadow:0 12px 28px rgba(0,0,0,0.14);
         pointer-events: none; width: max(280px, 60%);
-      }
-      .card-wrap:hover .hovercard{ opacity:1; visibility:visible; }
-      .hover-up{ bottom:calc(100% + 8px); transform:translateX(-50%) translateY(6px); }
-      .card-wrap:hover .hover-up{ transform:translateX(-50%) translateY(0); }
-      .hover-down{ top:calc(100% + 8px); transform:translateX(-50%) translateY(-6px); }
-      .card-wrap:hover .hover-down{ transform:translateX(-50%) translateY(0); }
-      .hovercard h4{ margin:0 0 4px; font-size:1rem; font-weight:700; }
-      .hovercard p{ margin:0; font-size:.9rem; color:#111; }
+        text-align:left;
+      }}
+      .card-wrap:hover .hovercard{{ opacity:1; visibility:visible; }}
+      .hover-up{{ bottom:calc(100% + 8px); transform:translateX(-50%) translateY(6px); }}
+      .card-wrap:hover .hover-up{{ transform:translateX(-50%) translateY(0); }}
+      .hover-down{{ top:calc(100% + 8px); transform:translateX(-50%) translateY(-6px); }}
+      .card-wrap:hover .hover-down{{ transform:translateX(-50%) translateY(0); }}
+      .hovercard h4{{ margin:0 0 4px; font-size:1rem; font-weight:700; }}
+      .hovercard p{{ margin:0; font-size:.9rem; color:#111; }}
+      .hover-img{{ display:block; width:100%; max-height:120px; object-fit:contain; margin:0 0 8px 0; background:#fff; border:1px solid #eef2f3; border-radius:8px; }}
 
-      /* ===== Imagen dentro del hover ===== */
-      .hover-img{
-        display:block;
-        width:100%;
-        max-height:120px;
-        object-fit:contain;
-        margin:0 0 8px 0;
+      /* ===== Panel de detalle (slide-in) ===== */
+      .svc-detail-wrap {{ max-width:1320px; margin: 0 auto 24px; }}
+      .svc-detail {{
+        border:1px solid #e5e5e7; border-radius:12px; padding:16px 18px;
+        box-shadow:0 10px 24px rgba(0,0,0,.06);
+        transform: translateX(14px); opacity:0; max-height:0; overflow:hidden;
+        transition: transform .25s ease, opacity .25s ease, max-height .25s ease;
         background:#fff;
-        border:1px solid #eef2f3;
-        border-radius:8px;
-      }
-
-      /* ===== Submenú Soporte ===== */
-      #subnav-wrap{ position: sticky; top: 48px; z-index: 900; background: #ffffff; border-bottom: 1px solid #f0f0f1; }
-      nav.subnav{ max-width: 1000px; margin: 0 auto; padding: 8px 16px; display: flex; align-items: center; justify-content: center; gap: 22px; }
-      nav.subnav a{ display:inline-block; color:#111827; text-decoration:none; padding:6px 2px; border-bottom:2px solid transparent; font-weight:600; font-size:.92rem; }
-      nav.subnav a:hover{ border-bottom-color:#111827; }
-      nav.subnav a.active{ border-bottom-color:#111827; }
+      }}
+      .services-area.detail-open + .svc-detail-wrap .svc-detail {{
+        transform: translateX(0); opacity:1; max-height:600px;
+      }}
+      .svc-detail h3 {{ margin:0 0 6px 0; font-size:1.15rem; }}
+      .svc-detail p  {{ margin:.25rem 0; }}
+      .svc-detail .meta {{ font-size:.9rem; color:#444; }}
+      .svc-actions {{ display:flex; gap:10px; margin-top:10px; }}
+      .btn-ghost {{
+        display:inline-block; padding:8px 12px; border:1px solid #e5e5e7; border-radius:8px;
+        text-decoration:none; color:#111; font-weight:600;
+      }}
+      .btn-ghost:hover {{ background:#f7f7f8; }}
     </style>
     """, unsafe_allow_html=True)
 
@@ -254,24 +242,77 @@ else:
     if nav == "Servicios":
         st.markdown("<div class='title' style='text-align:center;font-weight:700;font-size:1.2rem;margin:20px 0;'>Servicios</div>", unsafe_allow_html=True)
 
-        # Asigná una imagen a cada servicio (colocá los archivos en la carpeta de la app)
+        # Definición de servicios (con 'id' seguro para URL)
         servicios = [
-            {"titulo": "APIs",                    "desc1": "Diseño y desarrollo de APIs escalables.",        "desc2": "Autenticación, rate limiting y monitoreo.",      "img": "download.png"},
-            {"titulo": "Software para Industrias","desc1": "Sistemas a medida para planta/producción.",      "desc2": "Integración con ERP y tableros.",                "img": "download.png"},
-            {"titulo": "Tracking de Pedidos",     "desc1": "Trazabilidad punta a punta.",                    "desc2": "Notificaciones y SLA visibles.",                 "img": "download.png"},
-            {"titulo": "Ecommerce",               "desc1": "Tiendas headless / integradas.",                 "desc2": "Pagos, logística y analytics.",                  "img": "download.png"},
-            {"titulo": "Finanzas",                "desc1": "Forecasting y conciliaciones automáticas.",      "desc2": "Reportes y auditoría.",                          "img": "download.png"},
-            {"titulo": "Gestión de Stock",        "desc1": "Inventario en tiempo real.",                     "desc2": "Alertas, valuación y KPIs.",                      "img": "download.png"},
+            {
+                "id": "apis",
+                "titulo": "APIs",
+                "desc1": "Diseño y desarrollo de APIs escalables.",
+                "desc2": "Autenticación, rate limiting y monitoreo.",
+                "img": "download.png",
+                "long": "Diseñamos APIs REST/GraphQL con seguridad (OAuth2/JWT), versionado, observabilidad, pruebas contractuales y SLAs claros. Integración con gateways y mensajería."
+            },
+            {
+                "id": "industria",
+                "titulo": "Software para Industrias",
+                "desc1": "Sistemas a medida para planta/producción.",
+                "desc2": "Integración con ERP y tableros.",
+                "img": "download.png",
+                "long": "MES/SCADA liviano, captura de datos en línea, controles de calidad y OEE. Integración con SAP/Produmex, dashboards en tiempo real y trazabilidad completa."
+            },
+            {
+                "id": "tracking",
+                "titulo": "Tracking de Pedidos",
+                "desc1": "Trazabilidad punta a punta.",
+                "desc2": "Notificaciones y SLA visibles.",
+                "img": "download.png",
+                "long": "Visibilidad e2e: toma de pedido → preparación → despacho → entrega. Notificaciones proactivas, auditoría y paneles con métricas de cumplimiento."
+            },
+            {
+                "id": "ecommerce",
+                "titulo": "Ecommerce",
+                "desc1": "Tiendas headless / integradas.",
+                "desc2": "Pagos, logística y analytics.",
+                "img": "download.png",
+                "long": "Arquitecturas headless, promociones avanzadas, OMS y sincronización con ERP/WMS. Checkout optimizado y data layer para analítica."
+            },
+            {
+                "id": "finanzas",
+                "titulo": "Finanzas",
+                "desc1": "Forecasting y conciliaciones automáticas.",
+                "desc2": "Reportes y auditoría.",
+                "img": "download.png",
+                "long": "Flujos de conciliación bancaria, aging y cashflow, integración contable, reportería multiempresa y reglas de auditoría con alertas."
+            },
+            {
+                "id": "stock",
+                "titulo": "Gestión de Stock",
+                "desc1": "Inventario en tiempo real.",
+                "desc2": "Alertas, valuación y KPIs.",
+                "img": "download.png",
+                "long": "App móvil de inventario, ubicación por sectores, reposición, lote/serie, valuación y KPIs operativos. Integración con WMS y ERP."
+            },
         ]
+        servicios_by_id = {s["id"]: s for s in servicios}
 
+        # Marcar si hay selección
+        st.markdown(f"<div class='services-area {detail_open_class}'>", unsafe_allow_html=True)
+
+        # Render de tarjetas clickeables
         html_cards = ""
         for i, svc in enumerate(servicios):
             hover_class = "hover-down" if i < 3 else "hover-up"
             img_html = hover_img_html(svc.get("img"), alt=svc["titulo"]) if svc.get("img") else ""
+            params = {"nav": "Servicios", "ing": "1", "sel": svc["id"]}
+            if st.session_state.soporte_authed:
+                params["sp"] = "1"
+            href = "./?" + "&".join([f"{k}={quote(str(v))}" for k, v in params.items()])
             html_cards += f"""
 <div class='tile'>
   <div class='card-wrap'>
-    <div class='card'><h3>{svc["titulo"]}</h3></div>
+    <a class='card-link' href='{href}' target='_self' aria-label='Abrir {svc["titulo"]}'>
+      <div class='card'><h3>{svc["titulo"]}</h3></div>
+    </a>
     <div class='hovercard {hover_class}'>
       {img_html}
       <h4>{svc["titulo"]}</h4>
@@ -282,6 +323,34 @@ else:
 </div>
 """
         st.markdown(f"<div class='services-grid'>{html_cards}</div>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)  # cierre .services-area
+
+        # Panel de detalle si hay ?sel=
+        if sel_qp and sel_qp in servicios_by_id:
+            svc = servicios_by_id[sel_qp]
+            # href para cerrar (quita sel)
+            close_params = {"nav": "Servicios", "ing": "1"}
+            if st.session_state.soporte_authed:
+                close_params["sp"] = "1"
+            close_href = "./?" + "&".join([f"{k}={quote(str(v))}" for k, v in close_params.items()])
+
+            detail_html = f"""
+<div class='svc-detail-wrap'>
+  <div class='svc-detail'>
+    <div style='display:flex; gap:18px; align-items:flex-start; flex-wrap:wrap;'>
+      <div style='flex:1 1 320px; min-width:280px;'>
+        <h3>{svc["titulo"]}</h3>
+        <p class='meta'>• {svc["desc1"]}<br/>• {svc["desc2"]}</p>
+        <p>{svc["long"]}</p>
+        <div class='svc-actions'>
+          <a class='btn-ghost' href='{close_href}' target='_self'>← Cerrar</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+"""
+            st.markdown(detail_html, unsafe_allow_html=True)
 
     elif nav == "Contacto":
         st.markdown("<h3>Contacto</h3><p>Email: brandatta@brandatta.com.ar</p><p>Teléfono: +54 11 0000-0000</p><p>Dirección: Buenos Aires, Argentina</p>", unsafe_allow_html=True)
