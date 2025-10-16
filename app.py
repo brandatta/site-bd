@@ -81,6 +81,16 @@ def header_logo_html(path="logooo (1).png"):
         # fallback si no existe el archivo
         return "<div id='brand-logo' style='width:160px;height:60px;background:#eee;border:1px solid #ddd;border-radius:6px;'></div>"
 
+# ===== Helper: imagen para hover (en base64) =====
+def hover_img_html(path, alt="img"):
+    try:
+        img = Image.open(path)
+        buf = BytesIO(); img.save(buf, format="PNG")
+        b64 = base64.b64encode(buf.getvalue()).decode()
+        return f"<img class='hover-img' src='data:image/png;base64,{b64}' alt='{alt}' />"
+    except Exception:
+        return ""  # si no existe, no muestra nada
+
 # ================== PORTADA ==================
 if not st.session_state.ingresado:
     st.markdown("""
@@ -189,6 +199,18 @@ else:
       .hovercard h4{ margin:0 0 4px; font-size:1rem; font-weight:700; }
       .hovercard p{ margin:0; font-size:.9rem; color:#111; }
 
+      /* ===== Imagen dentro del hover ===== */
+      .hover-img{
+        display:block;
+        width:100%;
+        max-height:120px;
+        object-fit:contain;
+        margin:0 0 8px 0;
+        background:#fff;
+        border:1px solid #eef2f3;
+        border-radius:8px;
+      }
+
       /* ===== Submenú Soporte ===== */
       #subnav-wrap{ position: sticky; top: 48px; z-index: 900; background: #ffffff; border-bottom: 1px solid #f0f0f1; }
       nav.subnav{ max-width: 1000px; margin: 0 auto; padding: 8px 16px; display: flex; align-items: center; justify-content: center; gap: 22px; }
@@ -231,22 +253,27 @@ else:
     # ===== SERVICIOS =====
     if nav == "Servicios":
         st.markdown("<div class='title' style='text-align:center;font-weight:700;font-size:1.2rem;margin:20px 0;'>Servicios</div>", unsafe_allow_html=True)
+
+        # Asigná una imagen a cada servicio (colocá los archivos en la carpeta de la app)
         servicios = [
-            {"titulo": "APIs", "desc1": "Diseño y desarrollo de APIs escalables.", "desc2": "Autenticación, rate limiting y monitoreo."},
-            {"titulo": "Software para Industrias", "desc1": "Sistemas a medida para planta/producción.", "desc2": "Integración con ERP y tableros."},
-            {"titulo": "Tracking de Pedidos", "desc1": "Trazabilidad punta a punta.", "desc2": "Notificaciones y SLA visibles."},
-            {"titulo": "Ecommerce", "desc1": "Tiendas headless / integradas.", "desc2": "Pagos, logística y analytics."},
-            {"titulo": "Finanzas", "desc1": "Forecasting y conciliaciones automáticas.", "desc2": "Reportes y auditoría."},
-            {"titulo": "Gestión de Stock", "desc1": "Inventario en tiempo real.", "desc2": "Alertas, valuación y KPIs."},
+            {"titulo": "APIs",                    "desc1": "Diseño y desarrollo de APIs escalables.",        "desc2": "Autenticación, rate limiting y monitoreo.",      "img": "download.png"},
+            {"titulo": "Software para Industrias","desc1": "Sistemas a medida para planta/producción.",      "desc2": "Integración con ERP y tableros.",                "img": "download.png"},
+            {"titulo": "Tracking de Pedidos",     "desc1": "Trazabilidad punta a punta.",                    "desc2": "Notificaciones y SLA visibles.",                 "img": "download.png"},
+            {"titulo": "Ecommerce",               "desc1": "Tiendas headless / integradas.",                 "desc2": "Pagos, logística y analytics.",                  "img": "download.png"},
+            {"titulo": "Finanzas",                "desc1": "Forecasting y conciliaciones automáticas.",      "desc2": "Reportes y auditoría.",                          "img": "download.png"},
+            {"titulo": "Gestión de Stock",        "desc1": "Inventario en tiempo real.",                     "desc2": "Alertas, valuación y KPIs.",                      "img": "download.png"},
         ]
+
         html_cards = ""
         for i, svc in enumerate(servicios):
             hover_class = "hover-down" if i < 3 else "hover-up"
+            img_html = hover_img_html(svc.get("img"), alt=svc["titulo"]) if svc.get("img") else ""
             html_cards += f"""
 <div class='tile'>
   <div class='card-wrap'>
     <div class='card'><h3>{svc["titulo"]}</h3></div>
     <div class='hovercard {hover_class}'>
+      {img_html}
       <h4>{svc["titulo"]}</h4>
       <p>• {svc["desc1"]}</p>
       <p>• {svc["desc2"]}</p>
