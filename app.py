@@ -202,30 +202,6 @@ else:
     </style>
     """, unsafe_allow_html=True)
 
-    # ===== JS utilitario para abrir/cerrar detalle via query params (robusto) =====
-    st.markdown("""
-    <script>
-    function openSvc(id){
-      const params = new URLSearchParams(window.location.search);
-      params.set('nav','Servicios');
-      params.set('ing','1');
-      params.set('sel', id);
-      if (params.get('sp') === '1') { params.set('sp','1'); } else { params.delete('sp'); }
-      const url = window.location.pathname + '?' + params.toString();
-      window.location.href = url;
-    }
-    function closeSvc(){
-      const params = new URLSearchParams(window.location.search);
-      params.delete('sel');
-      params.set('nav','Servicios');
-      params.set('ing','1');
-      if (params.get('sp') === '1') { params.set('sp','1'); } else { params.delete('sp'); }
-      const url = window.location.pathname + '?' + params.toString();
-      window.location.href = url;
-    }
-    </script>
-    """, unsafe_allow_html=True)
-
     # ===== HEADER (logo izquierda + nav centrado) =====
     logo_left = header_logo_html("logooo (1).png")
     links_html = []
@@ -316,17 +292,24 @@ else:
         # Contenedor con clase condicional para animación
         st.markdown(f"<div class='services-area {detail_open_class}'>", unsafe_allow_html=True)
 
-        # Render de tarjetas clickeables (JS openSvc)
+        # Render de tarjetas clickeables (ENLACE REAL, sin JS)
         html_cards = ""
         for i, svc in enumerate(servicios):
             hover_class = "hover-down" if i < 3 else "hover-up"
             img_html = hover_img_html(svc.get("img"), alt=svc["titulo"]) if svc.get("img") else ""
+
+            # armar href preservando flags y agregando sel
+            params = {"nav": "Servicios", "ing": "1", "sel": svc["id"]}
+            if st.session_state.soporte_authed:
+                params["sp"] = "1"
+            href = "./?" + "&".join([f"{k}={quote(str(v))}" for k, v in params.items()])
+
             html_cards += f"""
-<div class='tile' role='button' tabindex='0'
-     onclick="openSvc('{svc["id"]}')"
-     onkeypress="if(event.key==='Enter') openSvc('{svc["id"]}')">
+<div class='tile'>
   <div class='card-wrap'>
-    <div class='card'><h3>{svc["titulo"]}</h3></div>
+    <a class='card-link' href='{href}' target='_self' style='text-decoration:none;color:inherit;display:block;'>
+      <div class='card'><h3>{svc["titulo"]}</h3></div>
+    </a>
     <div class='hovercard {hover_class}'>
       {img_html}
       <h4>{svc["titulo"]}</h4>
@@ -342,6 +325,13 @@ else:
         # Panel de detalle si hay ?sel=
         if sel_qp and sel_qp in servicios_by_id:
             svc = servicios_by_id[sel_qp]
+
+            # href para cerrar (quita sel y mantiene flags)
+            close_params = {"nav": "Servicios", "ing": "1"}
+            if st.session_state.soporte_authed:
+                close_params["sp"] = "1"
+            close_href = "./?" + "&".join([f"{k}={quote(str(v))}" for k, v in close_params.items()])
+
             detail_html = f"""
 <div class='svc-detail-wrap'>
   <div class='svc-detail'>
@@ -351,7 +341,7 @@ else:
         <p class='meta'>• {svc["desc1"]}<br/>• {svc["desc2"]}</p>
         <p>{svc["long"]}</p>
         <div class='svc-actions'>
-          <button class='btn-ghost' onclick='closeSvc()'>← Cerrar</button>
+          <a class='btn-ghost' href='{close_href}' target='_self'>← Cerrar</a>
         </div>
       </div>
     </div>
