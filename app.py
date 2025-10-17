@@ -45,6 +45,7 @@ ing_qp  = qp.get("ing")
 snav_qp = unquote(qp.get("snav")) if qp.get("snav") else None
 sp_qp   = qp.get("sp")
 sel_qp  = unquote(qp.get("sel")) if qp.get("sel") else None  # compat
+svc_qp  = unquote(qp.get("svc")) if qp.get("svc") else None  # NUEVO: id del servicio para vista de detalle
 
 if ing_qp == "1":
     st.session_state.ingresado = True
@@ -82,7 +83,7 @@ def header_logo_html(path="logooo (1).png"):
         # fallback si no existe el archivo
         return "<div id='brand-logo' style='width:160px;height:60px;background:#eee;border:1px solid #ddd;border-radius:6px;'></div>"
 
-# ===== Helper: imagen para hover/modal (en base64) =====
+# ===== Helper: imagen para hover/hero (en base64) =====
 def hover_img_html(path, alt="img"):
     try:
         img = Image.open(path)
@@ -111,13 +112,17 @@ if not st.session_state.ingresado:
 
     if st.button("Ingresar", key="ingresar_btn"):
         st.session_state.ingresado = True
-        _qp_set({"nav": st.session_state.get("nav", "Servicios"), "ing": "1", "sp": "1" if st.session_state.soporte_authed else None})
+        _qp_set({
+            "nav": st.session_state.get("nav", "Servicios"),
+            "ing": "1",
+            "sp": "1" if st.session_state.soporte_authed else None
+        })
 
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ================== CONTENIDO ==================
 else:
-    # ====== CSS General + Servicios + Modal ======
+    # ====== CSS General ======
     st.markdown("""
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&display=swap');
@@ -157,7 +162,7 @@ else:
       .card:hover{ border-color:#bff3c5; box-shadow:0 10px 24px rgba(0,0,0,.06); }
       .card h3{ font-size:1.05rem; font-weight:700; color:#111; margin:0; }
 
-      /* Hovercard (solo imagen arriba) */
+      /* Hovercard (solo imagen arriba como tooltip) */
       .hovercard{
         position:absolute; left:50%;
         background:rgba(255,255,255,0.97); backdrop-filter:blur(6px);
@@ -174,21 +179,14 @@ else:
       .card-wrap:hover .hover-down{ transform:translateX(-50%) translateY(0); }
       .hover-img{ display:block; width:100%; max-height:120px; object-fit:contain; margin:0; background:#fff; border:1px solid #eef2f3; border-radius:8px; }
 
-      /* ===== MODAL (CSS-only con :target) ===== */
-      .modal{ position: fixed; inset: 0; background: rgba(0,0,0,.45); display:none; align-items:center; justify-content:center; z-index: 9999; padding:20px; }
-      .modal:target{ display:flex; }
-      .modal-card{ background:#fff; color:#111; width:min(820px, 94vw); max-height:86vh; overflow:auto;
-                   border:1px solid #e5e5e7; border-radius:14px; box-shadow:0 18px 44px rgba(0,0,0,.22); padding:18px 20px; animation: fadeIn .2s ease; }
-      .modal-header{ display:flex; align-items:center; justify-content:space-between; gap:12px; border-bottom:1px solid #f0f0f2; padding-bottom:8px; margin-bottom:12px; }
-      .modal-close{ display:inline-block; text-decoration:none; border:1px solid #e5e5e7; border-radius:8px; padding:6px 10px; background:#fafafa; color:#111; font-weight:600; }
-      .modal-close:hover{ background:#f1f1f3; }
-      .modal-body p{ margin:.4rem 0; }
-      .modal-img{ display:block; width:100%; max-height:220px; object-fit:contain; margin:4px 0 10px 0; border:1px solid #eef2f3; border-radius:10px; background:#fff; }
-
-      @keyframes fadeIn {
-        from {opacity:0; transform: translateY(8px);}
-        to   {opacity:1; transform: translateY(0);}
-      }
+      /* ===== Página de detalle ===== */
+      .svc-detail { max-width: 980px; margin: 24px auto; background:#fff; border:1px solid #e5e5e7; border-radius:14px; padding:18px 20px; box-shadow:0 8px 24px rgba(0,0,0,.06); }
+      .svc-detail h1 { font-size:1.4rem; margin:0 0 10px 0; }
+      .svc-detail .hero { display:block; width:100%; max-height:240px; object-fit:contain; margin:6px 0 10px 0; border:1px solid #eef2f3; border-radius:10px; background:#fff; }
+      .svc-detail .body p { margin:.5rem 0; }
+      .svc-breadcrumb { max-width:980px; margin: 12px auto 0; }
+      .svc-breadcrumb a { text-decoration:none; font-weight:600; border:1px solid #e5e5e7; border-radius:8px; padding:6px 10px; background:#fafafa; color:#111; }
+      .svc-breadcrumb a:hover { background:#f1f1f3; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -224,9 +222,7 @@ else:
 
     # ===== SERVICIOS =====
     if nav == "Servicios":
-        st.markdown("<div class='title' style='text-align:center;font-weight:700;font-size:1.2rem;margin:20px 0;'>Servicios</div>", unsafe_allow_html=True)
-
-        # Definición de servicios (sin desc1/desc2)
+        # Definición de servicios (sin modales; contenido largo tal cual)
         servicios = [
             {
                 "id": "interfaces",
@@ -409,18 +405,56 @@ Proveer una plataforma integral para la gestión de stock que combine infraestru
             },
         ]
 
-        # Contenedor de tarjetas
-        st.markdown("<div class='services-area'>", unsafe_allow_html=True)
+        # Helper buscar por id
+        def _get_service_by_id(svc_id: str):
+            for s in servicios:
+                if s["id"] == svc_id:
+                    return s
+            return None
 
-        # Render de tarjetas clickeables -> abren MODAL con #svc-<id>
-        html_cards = ""
-        for i, svc in enumerate(servicios):
-            hover_class = "hover-down" if i < 3 else "hover-up"
-            img_html = hover_img_html(svc.get("img"), alt=svc["titulo"]) if svc.get("img") else ""
-            html_cards += f"""
+        # Si hay svc en la URL => página de detalle
+        if svc_qp:
+            svc = _get_service_by_id(svc_qp)
+            if svc:
+                # breadcrumb / volver al listado
+                back_params = {"nav": "Servicios", "ing": "1", "svc": None}
+                if st.session_state.soporte_authed:
+                    back_params["sp"] = "1"
+                back_href = "./?" + "&".join([f"{k}={quote(v)}" for k, v in back_params.items() if v is not None])
+
+                st.markdown(f"<div class='svc-breadcrumb'><a href='{back_href}' target='_self'>← Volver a Servicios</a></div>", unsafe_allow_html=True)
+
+                img_html = hover_img_html(svc.get("img"), alt=svc["titulo"]).replace("hover-img", "hero") if svc.get("img") else ""
+                detail_html = f"""
+<div class='svc-detail'>
+  <h1>{svc['titulo']}</h1>
+  {img_html if svc.get("img") else ""}
+  <div class='body'>
+    <p>{svc['long'].replace(chr(10), "<br/>")}</p>
+  </div>
+</div>
+"""
+                st.markdown(detail_html, unsafe_allow_html=True)
+            else:
+                st.warning("No se encontró el servicio solicitado. Volviendo al listado.")
+                _qp_set({"nav": "Servicios", "ing": "1", "svc": None})
+        else:
+            # Listado (grid)
+            st.markdown("<div class='title' style='text-align:center;font-weight:700;font-size:1.2rem;margin:20px 0;'>Servicios</div>", unsafe_allow_html=True)
+            st.markdown("<div class='services-area'>", unsafe_allow_html=True)
+
+            html_cards = ""
+            for i, svc in enumerate(servicios):
+                hover_class = "hover-down" if i < 3 else "hover-up"
+                params = {"nav": "Servicios", "ing": "1", "svc": svc["id"]}
+                if st.session_state.soporte_authed:
+                    params["sp"] = "1"
+                href = "./?" + "&".join([f"{k}={quote(v)}" for k, v in params.items()])
+                img_html = hover_img_html(svc.get("img"), alt=svc["titulo"]) if svc.get("img") else ""
+                html_cards += f"""
 <div class='tile'>
   <div class='card-wrap'>
-    <a class='card-link' href='#svc-{svc["id"]}' style='text-decoration:none;color:inherit;display:block;'>
+    <a class='card-link' href='{href}' target='_self' style='text-decoration:none;color:inherit;display:block;'>
       <div class='card'><h3>{svc["titulo"]}</h3></div>
     </a>
     <div class='hovercard {hover_class}'>
@@ -429,31 +463,8 @@ Proveer una plataforma integral para la gestión de stock que combine infraestru
   </div>
 </div>
 """
-        st.markdown(f"<div class='services-grid'>{html_cards}</div>", unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)  # cierre .services-area
-
-        # ===== Modales por servicio (CSS :target) =====
-        modals_html = ""
-        for svc in servicios:
-            modal_img = hover_img_html(svc.get("img"), alt=svc["titulo"]).replace("hover-img", "modal-img") if svc.get("img") else ""
-            modals_html += f"""
-<div id='svc-{svc["id"]}' class='modal'>
-  <div class='modal-card' role='dialog' aria-modal='true' aria-labelledby='svc-title-{svc["id"]}'>
-    <div class='modal-header'>
-      <h3 id='svc-title-{svc["id"]}' style='margin:0;font-size:1.1rem;'>{svc["titulo"]}</h3>
-      <a href='#' class='modal-close' aria-label='Cerrar'>×</a>
-    </div>
-    <div class='modal-body'>
-      {modal_img}
-      <p>{svc["long"].replace(chr(10), "<br/>")}</p>
-      <div style='margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;'>
-        <a href='#' class='modal-close'>Cerrar</a>
-      </div>
-    </div>
-  </div>
-</div>
-"""
-        st.markdown(modals_html, unsafe_allow_html=True)
+            st.markdown(f"<div class='services-grid'>{html_cards}</div>", unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
 
     elif nav == "Contacto":
         st.markdown("<h3>Contacto</h3><p>Email: brandatta@brandatta.com.ar</p><p>Teléfono: +54 11 0000-0000</p><p>Dirección: Buenos Aires, Argentina</p>", unsafe_allow_html=True)
